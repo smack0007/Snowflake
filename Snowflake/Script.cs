@@ -2,32 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Snowsoft.Scripting
-{
-	public class ScriptException : ApplicationException
-	{
-		public ScriptException(string message)
-			: base(message)
-		{
-		}
-	}
-
+namespace Snowsoft.SnowflakeScript
+{	
 	public class Script
 	{
-		private List<Lexeme> lexemes;
-
-		bool debug = false;
+		List<Lexeme> lexemes;
+		VariableStack stack;
+		bool debug;
 
 		/// <summary>
 		/// If debug is true, debug message will be output.
 		/// </summary>
 		public bool Debug
 		{
-			get { return debug; }
-			set { debug = true; }
+			get { return this.debug; }
+			set { this.debug = true; }
 		}
-
-		VariableStack stack;
 
 		/// <summary>
 		/// Private constructor. Use static methods to construct instances.
@@ -35,7 +25,8 @@ namespace Snowsoft.Scripting
 		private Script(List<Lexeme> lexemes)
 		{
 			this.lexemes = lexemes;
-			stack = new VariableStack();
+			this.stack = new VariableStack();
+			this.debug = false;
 		}
 
 		/// <summary>
@@ -53,7 +44,7 @@ namespace Snowsoft.Scripting
 
 		public void DisplayLexemes()
 		{
-			for(int i = 0; i < lexemes.Count; i++)
+			for (int i = 0; i < lexemes.Count; i++)
 				OutputLine(i + " => " + lexemes[i]);
 		}
 
@@ -64,14 +55,14 @@ namespace Snowsoft.Scripting
 		{
 			int pos = 0;
 
-			while(lexemes[pos].Type != LexemeType.EOF)
+			while (lexemes[pos].Type != LexemeType.EOF)
 			{
-				if(debug)
+				if (this.debug)
 					OutputLine("Executing " + lexemes[pos]);
 				
 				Statement(ref pos);
 
-				if(lexemes[pos - 1].Type != LexemeType.CloseBrace)
+				if (lexemes[pos - 1].Type != LexemeType.CloseBrace)
 				{
 					if(lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
 						throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
@@ -83,16 +74,16 @@ namespace Snowsoft.Scripting
 
 		private Variable Statement(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Statement at " + pos);
 
 			Variable variable = null;
 
-			if(lexemes[pos].Type == LexemeType.Echo) // Echo keyword
+			if (lexemes[pos].Type == LexemeType.Echo) // Echo keyword
 			{
 				Echo(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.If)
+			else if (lexemes[pos].Type == LexemeType.If)
 			{
 				DoIf(ref pos);
 			}
@@ -129,7 +120,7 @@ namespace Snowsoft.Scripting
 
 		private void Echo(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Echo at " + pos);
 
 			//if(lexemes[pos].Type != LexemeType.Echo)
@@ -139,7 +130,7 @@ namespace Snowsoft.Scripting
 
 			Variable variable = Expression(ref pos);
 
-			if(variable != null)
+			if (variable != null)
 				OutputLine(variable.ToString());
 		}
 
@@ -156,29 +147,29 @@ namespace Snowsoft.Scripting
 		private void DoIf(ref int pos, bool skip)
 		{
 			pos++;
-			if(lexemes[pos].Type != LexemeType.OpenParen)
+			if (lexemes[pos].Type != LexemeType.OpenParen)
 				throw new ScriptException("'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
 			Variable variable = Expression(ref pos);
 
-			if(lexemes[pos].Type != LexemeType.CloseParen)
+			if (lexemes[pos].Type != LexemeType.CloseParen)
 				throw new ScriptException("')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
-			if(lexemes[pos].Type != LexemeType.OpenBrace)
+			if (lexemes[pos].Type != LexemeType.OpenBrace)
 				throw new ScriptException("'{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
-			if(variable.ToBoolean() && !skip)
+			if (variable.ToBoolean() && !skip)
 			{
 				stack.Push();
 
-				while(lexemes[pos].Type != LexemeType.CloseBrace)
+				while (lexemes[pos].Type != LexemeType.CloseBrace)
 				{
 					Statement(ref pos);
 
-					if(lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
+					if (lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
 						throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 					pos++;
@@ -188,55 +179,57 @@ namespace Snowsoft.Scripting
 
 				pos++;
 
-				if(lexemes[pos].Type == LexemeType.Else)
+				if (lexemes[pos].Type == LexemeType.Else)
 				{
 					pos++;
 
-					if(lexemes[pos].Type == LexemeType.If)
+					if (lexemes[pos].Type == LexemeType.If)
 					{
 						DoIf(ref pos, true);
 					}
-					else if(lexemes[pos].Type == LexemeType.OpenBrace)
+					else if (lexemes[pos].Type == LexemeType.OpenBrace)
 					{
 						pos++;
 
-						while(lexemes[pos].Type != LexemeType.CloseBrace)
+						while (lexemes[pos].Type != LexemeType.CloseBrace)
 							pos++;
 
 						pos++;
 					}
 					else
+					{
 						throw new ScriptException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					}
 				}
 			}
 			else
 			{
-				while(lexemes[pos].Type != LexemeType.CloseBrace)
+				while (lexemes[pos].Type != LexemeType.CloseBrace)
 					pos++;
 
 				pos++;
 
-				if(lexemes[pos].Type == LexemeType.Else)
+				if (lexemes[pos].Type == LexemeType.Else)
 				{
 					pos++;
 
-					if(lexemes[pos].Type == LexemeType.If)
+					if (lexemes[pos].Type == LexemeType.If)
 					{
 						DoIf(ref pos, skip);
 					}
-					else if(lexemes[pos].Type == LexemeType.OpenBrace)
+					else if (lexemes[pos].Type == LexemeType.OpenBrace)
 					{
 						pos++;
 
-						if(!skip)
+						if (!skip)
 						{
 							stack.Push();
 
-							while(lexemes[pos].Type != LexemeType.CloseBrace)
+							while (lexemes[pos].Type != LexemeType.CloseBrace)
 							{
 								Statement(ref pos);
 
-								if(lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
+								if (lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
 									throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 								pos++;
@@ -246,14 +239,16 @@ namespace Snowsoft.Scripting
 						}
 						else
 						{
-							while(lexemes[pos].Type != LexemeType.CloseBrace)
+							while (lexemes[pos].Type != LexemeType.CloseBrace)
 								pos++;
 						}
 
 						pos++;
 					}
 					else
+					{
 						throw new ScriptException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					}
 				}
 			}
 		}
@@ -268,12 +263,12 @@ namespace Snowsoft.Scripting
 
 		private Variable Expression(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Expression at " + pos);
 
 			Variable variable = null;
 
-			if(lexemes[pos].Type == LexemeType.Variable)
+			if (lexemes[pos].Type == LexemeType.Variable)
 			{
 				variable = Variable(ref pos);
 
@@ -292,61 +287,61 @@ namespace Snowsoft.Scripting
 					pos++;
 				}
 			}
-			else if(lexemes[pos].Type == LexemeType.Null)
+			else if (lexemes[pos].Type == LexemeType.Null)
 			{
 				variable = Null(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.True || lexemes[pos].Type == LexemeType.False)
+			else if (lexemes[pos].Type == LexemeType.True || lexemes[pos].Type == LexemeType.False)
 			{
 				variable = Boolean(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.String)
+			else if (lexemes[pos].Type == LexemeType.String)
 			{
 				variable = String(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.MagicString)
+			else if (lexemes[pos].Type == LexemeType.MagicString)
 			{
 				variable = MagicString(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.Integer)
+			else if (lexemes[pos].Type == LexemeType.Integer)
 			{
 				variable = Integer(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.Float)
+			else if (lexemes[pos].Type == LexemeType.Float)
 			{
 				variable = Float(ref pos);
 			}
-			else if(lexemes[pos].Type == LexemeType.Array)
+			else if (lexemes[pos].Type == LexemeType.Array)
 			{
 				variable = Array(ref pos);
 			}
 
-			if(lexemes[pos].Type == LexemeType.Gets)
+			if (lexemes[pos].Type == LexemeType.Gets)
 			{
 				pos++;
 				variable.Gets(Expression(ref pos));
 			}
-			else if(lexemes[pos].Type == LexemeType.Plus)
+			else if (lexemes[pos].Type == LexemeType.Plus)
 			{
 				pos++;
 				variable = variable.Add(Expression(ref pos));
 			}
-			else if(lexemes[pos].Type == LexemeType.PlusGets)
+			else if (lexemes[pos].Type == LexemeType.PlusGets)
 			{
 				pos++;
 				variable.Gets(variable.Add(Expression(ref pos)));
 			}
-			else if(lexemes[pos].Type == LexemeType.Minus)
+			else if (lexemes[pos].Type == LexemeType.Minus)
 			{
 				pos++;
 				variable = variable.Subtract(Expression(ref pos));
 			}
-			else if(lexemes[pos].Type == LexemeType.MinusGets)
+			else if (lexemes[pos].Type == LexemeType.MinusGets)
 			{
 				pos++;
 				variable.Gets(variable.Subtract(Expression(ref pos)));
 			}
-			else if(lexemes[pos].Type == LexemeType.EqualTo)
+			else if (lexemes[pos].Type == LexemeType.EqualTo)
 			{
 				pos++;
 				variable = variable.EqualTo(Expression(ref pos));
@@ -362,7 +357,7 @@ namespace Snowsoft.Scripting
 		/// <returns>ScriptVariable</returns>
 		private Variable Variable(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Variable at " + pos);
 
 			//if(lexemes[pos].Type != LexemeType.Variable)
@@ -372,7 +367,7 @@ namespace Snowsoft.Scripting
 
 			Variable variable = null;
 
-			if(lexemes[pos].Type == LexemeType.Identifier)
+			if (lexemes[pos].Type == LexemeType.Identifier)
 			{
 				variable = stack[lexemes[pos].Val];
 			}
@@ -383,7 +378,7 @@ namespace Snowsoft.Scripting
 
 		private Variable Null(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Null at " + pos);
 
 			pos++;
@@ -392,11 +387,11 @@ namespace Snowsoft.Scripting
 
 		private Variable Boolean(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Boolean at " + pos);
 
 			pos++;
-			if(lexemes[pos - 1].Type == LexemeType.True)
+			if (lexemes[pos - 1].Type == LexemeType.True)
 				return new Variable(true);
 			else
 				return new Variable(false);
@@ -404,7 +399,7 @@ namespace Snowsoft.Scripting
 
 		private Variable String(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("String at " + pos);
 
 			return new Variable(lexemes[pos++].Val);
@@ -412,7 +407,7 @@ namespace Snowsoft.Scripting
 
 		private Variable MagicString(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("MagicString at " + pos);
 
 			string output = lexemes[pos++].Val;
@@ -422,7 +417,7 @@ namespace Snowsoft.Scripting
 
 		private Variable Integer(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Integer at " + pos);
 						
 			return new Variable(Int32.Parse(lexemes[pos++].Val));
@@ -430,7 +425,7 @@ namespace Snowsoft.Scripting
 
 		private Variable Float(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Float at " + pos);
 
 			return new Variable(Double.Parse(lexemes[pos++].Val));
@@ -438,7 +433,7 @@ namespace Snowsoft.Scripting
 
 		private Variable Array(ref int pos)
 		{
-			if(debug)
+			if (this.debug)
 				OutputLine("Array at " + pos);
 
 			pos++;
@@ -449,9 +444,9 @@ namespace Snowsoft.Scripting
 			pos++;
 
 			int i = 0;
-			while(lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
+			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{
-				if(lexemes[pos + 1].Type != LexemeType.MapsTo) // No key specified
+				if (lexemes[pos + 1].Type != LexemeType.MapsTo) // No key specified
 				{
 					values.Add((i++).ToString(), Expression(ref pos));
 				}
@@ -468,7 +463,7 @@ namespace Snowsoft.Scripting
 					pos++;
 			}
 
-			if(lexemes[pos].Type != LexemeType.CloseParen)
+			if (lexemes[pos].Type != LexemeType.CloseParen)
 				throw new ScriptException("')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;

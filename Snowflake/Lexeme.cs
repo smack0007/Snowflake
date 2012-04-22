@@ -1,29 +1,33 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.Scripting
+namespace Snowsoft.SnowflakeScript
 {
-	public enum LexemeType
-	{
-		Unknown = 0, // Null
-		String, MagicString, // '' and "" strings
-		Identifier, // Identifier
-		If, Else, While, For, ForEach, As, Echo, Null, True, False, Array, // Keywords
-		Numeric, Integer, Float, // Numerics
-		EndStatement, Variable, Period, Comma, OpenParen, CloseParen, OpenBracket, CloseBracket, OpenBrace, CloseBrace, // Symbols
-		Gets, Not, EqualTo, NotEqualTo, // Symbols
-		Plus, PlusGets, Minus, MinusGets, Multiply, MultiplyGets, Divide, DivideGets, // Symbols
-		And, Or,
-		MapsTo, // Symbols
-		EOF
-	};
-
 	public class Lexeme
 	{
-		public LexemeType Type;
-		public string Val;
+		public LexemeType Type
+		{
+			get;
+			set;
+		}
 
-		public int Line, Column;
+		public string Val
+		{
+			get;
+			set;
+		}
+
+		public int Line
+		{
+			get;
+			set;
+		}
+
+		public int Column
+		{
+			get;
+			set;
+		}
 
 		public Lexeme(LexemeType type, string val)
 			: this(type, val, 0, 0)

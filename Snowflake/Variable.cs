@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.Scripting
+namespace Snowsoft.SnowflakeScript
 {
 	public class VariableException : ApplicationException
 	{
@@ -9,16 +9,6 @@ namespace Snowsoft.Scripting
 			: base(message)
 		{
 		}
-	}
-
-	public enum VariableType
-	{
-		Null = 0,
-		Boolean,
-		String,
-		Integer,
-		Float,
-		Array
 	}
 
 	public class Variable

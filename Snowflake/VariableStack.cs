@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.Scripting
+namespace Snowsoft.SnowflakeScript
 {
 	public class VariableStackException : ApplicationException
 	{
@@ -23,9 +23,9 @@ namespace Snowsoft.Scripting
 			get
 			{
 				// See if it's currently anywhere in the stack
-				for(int i = stack.Count - 1; i >= 0; i--)
+				for (int i = stack.Count - 1; i >= 0; i--)
 				{
-					if(stack[i].ContainsKey(name))
+					if (stack[i].ContainsKey(name))
 						return stack[i][name];
 				}
 
@@ -55,7 +55,7 @@ namespace Snowsoft.Scripting
 		/// </summary>
 		public void Pop()
 		{
-			if(stack.Count == 1)
+			if (stack.Count == 1)
 				throw new VariableStackException("The stack is not greater than 1");
 
 			stack.RemoveAt(stack.Count - 1);
