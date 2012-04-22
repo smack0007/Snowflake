@@ -52,19 +52,19 @@ namespace Snowsoft.SnowflakeScript
 			return "{" + Type + ", " + Val + ", " + Line + ", " + Column + "}";
 		}
 
-		public static List<Lexeme> Parse(ref string text)
+		public static List<Lexeme> Parse(string text)
 		{
 			List<Lexeme> lexemes = new List<Lexeme>();
 
 			text += '\n'; // Ensure new line at EOF
 
-			bool output = false;
-			string value = "";
-			LexemeType type = LexemeType.Unknown;
+			bool output = false; // If true, write the lexeme.
+			string value = ""; // The current value of the lexeme.
+			LexemeType type = LexemeType.Unknown; 
 			bool isFloat = false; // For parsing numbers
 
-			int line = 1, column = 1;
-			int curLine = 1, curColumn = 1;
+			int line = 1, column = 1; // Current position of the lexeme being parsed.
+			int curLine = 1, curColumn = 1; // Current position of parsing.
 
 			for(int i = 0; i < text.Length - 1; i++, curColumn++)
 			{
@@ -76,7 +76,7 @@ namespace Snowsoft.SnowflakeScript
 
 				if(type == LexemeType.Unknown) // We're looking for a lexeme
 				{
-					if(Char.IsWhiteSpace(text[i])) // Skip over white space
+					if(char.IsWhiteSpace(text[i])) // Skip over white space
 					{
 						continue;
 					}
@@ -203,20 +203,20 @@ namespace Snowsoft.SnowflakeScript
 					}
 					else if(text[i] == '&' && text[i + 1] == '&') // And
 					{
-						lexemes.Add(new Lexeme(LexemeType.And, null, curLine, curColumn));
+						lexemes.Add(new Lexeme(LexemeType.LogicalAnd, null, curLine, curColumn));
 						i++;
 					}
 					else if(text[i] == '|' && text[i + 1] == '|') // Or
 					{
-						lexemes.Add(new Lexeme(LexemeType.And, null, curLine, curColumn));
+						lexemes.Add(new Lexeme(LexemeType.LogicalOr, null, curLine, curColumn));
 						i++;
 					}
-					else if(Char.IsLetter(text[i]) || text[i] == '_') // Identifier
+					else if(char.IsLetter(text[i]) || text[i] == '_') // Identifier
 					{
 						type = LexemeType.Identifier;
 						value += text[i];
 					}
-					else if(Char.IsNumber(text[i])) // Numeric
+					else if(char.IsNumber(text[i])) // Numeric
 					{
 						type = LexemeType.Numeric;
 						value += text[i];
@@ -270,33 +270,58 @@ namespace Snowsoft.SnowflakeScript
 				{
 					if(type == LexemeType.Identifier)
 					{
-						string valueUpper = value.ToUpper();
+						string valueToUpper = value.ToUpper();
 
-						// Check for keywords first, otherwise it's an identifier
-						if(valueUpper == "IF")
-							lexemes.Add(new Lexeme(LexemeType.If, null, line, column));
-						else if(valueUpper == "ELSE")
-							lexemes.Add(new Lexeme(LexemeType.Else, null, line, column));
-						else if(valueUpper == "WHILE")
-							lexemes.Add(new Lexeme(LexemeType.While, null, line, column));
-						else if(valueUpper == "FOR")
-							lexemes.Add(new Lexeme(LexemeType.For, null, line, column));
-						else if(valueUpper == "FOREACH")
-							lexemes.Add(new Lexeme(LexemeType.ForEach, null, line, column));
-						else if(valueUpper == "AS")
-							lexemes.Add(new Lexeme(LexemeType.As, null, line, column));
-						else if(valueUpper == "ECHO")
-							lexemes.Add(new Lexeme(LexemeType.Echo, null, line, column));
-						else if(valueUpper == "NULL")
-							lexemes.Add(new Lexeme(LexemeType.Null, null, line, column));
-						else if(valueUpper == "TRUE")
-							lexemes.Add(new Lexeme(LexemeType.True, null, line, column));
-						else if(valueUpper == "FALSE")
-							lexemes.Add(new Lexeme(LexemeType.False, null, line, column));
-						else if(valueUpper == "ARRAY")
-							lexemes.Add(new Lexeme(LexemeType.Array, null, line, column));
-						else // It's an identifier
-							lexemes.Add(new Lexeme(type, value, line, column));
+						switch (valueToUpper)
+						{
+							case "IF":
+								lexemes.Add(new Lexeme(LexemeType.If, null, line, column));
+								break;
+
+							case "ELSE":
+								lexemes.Add(new Lexeme(LexemeType.Else, null, line, column));
+								break;
+
+							case "WHILE":
+								lexemes.Add(new Lexeme(LexemeType.While, null, line, column));
+								break;
+
+							case "FOR":
+								lexemes.Add(new Lexeme(LexemeType.For, null, line, column));
+								break;
+
+							case "FOREACH":
+								lexemes.Add(new Lexeme(LexemeType.ForEach, null, line, column));
+								break;
+
+							case "AS":
+								lexemes.Add(new Lexeme(LexemeType.As, null, line, column));
+								break;
+
+							case "ECHO":
+								lexemes.Add(new Lexeme(LexemeType.Echo, null, line, column));
+								break;
+
+							case "NULL":
+								lexemes.Add(new Lexeme(LexemeType.Null, null, line, column));
+								break;
+
+							case "TRUE":
+								lexemes.Add(new Lexeme(LexemeType.True, null, line, column));
+								break;
+
+							case "FALSE":
+								lexemes.Add(new Lexeme(LexemeType.False, null, line, column));
+								break;
+
+							case "ARRAY":
+								lexemes.Add(new Lexeme(LexemeType.Array, null, line, column));
+								break;
+
+							default:
+								lexemes.Add(new Lexeme(type, value, line, column));
+								break;
+						}						
 					}
 					else if(type == LexemeType.Numeric)
 					{
@@ -323,6 +348,7 @@ namespace Snowsoft.SnowflakeScript
 				}
 			}
 
+			// Add an EOF to mark the end of the script.
 			lexemes.Add(new Lexeme(LexemeType.EOF, null, line, column));
 
 			return lexemes;

@@ -4,6 +4,9 @@ namespace Snowsoft.SnowflakeScript
 {
 	public enum LexemeType
 	{
+		/// <summary>
+		/// Used internally to indicate we're currently looking for a lexeme.
+		/// </summary>
 		Unknown = 0,
 
 		/// <summary>
@@ -76,7 +79,9 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		Array,
 
-
+		/// <summary>
+		/// Unidentified numeric value. This should not be output.
+		/// </summary>
 		Numeric,
 		
 		/// <summary>
@@ -89,16 +94,134 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		Float,
 
-		EndStatement, Variable, Period, Comma, OpenParen, CloseParen, OpenBracket, CloseBracket, OpenBrace, CloseBrace, // Symbols
+		/// <summary>
+		/// ;
+		/// </summary>
+		EndStatement,
+		
+		/// <summary>
+		/// $
+		/// </summary>
+		Variable,
+		
+		/// <summary>
+		/// .
+		/// </summary>
+		Period,
+		
+		/// <summary>
+		/// ,
+		/// </summary>
+		Comma,
+		
+		/// <summary>
+		/// (
+		/// </summary>
+		OpenParen,
+		
+		/// <summary>
+		/// )
+		/// </summary>
+		CloseParen,
+		
+		/// <summary>
+		/// {
+		/// </summary>
+		OpenBracket,
+		
+		/// <summary>
+		/// }
+		/// </summary>
+		CloseBracket,
+		
+		/// <summary>
+		/// [
+		/// </summary>
+		OpenBrace,
+		
+		/// <summary>
+		/// ]
+		/// </summary>
+		CloseBrace,
 
-		Gets, Not, EqualTo, NotEqualTo, // Symbols
+		/// <summary>
+		/// =
+		/// </summary>
+		Gets,
+		
+		/// <summary>
+		/// !
+		/// </summary>
+		Not,
+		
+		/// <summary>
+		/// ==
+		/// </summary>
+		EqualTo,
+		
+		/// <summary>
+		/// !=
+		/// </summary>
+		NotEqualTo,
 
-		Plus, PlusGets, Minus, MinusGets, Multiply, MultiplyGets, Divide, DivideGets, // Symbols
+		/// <summary>
+		/// +
+		/// </summary>
+		Plus,
+		
+		/// <summary>
+		/// +=
+		/// </summary>
+		PlusGets,
+		
+		/// <summary>
+		/// -
+		/// </summary>
+		Minus,
+		
+		/// <summary>
+		/// -=
+		/// </summary>
+		MinusGets,
+		
+		/// <summary>
+		/// *
+		/// </summary>
+		Multiply,
+		
+		/// <summary>
+		/// *=
+		/// </summary>
+		MultiplyGets,
+		
+		/// <summary>
+		/// /
+		/// </summary>
+		Divide,
+		
+		/// <summary>
+		/// /=
+		/// </summary>
+		DivideGets,
 
-		And, Or,
+		/// <summary>
+		/// &&
+		/// </summary>
+		LogicalAnd,
+		
+		/// <summary>
+		/// ||
+		/// </summary>
+		LogicalOr,
 
-		MapsTo, // Symbols
+		/// <summary>
+		/// =>
+		/// </summary>
+		MapsTo,
 
+		/// <summary>
+		/// Used to indicate the end of a list of Lexemes.
+		/// </summary>
 		EOF
 	};
 }

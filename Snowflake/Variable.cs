@@ -3,80 +3,68 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript
 {
-	public class VariableException : ApplicationException
-	{
-		public VariableException(string message)
-			: base(message)
-		{
-		}
-	}
-
 	public class Variable
 	{
-		object val;
-
 		public object Val
 		{
-			get { return val; }
-			set { val = value; }
+			get;
+			set;
 		}
 
-		VariableType type;
-
-		VariableType Type
+		public VariableType Type
 		{
-			get { return type; }
-			set { type = value; }
+			get;
+			set;
 		}			
 
 		public Variable()
 		{
-			this.type = VariableType.Null;
+			this.Type = VariableType.Null;
 		}
 
 		public Variable(bool val)
 		{
-			this.val = val;
-			this.type = VariableType.Boolean;
+			this.Val = val;
+			this.Type = VariableType.Boolean;
 		}
 
 		public Variable(string val)
 		{
-			this.val = val;
-			this.type = VariableType.String;
+			this.Val = val;
+			this.Type = VariableType.String;
 		}
 
 		public Variable(int val)
 		{
-			this.val = val;
-			this.type = VariableType.Integer;
+			this.Val = val;
+			this.Type = VariableType.Integer;
 		}
 
 		public Variable(double val)
 		{
-			this.val = val;
-			this.type = VariableType.Float;
+			this.Val = val;
+			this.Type = VariableType.Float;
 		}
 
 		public Variable(Dictionary<string, Variable> val)
 		{
-			this.val = val;
-			this.type = VariableType.Array;
+			this.Val = val;
+			this.Type = VariableType.Array;
 		}
 
 		public void Gets(Variable variable)
 		{
-			this.val = variable.val;
-			this.type = variable.type;
+			this.Val = variable.Val;
+			this.Type = variable.Type;
 		}
 
 		public Variable Add(Variable variable)
 		{
-			if(type == VariableType.String)
+			if(this.Type == VariableType.String)
 			{
 				return new Variable(this.ToString() + variable.ToString());
 			}
-			if(type == VariableType.Integer)
+			if(this.Type == VariableType.Integer)
 			{
 				if(variable.Type == VariableType.Integer) // Integer to Integer Addition
 				{
@@ -87,17 +75,17 @@ namespace Snowsoft.SnowflakeScript
 					return new Variable(this.ToFloat() + variable.ToFloat());
 				}
 			}
-			else if(type == VariableType.Float)
+			else if(this.Type == VariableType.Float)
 			{
 				return new Variable(this.ToFloat() + variable.ToFloat());
 			}
 
-			throw new VariableException("Add not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "Add not available for type " + this.Type.ToString());
 		}
 
 		public Variable Subtract(Variable variable)
 		{
-			if(type == VariableType.Integer)
+			if(this.Type == VariableType.Integer)
 			{
 				if(variable.Type == VariableType.Integer) // Integer to Integer Subtraction
 				{
@@ -108,47 +96,49 @@ namespace Snowsoft.SnowflakeScript
 					return new Variable(this.ToFloat() - variable.ToFloat());
 				}
 			}
-			else if(type == VariableType.Float)
+			else if(this.Type == VariableType.Float)
 			{
 				return new Variable(this.ToFloat() - variable.ToFloat());
 			}
 
-			throw new VariableException("Subtract not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "Subtract not available for type " + this.Type.ToString());
 		}
 
 		public Variable EqualTo(Variable variable)
 		{
-			if(type == VariableType.Integer)
+			if(this.Type == VariableType.Integer)
 			{
 				return new Variable(this.ToInteger() == variable.ToInteger());
 			}
-			else if(type == VariableType.Float)
+			else if(this.Type == VariableType.Float)
 			{
 				return new Variable(this.ToFloat() == variable.ToFloat());
 			}
-			else if(type == VariableType.String)
+			else if(this.Type == VariableType.String)
 			{
 				return new Variable(this.ToString() == variable.ToString());
 			}
 
-			throw new VariableException("EqualTo not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "EqualTo not available for type " + this.Type.ToString());
 		}
 
 		public Variable AtIndex(Variable index)
 		{
 			if(this.Type != VariableType.Array)
-				throw new VariableException("Variable is not an array");
+				throw new ScriptException(ScriptError.OperationNotAvailable, "Variable is not an array");
 
 			if(index != null) // Key was specified
 			{
 				string key = index.ToString();
 
-				if(((Dictionary<string, Variable>)val).ContainsKey(key))
-					return ((Dictionary<string, Variable>)val)[key];
+				if (((Dictionary<string, Variable>)this.Val).ContainsKey(key))
+				{
+					return ((Dictionary<string, Variable>)this.Val)[key];
+				}
 				else
 				{
 					Variable variable = new Variable();
-					((Dictionary<string, Variable>)val).Add(key, variable);
+					((Dictionary<string, Variable>)this.Val).Add(key, variable);
 
 					return variable;
 				}
@@ -157,7 +147,7 @@ namespace Snowsoft.SnowflakeScript
 			{
 				Variable variable = new Variable();
 
-				((Dictionary<string, Variable>)val).Add(((Dictionary<string, Variable>)val).Count.ToString(), variable);
+				((Dictionary<string, Variable>)this.Val).Add(((Dictionary<string, Variable>)this.Val).Count.ToString(), variable);
 
 				return variable;
 			}
@@ -165,11 +155,11 @@ namespace Snowsoft.SnowflakeScript
 
 		public bool ToBoolean()
 		{
-			if(type == VariableType.Null)
+			if(this.Type == VariableType.Null)
 				return false;
-			else if(type == VariableType.Boolean)
-				return (bool)val;
-			else if(type == VariableType.String)
+			else if(this.Type == VariableType.Boolean)
+				return (bool)this.Val;
+			else if(this.Type == VariableType.String)
 			{
 				string s = this.ToString().ToUpper();
 
@@ -182,7 +172,7 @@ namespace Snowsoft.SnowflakeScript
 					return false;
 				}
 			}
-			else if(type == VariableType.Integer)
+			else if(this.Type == VariableType.Integer)
 			{
 				int i = this.ToInteger();
 
@@ -191,7 +181,7 @@ namespace Snowsoft.SnowflakeScript
 
 				return true;
 			}
-			else if(type == VariableType.Float)
+			else if(this.Type == VariableType.Float)
 			{
 				double f = this.ToFloat();
 
@@ -201,29 +191,39 @@ namespace Snowsoft.SnowflakeScript
 				return true;
 			}
 
-			throw new VariableException("Boolean conversion not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "Boolean conversion not available for type " + this.Type.ToString());
 		}
 
 		public override string ToString()
 		{
-			if(type == VariableType.Null)
-				return "Null";
-			else if(type == VariableType.Boolean)
-				return ((bool)val).ToString();
-			else if(type == VariableType.String)
-				return (string)val;
-			else if(type == VariableType.Integer)
-				return ((int)val).ToString();
-			else if(type == VariableType.Float)
-				return ((double)val).ToString();
-			else if(type == VariableType.Array)
+			if (this.Type == VariableType.Null)
 			{
-				Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)val);
+				return "Null";
+			}
+			else if (this.Type == VariableType.Boolean)
+			{
+				return ((bool)this.Val).ToString();
+			}
+			else if (this.Type == VariableType.String)
+			{
+				return (string)this.Val;
+			}
+			else if (this.Type == VariableType.Integer)
+			{
+				return ((int)this.Val).ToString();
+			}
+			else if (this.Type == VariableType.Float)
+			{
+				return ((double)this.Val).ToString();
+			}
+			else if (this.Type == VariableType.Array)
+			{
+				Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)this.Val);
 
 				string s = "";
-				foreach(string key in dictionary.Keys)
+				foreach (string key in dictionary.Keys)
 				{
-					if(s != "")
+					if (s != "")
 						s += ", ";
 
 					s += key + " => " + dictionary[key];
@@ -232,29 +232,39 @@ namespace Snowsoft.SnowflakeScript
 				return '{' + s + '}';
 			}
 
-			throw new VariableException("String conversion not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "String conversion not available for type " + this.Type.ToString());
 		}
 
 		public int ToInteger()
 		{
-			if(type == VariableType.Null)
+			if (this.Type == VariableType.Null)
+			{
 				return 0;
-			else if(type == VariableType.Integer || type == VariableType.Float)
-				return (int)val;
+			}
+			else if (this.Type == VariableType.Integer || this.Type == VariableType.Float)
+			{
+				return (int)this.Val;
+			}
 
-			throw new VariableException("Integer conversion not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "Integer conversion not available for type " + this.Type.ToString());
 		}
 
 		public double ToFloat()
 		{
-			if(type == VariableType.Null)
+			if (this.Type == VariableType.Null)
+			{
 				return 0;
-			else if(type == VariableType.Integer)
-				return (double)val;
-			else if(type == VariableType.Float)
-				return (double)val;
+			}
+			else if (this.Type == VariableType.Integer)
+			{
+				return (double)this.Val;
+			}
+			else if (this.Type == VariableType.Float)
+			{
+				return (double)this.Val;
+			}
 
-			throw new VariableException("Float conversion not available for type " + type.ToString());
+			throw new ScriptException(ScriptError.OperationNotAvailable, "Float conversion not available for type " + this.Type.ToString());
 		}
 	}
 }

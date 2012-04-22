@@ -39,7 +39,7 @@ namespace Snowsoft.SnowflakeScript
 			StreamReader sr = File.OpenText(filename);
 			string text = sr.ReadToEnd();
 			
-			return new Script(Lexeme.Parse(ref text));
+			return new Script(Lexeme.Parse(text));
 		}	
 
 		public void DisplayLexemes()
@@ -64,8 +64,8 @@ namespace Snowsoft.SnowflakeScript
 
 				if (lexemes[pos - 1].Type != LexemeType.CloseBrace)
 				{
-					if(lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
-						throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					if (lexemes[pos].Type != LexemeType.EndStatement)
+						throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 					pos++;
 				}
@@ -148,17 +148,17 @@ namespace Snowsoft.SnowflakeScript
 		{
 			pos++;
 			if (lexemes[pos].Type != LexemeType.OpenParen)
-				throw new ScriptException("'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+				throw new ScriptException(ScriptError.SyntaxError, "'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
 			Variable variable = Expression(ref pos);
 
 			if (lexemes[pos].Type != LexemeType.CloseParen)
-				throw new ScriptException("')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+				throw new ScriptException(ScriptError.SyntaxError, "')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
 			if (lexemes[pos].Type != LexemeType.OpenBrace)
-				throw new ScriptException("'{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+				throw new ScriptException(ScriptError.SyntaxError, "'{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
 			if (variable.ToBoolean() && !skip)
@@ -169,8 +169,8 @@ namespace Snowsoft.SnowflakeScript
 				{
 					Statement(ref pos);
 
-					if (lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
-						throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					if (lexemes[pos].Type != LexemeType.EndStatement)
+						throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 					pos++;
 				}
@@ -198,7 +198,7 @@ namespace Snowsoft.SnowflakeScript
 					}
 					else
 					{
-						throw new ScriptException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+						throw new ScriptException(ScriptError.SyntaxError, "'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 					}
 				}
 			}
@@ -230,7 +230,7 @@ namespace Snowsoft.SnowflakeScript
 								Statement(ref pos);
 
 								if (lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
-									throw new ScriptException("; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+									throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 								pos++;
 							}
@@ -247,7 +247,7 @@ namespace Snowsoft.SnowflakeScript
 					}
 					else
 					{
-						throw new ScriptException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+						throw new ScriptException(ScriptError.SyntaxError, "'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 					}
 				}
 			}
@@ -282,7 +282,7 @@ namespace Snowsoft.SnowflakeScript
 						variable = variable.AtIndex(null); // Request next key
 
 					if(lexemes[pos].Type != LexemeType.CloseBracket)
-						throw new ScriptException("']' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+						throw new ScriptException(ScriptError.SyntaxError, "']' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 					pos++;
 				}
@@ -438,7 +438,7 @@ namespace Snowsoft.SnowflakeScript
 
 			pos++;
 			if(lexemes[pos].Type != LexemeType.OpenParen)
-				throw new ScriptException("'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+				throw new ScriptException(ScriptError.SyntaxError, "'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			Dictionary<string, Variable> values = new Dictionary<string, Variable>();
 			pos++;
@@ -464,7 +464,7 @@ namespace Snowsoft.SnowflakeScript
 			}
 
 			if (lexemes[pos].Type != LexemeType.CloseParen)
-				throw new ScriptException("')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+				throw new ScriptException(ScriptError.SyntaxError, "')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 
 			pos++;
 			return new Variable(values);

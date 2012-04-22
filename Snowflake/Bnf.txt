@@ -1,14 +1,27 @@
 Script => EOF | Statement [;]
+
 Statement => Echo | If | Expression
+
 Echo => [echo] Expression
+
 Expression => Variable {Operation Expression} | Null | String | MagicString | Integer | Float | Array
+
 Variable => [$] Identifier
+
 Operation => [=] | [+] | [-] | [*] | [/] 
+
 Null => [null]
+
 String => ['][.]*[']
+
 MagicString => ["][.]*["]
+
 Identifier => [A-Za-z_][A-Za-z0-9_]*
+
 Integer => [1-9]*
+
 Float => [1-9]*[.][1-9*]
+
 Array => [array] [(] ({Statement [=][>]} Statement [,])* ({Statement [=][>]} Statement)* [)]
+
 If => [if] [(] Expression [)] [{] Statement(s) [}] ( [else] [{] Statement(s) [}] )

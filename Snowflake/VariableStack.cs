@@ -3,14 +3,6 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript
 {
-	public class VariableStackException : ApplicationException
-	{
-		public VariableStackException(string message)
-			: base(message)
-		{
-		}
-	}
-
 	/// <summary>
 	/// Represents a stack.
 	/// </summary>
@@ -23,23 +15,23 @@ namespace Snowsoft.SnowflakeScript
 			get
 			{
 				// See if it's currently anywhere in the stack
-				for (int i = stack.Count - 1; i >= 0; i--)
+				for (int i = this.stack.Count - 1; i >= 0; i--)
 				{
-					if (stack[i].ContainsKey(name))
-						return stack[i][name];
+					if (this.stack[i].ContainsKey(name))
+						return this.stack[i][name];
 				}
 
 				// We didn't find the variable so add it to the top of the stack
 				Variable variable = new Variable();
-				stack[stack.Count - 1].Add(name, variable);
+				this.stack[stack.Count - 1].Add(name, variable);
 				return variable;
 			}
 		}
 
 		public VariableStack()
 		{
-			stack = new List<Dictionary<string, Variable>>();
-			stack.Add(new Dictionary<string, Variable>());
+			this.stack = new List<Dictionary<string, Variable>>();
+			this.stack.Add(new Dictionary<string, Variable>());
 		}
 
 		/// <summary>
@@ -47,7 +39,7 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		public void Push()
 		{
-			stack.Add(new Dictionary<string, Variable>());
+			this.stack.Add(new Dictionary<string, Variable>());
 		}
 
 		/// <summary>
@@ -55,10 +47,10 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		public void Pop()
 		{
-			if (stack.Count == 1)
-				throw new VariableStackException("The stack is not greater than 1");
+			if (this.stack.Count == 1)
+				throw new ScriptException(ScriptError.StackError, "Cannot pop as the stack size is only 1.");
 
-			stack.RemoveAt(stack.Count - 1);
+			this.stack.RemoveAt(this.stack.Count - 1);
 		}
 	}
 }
