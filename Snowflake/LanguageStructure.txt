@@ -12,7 +12,9 @@ Echo : [echo] Expression
 
 If : [if] [(] Expression [)] [{] { Statement } [}] | [if] [(] Expression [)] [{] { Statement } [}] [else] [{] { Statement } [}]
 
-Expression : Variable | Variable Operation Expression | Null | String | MagicString | Integer | Float | Array | List
+Expression : FuncCall | Variable | Variable Operation Expression | Null | String | MagicString | Integer | Float | Array | List
+
+FuncCall : Identifier [(] { Expression [,]! } [)]
 
 Operation : [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
 

@@ -152,12 +152,17 @@ namespace Snowsoft.SnowflakeScript
 		/// <summary>
 		/// Execute the script.
 		/// </summary>
-		public void Execute()
-		{			
-			if (!this.funcs.ContainsKey("Main"))
-				throw new ScriptException(ScriptError.FunctionDoesNotExist, "No Main() func found.");
+		public Variable Execute()
+		{
+			return this.Execute("Main");
+		}
 
-			FuncInfo funcInfo = this.funcs["Main"];
+		public Variable Execute(string funcName)
+		{
+			if (!this.funcs.ContainsKey(funcName))
+				throw new ScriptException(ScriptError.FunctionDoesNotExist, "No function found by the name " + funcName + ".");
+
+			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
 
 			pos++;
@@ -165,6 +170,8 @@ namespace Snowsoft.SnowflakeScript
 			{
 				Statement(ref pos);
 			}
+
+			return null; // TODO: Implement this.
 		}
 
 		private Variable Statement(ref int pos)
@@ -341,7 +348,11 @@ namespace Snowsoft.SnowflakeScript
 
 			Variable variable = null;
 
-			if (lexemes[pos].Type == LexemeType.Variable)
+			if (lexemes[pos].Type == LexemeType.Identifier)
+			{
+				FuncCall(ref pos);
+			}
+			else if (lexemes[pos].Type == LexemeType.Variable)
 			{
 				variable = Variable(ref pos);
 
@@ -354,10 +365,43 @@ namespace Snowsoft.SnowflakeScript
 					else
 						variable = variable.AtIndex(null); // Request next key
 
-					if(lexemes[pos].Type != LexemeType.CloseBracket)
-						throw new ScriptException(ScriptError.SyntaxError, "']' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					if (lexemes[pos].Type != LexemeType.CloseBracket)
+						this.EnsureLexemeType(LexemeType.CloseBracket, pos);
 
 					pos++;
+				}
+
+				// Check for operations
+
+				if (lexemes[pos].Type == LexemeType.Gets)
+				{
+					pos++;
+					variable.Gets(Expression(ref pos));
+				}
+				else if (lexemes[pos].Type == LexemeType.Plus)
+				{
+					pos++;
+					variable = variable.Add(Expression(ref pos));
+				}
+				else if (lexemes[pos].Type == LexemeType.PlusGets)
+				{
+					pos++;
+					variable.Gets(variable.Add(Expression(ref pos)));
+				}
+				else if (lexemes[pos].Type == LexemeType.Minus)
+				{
+					pos++;
+					variable = variable.Subtract(Expression(ref pos));
+				}
+				else if (lexemes[pos].Type == LexemeType.MinusGets)
+				{
+					pos++;
+					variable.Gets(variable.Subtract(Expression(ref pos)));
+				}
+				else if (lexemes[pos].Type == LexemeType.EqualTo)
+				{
+					pos++;
+					variable = variable.EqualTo(Expression(ref pos));
 				}
 			}
 			else if (lexemes[pos].Type == LexemeType.Null)
@@ -389,38 +433,35 @@ namespace Snowsoft.SnowflakeScript
 				variable = Array(ref pos);
 			}
 
-			if (lexemes[pos].Type == LexemeType.Gets)
-			{
-				pos++;
-				variable.Gets(Expression(ref pos));
-			}
-			else if (lexemes[pos].Type == LexemeType.Plus)
-			{
-				pos++;
-				variable = variable.Add(Expression(ref pos));
-			}
-			else if (lexemes[pos].Type == LexemeType.PlusGets)
-			{
-				pos++;
-				variable.Gets(variable.Add(Expression(ref pos)));
-			}
-			else if (lexemes[pos].Type == LexemeType.Minus)
-			{
-				pos++;
-				variable = variable.Subtract(Expression(ref pos));
-			}
-			else if (lexemes[pos].Type == LexemeType.MinusGets)
-			{
-				pos++;
-				variable.Gets(variable.Subtract(Expression(ref pos)));
-			}
-			else if (lexemes[pos].Type == LexemeType.EqualTo)
-			{
-				pos++;
-				variable = variable.EqualTo(Expression(ref pos));
-			}
-
 			return variable;
+		}
+
+		private Variable FuncCall(ref int pos)
+		{
+			this.EnsureLexemeType(LexemeType.Identifier, pos);
+			string funcName = this.lexemes[pos].Val;
+
+			pos++;
+			this.EnsureLexemeType(LexemeType.OpenParen, pos);
+
+			pos++;
+			List<Variable> args = new List<Variable>();
+
+			while (this.lexemes[pos].Type == LexemeType.Variable)
+			{
+				args.Add(this.Expression(ref pos));
+
+				if (this.lexemes[pos].Type == LexemeType.Comma)
+					pos++;
+			}
+			
+			// TODO: Check the arg count and execute with func with args.
+			
+			this.EnsureLexemeType(LexemeType.CloseParen, pos);
+			
+			pos++; // Move to just after the FuncCall.
+
+			return this.Execute(funcName);
 		}
 
 		/// <summary>
