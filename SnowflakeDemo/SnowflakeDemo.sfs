@@ -1,1 +1,10 @@
-﻿echo 'Hello World!';
+﻿func Main()
+{
+	$name = 'smack0007';
+	echo $name;
+}
+
+func Test()
+{
+	echo 'Test';
+}

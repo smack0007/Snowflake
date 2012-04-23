@@ -6,7 +6,17 @@ namespace Snowsoft.SnowflakeScript
 {	
 	public class Script
 	{
+		class FuncInfo
+		{
+			public string Name;
+			public int Location;
+			public string[] Args;
+			public int EntryLocation;
+			public int ExitLocation;
+		}
+
 		List<Lexeme> lexemes;
+		Dictionary<string, FuncInfo> funcs;
 		VariableStack stack;
 		bool debug;
 
@@ -25,8 +35,18 @@ namespace Snowsoft.SnowflakeScript
 		private Script(List<Lexeme> lexemes)
 		{
 			this.lexemes = lexemes;
+			this.funcs = new Dictionary<string, FuncInfo>();
 			this.stack = new VariableStack();
 			this.debug = false;
+
+			for (int pos = 0; pos < this.lexemes.Count; pos++)
+			{
+				if (this.lexemes[pos].Type == LexemeType.Func)
+				{
+					FuncInfo funcInfo = this.ParseFunc(ref pos);
+					this.funcs.Add(funcInfo.Name, funcInfo);
+				}
+			}
 		}
 
 		/// <summary>
@@ -48,27 +68,102 @@ namespace Snowsoft.SnowflakeScript
 				OutputLine(i + " => " + lexemes[i]);
 		}
 
+		private void ThrowSyntaxException(string expected, int pos)
+		{
+			throw new ScriptException(ScriptError.SyntaxError, expected + " was expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
+		}
+
+		private void EnsureLexemeType(LexemeType expected, int pos)
+		{
+			if (this.lexemes[pos].Type != expected)
+				this.ThrowSyntaxException(expected.ToString(), pos);
+		}
+
+		private FuncInfo ParseFunc(ref int pos)
+		{
+			FuncInfo funcInfo = new FuncInfo();
+
+			this.EnsureLexemeType(LexemeType.Func, pos);
+			funcInfo.Location = pos;
+
+			pos++;
+			this.EnsureLexemeType(LexemeType.Identifier, pos);
+
+			funcInfo.Name = this.lexemes[pos].Val;
+
+			pos++;
+			this.EnsureLexemeType(LexemeType.OpenParen, pos);
+
+			pos++;
+			if (this.lexemes[pos].Type == LexemeType.Variable)
+			{
+				List<string> argList = new List<string>();
+				
+				pos++;
+				this.EnsureLexemeType(LexemeType.Identifier, pos);
+				argList.Add(this.lexemes[pos].Val);
+
+				pos++;
+				while (this.lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					this.EnsureLexemeType(LexemeType.Variable, pos);
+
+					pos++;
+					this.EnsureLexemeType(LexemeType.Identifier, pos);
+					argList.Add(this.lexemes[pos].Val);
+
+					pos++;
+				}
+
+				funcInfo.Args = argList.ToArray();
+			}
+			else // No args
+			{
+				funcInfo.Args = new string[0];
+			}
+
+			this.EnsureLexemeType(LexemeType.CloseParen, pos);
+
+			pos++;
+			this.EnsureLexemeType(LexemeType.OpenBrace, pos);
+			funcInfo.EntryLocation = pos;
+
+			int level = 1;
+			while (level > 0 && this.lexemes[pos].Type != LexemeType.EOF)
+			{
+				pos++;
+				if (this.lexemes[pos].Type == LexemeType.OpenBrace)
+				{
+					level++;
+				}
+				else if(this.lexemes[pos].Type == LexemeType.CloseBrace)
+				{
+					level--;
+				}
+			}
+
+			this.EnsureLexemeType(LexemeType.CloseBrace, pos);
+			funcInfo.ExitLocation = pos;
+
+			return funcInfo;
+		}
+
 		/// <summary>
 		/// Execute the script.
 		/// </summary>
 		public void Execute()
-		{
-			int pos = 0;
+		{			
+			if (!this.funcs.ContainsKey("Main"))
+				throw new ScriptException(ScriptError.FunctionDoesNotExist, "No Main() func found.");
 
-			while (lexemes[pos].Type != LexemeType.EOF)
+			FuncInfo funcInfo = this.funcs["Main"];
+			int pos = funcInfo.EntryLocation;
+
+			pos++;
+			while (pos != funcInfo.ExitLocation)
 			{
-				if (this.debug)
-					OutputLine("Executing " + lexemes[pos]);
-				
 				Statement(ref pos);
-
-				if (lexemes[pos - 1].Type != LexemeType.CloseBrace)
-				{
-					if (lexemes[pos].Type != LexemeType.EndStatement)
-						throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
-
-					pos++;
-				}
 			}
 		}
 
@@ -79,7 +174,7 @@ namespace Snowsoft.SnowflakeScript
 
 			Variable variable = null;
 
-			if (lexemes[pos].Type == LexemeType.Echo) // Echo keyword
+			if (lexemes[pos].Type == LexemeType.Echo)
 			{
 				Echo(ref pos);
 			}
@@ -87,33 +182,13 @@ namespace Snowsoft.SnowflakeScript
 			{
 				DoIf(ref pos);
 			}
-			/*
-			else if(lexemes[pos].Type == LexemeType.Identifier) // Statement begins with an identifier so it must be a function
-			{
-				string function = lexemes[pos].Val;
-
-				pos++;
-				if(lexemes[pos].Type != LexemeType.OpenParen)
-					throw new ScriptException("( was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
-
-				int pos2 = pos + 1;
-				while(lexemes[pos2].Type != LexemeType.CloseParen && lexemes[pos2].Type != LexemeType.EOF)
-					pos2++;
-
-				if(lexemes[pos2].Type != LexemeType.CloseParen)
-					throw new ScriptException(") was expected at Line " + lexemes[pos2].Line + " Column " + lexemes[pos2].Column);
-
-				object obj = Function(function, FunctionArgs(pos, pos2));
-
-				pos = pos2 + 1;
-
-				return obj;
-			}
-			*/
 			else // Must be an expression
 			{
 				variable = Expression(ref pos);
 			}
+
+			this.EnsureLexemeType(LexemeType.EndStatement, pos);
+			pos++;
 
 			return variable;
 		}
@@ -123,11 +198,9 @@ namespace Snowsoft.SnowflakeScript
 			if (this.debug)
 				OutputLine("Echo at " + pos);
 
-			//if(lexemes[pos].Type != LexemeType.Echo)
-			//	throw new ScriptException("'echo' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(LexemeType.Echo, pos);
 
 			pos++;
-
 			Variable variable = Expression(ref pos);
 
 			if (variable != null)
@@ -360,8 +433,7 @@ namespace Snowsoft.SnowflakeScript
 			if (this.debug)
 				OutputLine("Variable at " + pos);
 
-			//if(lexemes[pos].Type != LexemeType.Variable)
-			//	throw new ScriptException("'$' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(LexemeType.Variable, pos);
 
 			pos++;
 
@@ -469,20 +541,6 @@ namespace Snowsoft.SnowflakeScript
 			pos++;
 			return new Variable(values);
 		}
-
-		/*
-		public object Function(string name, List<object> args)
-		{
-			return null;
-		}
-
-		public List<object> FunctionArgs(int left, int right)
-		{
-			OutputLine("FunctionArgs " + left + " to " + right);
-
-			return new List<object>();
-		}
-		*/
 
 		/// <summary>
 		/// Output function. By default uses Console.Write().

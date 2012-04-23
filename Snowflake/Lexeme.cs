@@ -274,6 +274,10 @@ namespace Snowsoft.SnowflakeScript
 
 						switch (valueToUpper)
 						{
+							case "FUNC":
+								lexemes.Add(new Lexeme(LexemeType.Func, null, line, column));
+								break;
+
 							case "IF":
 								lexemes.Add(new Lexeme(LexemeType.If, null, line, column));
 								break;
@@ -316,6 +320,10 @@ namespace Snowsoft.SnowflakeScript
 
 							case "ARRAY":
 								lexemes.Add(new Lexeme(LexemeType.Array, null, line, column));
+								break;
+
+							case "LIST":
+								lexemes.Add(new Lexeme(LexemeType.List, null, line, column));
 								break;
 
 							default:

@@ -1,0 +1,40 @@
+Script : { Func } EOF
+
+Func : [func] Identifier [(] { Variable [,]! } [)] [{] { Statement } [}]
+
+Identifier : [A-Za-z_][A-Za-z0-9_]*
+
+Variable : [$] Identifier
+
+Statement : ( Echo | If | Expression ) [;]
+
+Echo : [echo] Expression
+
+If : [if] [(] Expression [)] [{] { Statement } [}] | [if] [(] Expression [)] [{] { Statement } [}] [else] [{] { Statement } [}]
+
+Expression : Variable | Variable Operation Expression | Null | String | MagicString | Integer | Float | Array | List
+
+Operation : [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
+
+Null : [null]
+
+String : ['] [chars]* [']
+
+MagicString : ["] [chars]* ["]
+
+Integer : [1-9]*
+
+Float : [1-9]*[.][1-9]*
+
+Array : [array] [(] { Expression [,]! } [)]
+
+List : [list] [(] { Expression [=][>] Expression [,]! } [)]
+
+Legend:
+	*       Any number of
+	|		Or
+	( )		Grouping
+	[ ]		Symbol or Keyword
+	{ }		Repetition
+	[ ]!	Symbol is repetition indicator
+

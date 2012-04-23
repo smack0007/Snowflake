@@ -25,6 +25,11 @@ namespace Snowsoft.SnowflakeScript
 		Identifier,
 
 		/// <summary>
+		/// func
+		/// </summary>
+		Func,
+
+		/// <summary>
 		/// if
 		/// </summary>
 		If,
@@ -80,6 +85,11 @@ namespace Snowsoft.SnowflakeScript
 		Array,
 
 		/// <summary>
+		/// list
+		/// </summary>
+		List,
+
+		/// <summary>
 		/// Unidentified numeric value. This should not be output.
 		/// </summary>
 		Numeric,
@@ -125,22 +135,22 @@ namespace Snowsoft.SnowflakeScript
 		CloseParen,
 		
 		/// <summary>
-		/// {
+		/// [
 		/// </summary>
 		OpenBracket,
 		
 		/// <summary>
-		/// }
+		/// ]
 		/// </summary>
 		CloseBracket,
 		
 		/// <summary>
-		/// [
+		/// {
 		/// </summary>
 		OpenBrace,
 		
 		/// <summary>
-		/// ]
+		/// }
 		/// </summary>
 		CloseBrace,
 
