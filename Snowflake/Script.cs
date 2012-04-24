@@ -17,7 +17,7 @@ namespace Snowsoft.SnowflakeScript
 
 		List<Lexeme> lexemes;
 		Dictionary<string, FuncInfo> funcs;
-		VariableStack stack;
+		VariableStack variableStack;
 		bool debug;
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Snowsoft.SnowflakeScript
 		{
 			this.lexemes = lexemes;
 			this.funcs = new Dictionary<string, FuncInfo>();
-			this.stack = new VariableStack();
+			this.variableStack = new VariableStack();
 			this.debug = false;
 
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
@@ -77,6 +77,31 @@ namespace Snowsoft.SnowflakeScript
 		{
 			if (this.lexemes[pos].Type != expected)
 				this.ThrowSyntaxException(expected.ToString(), pos);
+		}
+
+		/// <summary>
+		/// Moves "pos" to from OpenBrace to the matching CloseBrace.
+		/// </summary>
+		/// <param name="pos"></param>
+		private void MoveToMatchingBrace(ref int pos)
+		{
+			this.EnsureLexemeType(LexemeType.OpenBrace, pos);
+
+			int level = 1;
+			while (level > 0 && this.lexemes[pos].Type != LexemeType.EOF)
+			{
+				pos++;
+				if (this.lexemes[pos].Type == LexemeType.OpenBrace)
+				{
+					level++;
+				}
+				else if (this.lexemes[pos].Type == LexemeType.CloseBrace)
+				{
+					level--;
+				}
+			}
+
+			this.EnsureLexemeType(LexemeType.CloseBrace, pos);
 		}
 
 		private FuncInfo ParseFunc(ref int pos)
@@ -129,19 +154,7 @@ namespace Snowsoft.SnowflakeScript
 			this.EnsureLexemeType(LexemeType.OpenBrace, pos);
 			funcInfo.EntryLocation = pos;
 
-			int level = 1;
-			while (level > 0 && this.lexemes[pos].Type != LexemeType.EOF)
-			{
-				pos++;
-				if (this.lexemes[pos].Type == LexemeType.OpenBrace)
-				{
-					level++;
-				}
-				else if(this.lexemes[pos].Type == LexemeType.CloseBrace)
-				{
-					level--;
-				}
-			}
+			this.MoveToMatchingBrace(ref pos);
 
 			this.EnsureLexemeType(LexemeType.CloseBrace, pos);
 			funcInfo.ExitLocation = pos;
@@ -154,10 +167,15 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		public Variable Execute()
 		{
-			return this.Execute("Main");
+			return this.Execute("Main", null);
 		}
 
 		public Variable Execute(string funcName)
+		{
+			return this.Execute(funcName, null);
+		}
+
+		public Variable Execute(string funcName, IList<Variable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
 				throw new ScriptException(ScriptError.FunctionDoesNotExist, "No function found by the name " + funcName + ".");
@@ -165,11 +183,24 @@ namespace Snowsoft.SnowflakeScript
 			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
 
+			this.variableStack.Push();
+
+			if (args != null)
+			{
+				for (int i = 0; i < args.Count; i++)
+				{
+					Variable arg = this.variableStack[funcInfo.Args[i]];
+					arg.Val = args[i].Val;
+				}
+			}
+
 			pos++;
 			while (pos != funcInfo.ExitLocation)
 			{
 				Statement(ref pos);
 			}
+
+			this.variableStack.Pop();
 
 			return null; // TODO: Implement this.
 		}
@@ -243,7 +274,7 @@ namespace Snowsoft.SnowflakeScript
 			pos++;
 			if (variable.ToBoolean() && !skip)
 			{
-				stack.Push();
+				variableStack.Push();
 
 				while (lexemes[pos].Type != LexemeType.CloseBrace)
 				{
@@ -255,7 +286,7 @@ namespace Snowsoft.SnowflakeScript
 					pos++;
 				}
 
-				stack.Pop();
+				variableStack.Pop();
 
 				pos++;
 
@@ -303,7 +334,7 @@ namespace Snowsoft.SnowflakeScript
 
 						if (!skip)
 						{
-							stack.Push();
+							variableStack.Push();
 
 							while (lexemes[pos].Type != LexemeType.CloseBrace)
 							{
@@ -315,7 +346,7 @@ namespace Snowsoft.SnowflakeScript
 								pos++;
 							}
 
-							stack.Pop();
+							variableStack.Pop();
 						}
 						else
 						{
@@ -482,7 +513,7 @@ namespace Snowsoft.SnowflakeScript
 
 			if (lexemes[pos].Type == LexemeType.Identifier)
 			{
-				variable = stack[lexemes[pos].Val];
+				variable = variableStack[lexemes[pos].Val];
 			}
 
 			pos++;

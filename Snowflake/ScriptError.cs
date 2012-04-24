@@ -22,7 +22,7 @@ namespace Snowsoft.SnowflakeScript
 		/// <summary>
 		/// An error occured related to the stack.
 		/// </summary>
-		StackError,
+		VariableStackError,
 
 		/// <summary>
 		/// No function exists by the given name.

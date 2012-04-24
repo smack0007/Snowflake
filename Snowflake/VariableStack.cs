@@ -8,34 +8,46 @@ namespace Snowsoft.SnowflakeScript
 	/// </summary>
 	public class VariableStack
 	{
+		Dictionary<string, Variable> globals;
 		List<Dictionary<string, Variable>> stack;
 
 		public Variable this[string name]
 		{
 			get
 			{
-				// See if it's currently anywhere in the stack
-				for (int i = this.stack.Count - 1; i >= 0; i--)
+				// If we current have a function stack check if it's in that.
+				if (this.stack.Count > 0 && this.stack[this.stack.Count - 1].ContainsKey(name))
+					return this.stack[this.stack.Count - 1][name];
+
+				// See if it's in the globals.
+				if (this.globals.ContainsKey(name))
+					return this.globals[name];
+
+				// We didn't find the variable so create it.
+				Variable variable = new Variable();
+
+				// If we have a function stack, add it to that.
+				if (this.stack.Count > 0)
 				{
-					if (this.stack[i].ContainsKey(name))
-						return this.stack[i][name];
+					this.stack[stack.Count - 1].Add(name, variable);
+				}
+				else // Otherwise add it to the globals.
+				{
+					this.globals.Add(name, variable);
 				}
 
-				// We didn't find the variable so add it to the top of the stack
-				Variable variable = new Variable();
-				this.stack[stack.Count - 1].Add(name, variable);
 				return variable;
 			}
 		}
 
 		public VariableStack()
 		{
+			this.globals = new Dictionary<string, Variable>();
 			this.stack = new List<Dictionary<string, Variable>>();
-			this.stack.Add(new Dictionary<string, Variable>());
 		}
 
 		/// <summary>
-		/// Pushes a new layer onto the stack.
+		/// Pushes a new function onto the stack.
 		/// </summary>
 		public void Push()
 		{
@@ -43,12 +55,12 @@ namespace Snowsoft.SnowflakeScript
 		}
 
 		/// <summary>
-		/// Pops a layer off the stack.
+		/// Pops a function off the stack.
 		/// </summary>
 		public void Pop()
 		{
-			if (this.stack.Count == 1)
-				throw new ScriptException(ScriptError.StackError, "Cannot pop as the stack size is only 1.");
+			if (this.stack.Count == 0)
+				throw new ScriptException(ScriptError.VariableStackError, "Cannot pop the variable stack.");
 
 			this.stack.RemoveAt(this.stack.Count - 1);
 		}
