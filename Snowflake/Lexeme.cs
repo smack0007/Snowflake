@@ -386,6 +386,9 @@ namespace Snowsoft.SnowflakeScript
 				}
 			}
 
+			if (type != LexemeType.Unknown)
+				throw new ScriptException(ScriptError.ParseError, "Unexpected end of file.");
+
 			// Add an EOF to mark the end of the script.
 			lexemes.Add(new Lexeme(LexemeType.EOF, null, line, column));
 

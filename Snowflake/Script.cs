@@ -60,6 +60,16 @@ namespace Snowsoft.SnowflakeScript
 			string text = sr.ReadToEnd();
 			
 			return new Script(Lexeme.Parse(text));
+		}
+
+		/// <summary>
+		/// Loads a script from a string.
+		/// </summary>
+		/// <param name="script">The script text.</param>
+		/// <returns>Script</returns>
+		public static Script FromString(string script)
+		{
+			return new Script(Lexeme.Parse(script));
 		}	
 
 		public void DisplayLexemes()
