@@ -8,13 +8,13 @@ namespace Snowsoft.SnowflakeScript
 		public object Val
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public VariableType Type
 		{
 			get;
-			set;
+			private set;
 		}			
 
 		public Variable()

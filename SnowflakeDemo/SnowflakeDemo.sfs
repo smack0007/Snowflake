@@ -1,12 +1,11 @@
 ﻿func Main()
 {
 	$name = 'smack0007';
-	echo $name;
-
-	Test();
+	SaySomething($name);
+	SaySomething("Hello World!");
 }
 
-func Test()
+func SaySomething($text)
 {
-	echo 'Test';
+	echo $text;
 }

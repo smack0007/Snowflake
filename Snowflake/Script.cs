@@ -67,16 +67,17 @@ namespace Snowsoft.SnowflakeScript
 			for (int i = 0; i < lexemes.Count; i++)
 				OutputLine(i + " => " + lexemes[i]);
 		}
-
-		private void ThrowSyntaxException(string expected, int pos)
-		{
-			throw new ScriptException(ScriptError.SyntaxError, expected + " was expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
-		}
-
+				
 		private void EnsureLexemeType(LexemeType expected, int pos)
 		{
 			if (this.lexemes[pos].Type != expected)
-				this.ThrowSyntaxException(expected.ToString(), pos);
+				throw new ScriptException(ScriptError.SyntaxError, expected + " was expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
+		}
+
+		private void EnsureNotLexemeType(LexemeType unexpected, int pos)
+		{
+			if (this.lexemes[pos].Type == unexpected)
+				throw new ScriptException(ScriptError.SyntaxError, unexpected + " was not expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
 		}
 
 		/// <summary>
@@ -178,7 +179,7 @@ namespace Snowsoft.SnowflakeScript
 		public Variable Execute(string funcName, IList<Variable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
-				throw new ScriptException(ScriptError.FunctionDoesNotExist, "No function found by the name " + funcName + ".");
+				throw new ScriptException(ScriptError.InvalidFunctionCall, "No function found by the name " + funcName + ".");
 
 			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
@@ -187,10 +188,13 @@ namespace Snowsoft.SnowflakeScript
 
 			if (args != null)
 			{
+				if (args.Count != funcInfo.Args.Length)
+					throw new ScriptException(ScriptError.InvalidFunctionCall, "Invalid number of args specified for " + funcName + ".");
+
 				for (int i = 0; i < args.Count; i++)
 				{
 					Variable arg = this.variableStack[funcInfo.Args[i]];
-					arg.Val = args[i].Val;
+					arg.Gets(args[i]);
 				}
 			}
 
@@ -478,21 +482,24 @@ namespace Snowsoft.SnowflakeScript
 			pos++;
 			List<Variable> args = new List<Variable>();
 
-			while (this.lexemes[pos].Type == LexemeType.Variable)
+			while (this.lexemes[pos].Type != LexemeType.CloseParen &&
+				   this.lexemes[pos].Type != LexemeType.EOF)
 			{
 				args.Add(this.Expression(ref pos));
 
 				if (this.lexemes[pos].Type == LexemeType.Comma)
+				{
 					pos++;
+
+					this.EnsureNotLexemeType(LexemeType.CloseParen, pos);
+				}
 			}
-			
-			// TODO: Check the arg count and execute with func with args.
-			
+									
 			this.EnsureLexemeType(LexemeType.CloseParen, pos);
 			
 			pos++; // Move to just after the FuncCall.
 
-			return this.Execute(funcName);
+			return this.Execute(funcName, args);
 		}
 
 		/// <summary>

@@ -29,7 +29,7 @@ namespace Snowsoft.SnowflakeScript
 				// If we have a function stack, add it to that.
 				if (this.stack.Count > 0)
 				{
-					this.stack[stack.Count - 1].Add(name, variable);
+					this.stack[this.stack.Count - 1].Add(name, variable);
 				}
 				else // Otherwise add it to the globals.
 				{

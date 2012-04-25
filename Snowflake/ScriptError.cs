@@ -25,8 +25,8 @@ namespace Snowsoft.SnowflakeScript
 		VariableStackError,
 
 		/// <summary>
-		/// No function exists by the given name.
+		/// Failed to call a function.
 		/// </summary>
-		FunctionDoesNotExist
+		InvalidFunctionCall
 	}
 }

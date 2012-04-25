@@ -1,6 +1,6 @@
 Script : { Func } EOF
 
-Func : [func] Identifier [(] { Variable [,]! } [)] [{] { Statement } [}]
+Func : [func] Identifier [(] { Expression [,]! } [)] [{] { Statement } [}]
 
 Identifier : [A-Za-z_][A-Za-z0-9_]*
 
