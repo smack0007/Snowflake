@@ -28,6 +28,12 @@ namespace Snowsoft.SnowflakeScript
 			this.Type = VariableType.Boolean;
 		}
 
+		public Variable(char val)
+		{
+			this.Val = val;
+			this.Type = VariableType.Char;
+		}
+
 		public Variable(string val)
 		{
 			this.Val = val;
@@ -60,11 +66,15 @@ namespace Snowsoft.SnowflakeScript
 
 		public Variable Add(Variable variable)
 		{
-			if(this.Type == VariableType.String)
+			if (this.Type == VariableType.Char)
 			{
 				return new Variable(this.ToString() + variable.ToString());
 			}
-			if(this.Type == VariableType.Integer)
+			else if (this.Type == VariableType.String)
+			{
+				return new Variable(this.ToString() + variable.ToString());
+			}
+			else if (this.Type == VariableType.Integer)
 			{
 				if(variable.Type == VariableType.Integer) // Integer to Integer Addition
 				{
@@ -203,6 +213,10 @@ namespace Snowsoft.SnowflakeScript
 			else if (this.Type == VariableType.Boolean)
 			{
 				return ((bool)this.Val).ToString();
+			}
+			else if (this.Type == VariableType.Char)
+			{
+				return ((char)this.Val).ToString();
 			}
 			else if (this.Type == VariableType.String)
 			{

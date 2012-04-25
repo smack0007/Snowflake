@@ -10,15 +10,15 @@ namespace Snowsoft.SnowflakeScript
 		Unknown = 0,
 
 		/// <summary>
-		/// String using '.
+		/// 'c'.
+		/// </summary>
+		Char,
+
+		/// <summary>
+		/// "String".
 		/// </summary>
 		String,
-		
-		/// <summary>
-		/// String using ".
-		/// </summary>
-		MagicString, // '' and "" strings
-
+				
 		/// <summary>
 		/// An identifier lexeme.
 		/// </summary>

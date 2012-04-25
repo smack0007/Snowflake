@@ -246,7 +246,7 @@ namespace Snowsoft.SnowflakeScript
 			Variable variable = Expression(ref pos);
 
 			if (variable != null)
-				OutputLine(variable.ToString());
+				Output(variable.ToString());
 		}
 
 		private void DoIf(ref int pos)
@@ -447,13 +447,13 @@ namespace Snowsoft.SnowflakeScript
 			{
 				variable = Boolean(ref pos);
 			}
+			else if (lexemes[pos].Type == LexemeType.Char)
+			{
+				variable = Char(ref pos);
+			}
 			else if (lexemes[pos].Type == LexemeType.String)
 			{
 				variable = String(ref pos);
-			}
-			else if (lexemes[pos].Type == LexemeType.MagicString)
-			{
-				variable = MagicString(ref pos);
 			}
 			else if (lexemes[pos].Type == LexemeType.Integer)
 			{
@@ -509,95 +509,65 @@ namespace Snowsoft.SnowflakeScript
 		/// <returns>ScriptVariable</returns>
 		private Variable Variable(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Variable at " + pos);
-
 			this.EnsureLexemeType(LexemeType.Variable, pos);
 
 			pos++;
+			this.EnsureLexemeType(LexemeType.Identifier, pos);
 
-			Variable variable = null;
-
-			if (lexemes[pos].Type == LexemeType.Identifier)
-			{
-				variable = variableStack[lexemes[pos].Val];
-			}
-
+			Variable variable = this.variableStack[lexemes[pos].Val];
+			
 			pos++;
 			return variable;
 		}
 
 		private Variable Null(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Null at " + pos);
-
 			pos++;
 			return new Variable();
 		}
 
 		private Variable Boolean(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Boolean at " + pos);
-
 			pos++;
-			if (lexemes[pos - 1].Type == LexemeType.True)
+			if (this.lexemes[pos - 1].Type == LexemeType.True)
 				return new Variable(true);
 			else
 				return new Variable(false);
 		}
 
-		private Variable String(ref int pos)
+		private Variable Char(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("String at " + pos);
-
-			return new Variable(lexemes[pos++].Val);
+			return new Variable(this.lexemes[pos++].Val);
 		}
 
-		private Variable MagicString(ref int pos)
+		private Variable String(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("MagicString at " + pos);
-
-			string output = lexemes[pos++].Val;
-
-			return new Variable(output);
+			return new Variable(this.lexemes[pos++].Val);
 		}
 
 		private Variable Integer(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Integer at " + pos);
-						
-			return new Variable(Int32.Parse(lexemes[pos++].Val));
+			return new Variable(Int32.Parse(this.lexemes[pos++].Val));
 		}
 
 		private Variable Float(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Float at " + pos);
-
-			return new Variable(Double.Parse(lexemes[pos++].Val));
+			return new Variable(Double.Parse(this.lexemes[pos++].Val));
 		}
 
 		private Variable Array(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Array at " + pos);
-
 			pos++;
-			if(lexemes[pos].Type != LexemeType.OpenParen)
-				throw new ScriptException(ScriptError.SyntaxError, "'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(LexemeType.OpenParen, pos);
 
 			Dictionary<string, Variable> values = new Dictionary<string, Variable>();
 			pos++;
 
 			int i = 0;
-			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
+			while (this.lexemes[pos].Type != LexemeType.CloseParen &&
+				   this.lexemes[pos].Type != LexemeType.EOF)
 			{
-				if (lexemes[pos + 1].Type != LexemeType.MapsTo) // No key specified
+				if (this.lexemes[pos + 1].Type != LexemeType.MapsTo) // No key specified
 				{
 					values.Add((i++).ToString(), Expression(ref pos));
 				}
@@ -610,12 +580,11 @@ namespace Snowsoft.SnowflakeScript
 					values.Add(key.ToString(), Expression(ref pos));
 				}
 
-				if(lexemes[pos].Type == LexemeType.Comma)
+				if (this.lexemes[pos].Type == LexemeType.Comma)
 					pos++;
 			}
 
-			if (lexemes[pos].Type != LexemeType.CloseParen)
-				throw new ScriptException(ScriptError.SyntaxError, "')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(LexemeType.CloseParen, pos);
 
 			pos++;
 			return new Variable(values);

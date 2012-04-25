@@ -52,6 +52,12 @@ namespace Snowsoft.SnowflakeScript
 			return "{" + Type + ", " + Val + ", " + Line + ", " + Column + "}";
 		}
 
+		private static string ConvertEscapeCodes(string input)
+		{
+			return input.Replace("\\n", "\n")
+						.Replace("\\t", "\t");
+		}
+
 		public static List<Lexeme> Parse(string text)
 		{
 			List<Lexeme> lexemes = new List<Lexeme>();
@@ -85,14 +91,14 @@ namespace Snowsoft.SnowflakeScript
 						line = curLine;
 						column = curColumn;
 
-						type = LexemeType.String;
+						type = LexemeType.Char;
 					}
 					else if(text[i] == '"') // Start of a magic string
 					{
 						line = curLine;
 						column = curColumn;
 
-						type = LexemeType.MagicString;
+						type = LexemeType.String;
 					}
 					else if(text[i] == ';') // End Statement
 					{
@@ -222,28 +228,42 @@ namespace Snowsoft.SnowflakeScript
 						value += text[i];
 					}
 				}
+				else if(type == LexemeType.Char) // We're inside a char
+				{
+					if (text[i] != '\'')
+					{
+						value += text[i];
+					}
+					else if (text[i - 1] == '\\')
+					{
+						value += text[i];
+					}
+					else
+					{
+						output = true;
+					}
+				}
 				else if(type == LexemeType.String) // We're inside a string
 				{
-					if(text[i] != '\'')
+					if (text[i] != '"')
+					{
 						value += text[i];
-					else if(text[i - 1] == '\\')
+					}
+					else if (text[i - 1] == '\\')
+					{
 						value += text[i];
+					}
 					else
+					{
 						output = true;
-				}
-				else if(type == LexemeType.MagicString) // We're inside a magic string
-				{
-					if(text[i] != '"')
-						value += text[i];
-					else if(text[i - 1] == '\\')
-						value += text[i];
-					else
-						output = true;
+					}
 				}
 				else if(type == LexemeType.Identifier) // We're inside an identifier
 				{
-					if(Char.IsLetter(text[i]) || Char.IsNumber(text[i]) || text[i] == '_')
+					if (Char.IsLetter(text[i]) || Char.IsNumber(text[i]) || text[i] == '_')
+					{
 						value += text[i];
+					}
 					else
 					{
 						output = true;
@@ -252,9 +272,11 @@ namespace Snowsoft.SnowflakeScript
 				}
 				else if(type == LexemeType.Numeric) // We're inside a numeric
 				{
-					if(Char.IsNumber(text[i]))
+					if (Char.IsNumber(text[i]))
+					{
 						value += text[i];
-					else if(text[i] == '.')
+					}
+					else if (text[i] == '.')
 					{
 						isFloat = true;
 						value += text[i];
@@ -340,13 +362,21 @@ namespace Snowsoft.SnowflakeScript
 
 						lexemes.Add(new Lexeme(type, value));
 					}
+					else if(type == LexemeType.Char)
+					{
+						if (value.Length > 1)
+						{
+							if (value.Length > 2 || value[0] != '\\')
+							{
+								throw new ScriptException(ScriptError.ParseError, "Invalid char: " + value + ".");
+							}
+						}
+
+						lexemes.Add(new Lexeme(type, ConvertEscapeCodes(value.Replace("\\'", "'")), line, column));
+					}
 					else if(type == LexemeType.String)
 					{
-						lexemes.Add(new Lexeme(type, value.Replace("\\'", "'"), line, column));
-					}
-					else if(type == LexemeType.MagicString)
-					{
-						lexemes.Add(new Lexeme(type, value.Replace("\\\"", "\"").Replace("\\n", "\n"), line, column));
+						lexemes.Add(new Lexeme(type, ConvertEscapeCodes(value.Replace("\\\"", "\"")), line, column));
 					}
 
 					output = false;

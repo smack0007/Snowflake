@@ -8,6 +8,8 @@ namespace Snowsoft.SnowflakeScript
 
 		Boolean,
 
+		Char,
+
 		String,
 
 		Integer,
