@@ -8,30 +8,25 @@ namespace Snowsoft.SnowflakeScript
 		public ScriptLexemeType Type
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public string Val
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public int Line
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public int Column
 		{
 			get;
-			set;
-		}
-
-		public ScriptLexeme(ScriptLexemeType type, string val)
-			: this(type, val, 0, 0)
-		{
+			private set;
 		}
 
 		public ScriptLexeme(ScriptLexemeType type, string val, int line, int column)
@@ -49,7 +44,7 @@ namespace Snowsoft.SnowflakeScript
 
 		public override string ToString()
 		{
-			return "{" + Type + ", " + Val + ", " + Line + ", " + Column + "}";
+			return "{" + this.Type + ", " + this.Val + ", " + this.Line + ", " + this.Column + "}";
 		}
 	}
 }

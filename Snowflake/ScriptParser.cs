@@ -245,59 +245,61 @@ namespace Snowsoft.SnowflakeScript
 				{
 					if (type == ScriptLexemeType.Identifier)
 					{
-						string valueToUpper = value.ToUpper();
-
-						switch (valueToUpper)
+						switch (value)
 						{
-							case "FUNC":
+							case "func":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Func, null, line, column));
 								break;
 
-							case "IF":
+							case "return":
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Return, null, line, column));
+								break;
+
+							case "if":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.If, null, line, column));
 								break;
 
-							case "ELSE":
+							case "else":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Else, null, line, column));
 								break;
 
-							case "WHILE":
+							case "while":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.While, null, line, column));
 								break;
 
-							case "FOR":
+							case "for":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.For, null, line, column));
 								break;
 
-							case "FOREACH":
+							case "foreach":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.ForEach, null, line, column));
 								break;
 
-							case "AS":
+							case "as":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.As, null, line, column));
 								break;
 
-							case "ECHO":
+							case "echo":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Echo, null, line, column));
 								break;
 
-							case "NULL":
+							case "null":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Null, null, line, column));
 								break;
 
-							case "TRUE":
+							case "true":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.True, null, line, column));
 								break;
 
-							case "FALSE":
+							case "false":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.False, null, line, column));
 								break;
 
-							case "ARRAY":
+							case "array":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Array, null, line, column));
 								break;
 
-							case "LIST":
+							case "list":
 								lexemes.Add(new ScriptLexeme(ScriptLexemeType.List, null, line, column));
 								break;
 
@@ -313,7 +315,7 @@ namespace Snowsoft.SnowflakeScript
 						else
 							type = ScriptLexemeType.Integer;
 
-						lexemes.Add(new ScriptLexeme(type, value));
+						lexemes.Add(new ScriptLexeme(type, value, line, column));
 					}
 					else if (type == ScriptLexemeType.Char)
 					{

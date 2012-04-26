@@ -30,6 +30,11 @@ namespace Snowsoft.SnowflakeScript
 		Func,
 
 		/// <summary>
+		/// return
+		/// </summary>
+		Return,
+
+		/// <summary>
 		/// if
 		/// </summary>
 		If,
