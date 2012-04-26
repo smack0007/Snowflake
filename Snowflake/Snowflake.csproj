@@ -66,14 +66,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IScriptParser.cs" />
+    <Compile Include="ScriptEngine.cs" />
     <Compile Include="ScriptFunctionCallException.cs" />
     <Compile Include="ScriptLexeme.cs" />
     <Compile Include="ScriptLexemeType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script.cs" />
-    <Compile Include="ScriptError.cs" />
     <Compile Include="ScriptException.cs" />
-    <Compile Include="ScriptParseException.cs" />
+    <Compile Include="ScriptParserException.cs" />
+    <Compile Include="ScriptParser.cs" />
     <Compile Include="ScriptSyntaxException.cs" />
     <Compile Include="ScriptVariableException.cs" />
     <Compile Include="ScriptVariable.cs" />

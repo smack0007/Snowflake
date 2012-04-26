@@ -7,8 +7,9 @@ namespace SnowflakeDemo
 	{
 		static void Main(string[] args)
 		{
-			Script script = Script.FromFile("SnowflakeDemo.sfs");
-			script.Execute();
+			ScriptEngine engine = new ScriptEngine();
+			engine.LoadFromFile("SnowflakeDemo.sfs");
+			engine.Run();
 
 			Console.WriteLine("Press any key to exit...");
 			Console.ReadKey();

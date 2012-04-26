@@ -15,30 +15,24 @@ namespace Snowsoft.SnowflakeScript
 			public int ExitLocation;
 		}
 
-		List<ScriptLexeme> lexemes;
+		IList<ScriptLexeme> lexemes;
 		Dictionary<string, FuncInfo> funcs;
 		ScriptVariableStack variableStack;
-		bool debug;
-
+		
 		/// <summary>
-		/// If debug is true, debug message will be output.
+		/// Creates a new script based on the given lexemes.
 		/// </summary>
-		public bool Debug
+		public Script(IList<ScriptLexeme> lexemes)
 		{
-			get { return this.debug; }
-			set { this.debug = true; }
-		}
+			if (lexemes == null)
+			{
+				throw new ArgumentNullException("lexemes");
+			}
 
-		/// <summary>
-		/// Private constructor. Use static methods to construct instances.
-		/// </summary>
-		private Script(List<ScriptLexeme> lexemes)
-		{
 			this.lexemes = lexemes;
 			this.funcs = new Dictionary<string, FuncInfo>();
 			this.variableStack = new ScriptVariableStack();
-			this.debug = false;
-
+			
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
 			{
 				if (this.lexemes[pos].Type == ScriptLexemeType.Func)
@@ -47,35 +41,6 @@ namespace Snowsoft.SnowflakeScript
 					this.funcs.Add(funcInfo.Name, funcInfo);
 				}
 			}
-		}
-
-		/// <summary>
-		/// Loads a script from a file.
-		/// </summary>
-		/// <param name="filename">The filename to read from.</param>
-		/// <returns>Script</returns>
-		public static Script FromFile(string filename)
-		{
-			StreamReader sr = File.OpenText(filename);
-			string text = sr.ReadToEnd();
-			
-			return new Script(ScriptLexeme.Parse(text));
-		}
-
-		/// <summary>
-		/// Loads a script from a string.
-		/// </summary>
-		/// <param name="script">The script text.</param>
-		/// <returns>Script</returns>
-		public static Script FromString(string script)
-		{
-			return new Script(ScriptLexeme.Parse(script));
-		}	
-
-		public void DisplayLexemes()
-		{
-			for (int i = 0; i < lexemes.Count; i++)
-				OutputLine(i + " => " + lexemes[i]);
 		}
 				
 		private void EnsureLexemeType(ScriptLexemeType expected, int pos)
@@ -91,7 +56,7 @@ namespace Snowsoft.SnowflakeScript
 		}
 
 		/// <summary>
-		/// Moves "pos" to from OpenBrace to the matching CloseBrace.
+		/// Moves "pos" from OpenBrace to the matching CloseBrace.
 		/// </summary>
 		/// <param name="pos"></param>
 		private void MoveToMatchingBrace(ref int pos)
@@ -172,21 +137,13 @@ namespace Snowsoft.SnowflakeScript
 
 			return funcInfo;
 		}
-
-		/// <summary>
-		/// Execute the script.
-		/// </summary>
-		public ScriptVariable Execute()
+		
+		public ScriptVariable CallFunc(string funcName)
 		{
-			return this.Execute("Main", null);
+			return this.CallFunc(funcName, null);
 		}
 
-		public ScriptVariable Execute(string funcName)
-		{
-			return this.Execute(funcName, null);
-		}
-
-		public ScriptVariable Execute(string funcName, IList<ScriptVariable> args)
+		public ScriptVariable CallFunc(string funcName, IList<ScriptVariable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
 				throw new ScriptFunctionCallException("No function found by the name " + funcName + ".");
@@ -221,9 +178,6 @@ namespace Snowsoft.SnowflakeScript
 
 		private ScriptVariable Statement(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Statement at " + pos);
-
 			ScriptVariable variable = null;
 
 			if (lexemes[pos].Type == ScriptLexemeType.Echo)
@@ -247,9 +201,6 @@ namespace Snowsoft.SnowflakeScript
 
 		private void Echo(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Echo at " + pos);
-
 			this.EnsureLexemeType(ScriptLexemeType.Echo, pos);
 
 			pos++;
@@ -385,9 +336,6 @@ namespace Snowsoft.SnowflakeScript
 
 		private ScriptVariable Expression(ref int pos)
 		{
-			if (this.debug)
-				OutputLine("Expression at " + pos);
-
 			ScriptVariable variable = null;
 
 			if (lexemes[pos].Type == ScriptLexemeType.Identifier)
@@ -506,7 +454,7 @@ namespace Snowsoft.SnowflakeScript
 			
 			pos++; // Move to just after the FuncCall.
 
-			return this.Execute(funcName, args);
+			return this.CallFunc(funcName, args);
 		}
 
 		/// <summary>
