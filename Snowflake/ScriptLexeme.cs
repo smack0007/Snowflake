@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript
 {
-	public class Lexeme
+	public class ScriptLexeme
 	{
-		public LexemeType Type
+		public ScriptLexemeType Type
 		{
 			get;
 			set;
@@ -29,12 +29,12 @@ namespace Snowsoft.SnowflakeScript
 			set;
 		}
 
-		public Lexeme(LexemeType type, string val)
+		public ScriptLexeme(ScriptLexemeType type, string val)
 			: this(type, val, 0, 0)
 		{
 		}
 
-		public Lexeme(LexemeType type, string val, int line, int column)
+		public ScriptLexeme(ScriptLexemeType type, string val, int line, int column)
 		{
 			this.Type = type;
 
@@ -58,15 +58,15 @@ namespace Snowsoft.SnowflakeScript
 						.Replace("\\t", "\t");
 		}
 
-		public static List<Lexeme> Parse(string text)
+		public static List<ScriptLexeme> Parse(string text)
 		{
-			List<Lexeme> lexemes = new List<Lexeme>();
+			List<ScriptLexeme> lexemes = new List<ScriptLexeme>();
 
 			text += '\n'; // Ensure new line at EOF
 
 			bool output = false; // If true, write the lexeme.
 			string value = ""; // The current value of the lexeme.
-			LexemeType type = LexemeType.Unknown; 
+			ScriptLexemeType type = ScriptLexemeType.Unknown; 
 			bool isFloat = false; // For parsing numbers
 
 			int line = 1, column = 1; // Current position of the lexeme being parsed.
@@ -80,7 +80,7 @@ namespace Snowsoft.SnowflakeScript
 					curColumn = 1;
 				}
 
-				if(type == LexemeType.Unknown) // We're looking for a lexeme
+				if(type == ScriptLexemeType.Unknown) // We're looking for a lexeme
 				{
 					if(char.IsWhiteSpace(text[i])) // Skip over white space
 					{
@@ -91,144 +91,144 @@ namespace Snowsoft.SnowflakeScript
 						line = curLine;
 						column = curColumn;
 
-						type = LexemeType.Char;
+						type = ScriptLexemeType.Char;
 					}
 					else if(text[i] == '"') // Start of a magic string
 					{
 						line = curLine;
 						column = curColumn;
 
-						type = LexemeType.String;
+						type = ScriptLexemeType.String;
 					}
 					else if(text[i] == ';') // End Statement
 					{
-						lexemes.Add(new Lexeme(LexemeType.EndStatement, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.EndStatement, null, curLine, curColumn));
 					}
 					else if(text[i] == '$') // Variable
 					{
-						lexemes.Add(new Lexeme(LexemeType.Variable, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.Variable, null, curLine, curColumn));
 					}
 					else if(text[i] == '.') // Period
 					{
-						lexemes.Add(new Lexeme(LexemeType.Period, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.Period, null, curLine, curColumn));
 					}
 					else if(text[i] == ',') // Period
 					{
-						lexemes.Add(new Lexeme(LexemeType.Comma, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.Comma, null, curLine, curColumn));
 					}
 					else if(text[i] == '(') // OpenParen
 					{
-						lexemes.Add(new Lexeme(LexemeType.OpenParen, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.OpenParen, null, curLine, curColumn));
 					}
 					else if(text[i] == ')') // CloseParen
 					{
-						lexemes.Add(new Lexeme(LexemeType.CloseParen, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.CloseParen, null, curLine, curColumn));
 					}
 					else if(text[i] == '[') // OpenBracket
 					{
-						lexemes.Add(new Lexeme(LexemeType.OpenBracket, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.OpenBracket, null, curLine, curColumn));
 					}
 					else if(text[i] == ']') // CloseBracket
 					{
-						lexemes.Add(new Lexeme(LexemeType.CloseBracket, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.CloseBracket, null, curLine, curColumn));
 					}
 					else if(text[i] == '{') // OpenBrace
 					{
-						lexemes.Add(new Lexeme(LexemeType.OpenBrace, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.OpenBrace, null, curLine, curColumn));
 					}
 					else if(text[i] == '}') // CloseBrace
 					{
-						lexemes.Add(new Lexeme(LexemeType.CloseBrace, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.CloseBrace, null, curLine, curColumn));
 					}
 					else if(text[i] == '=') // Gets or EqualTo or MapsTo
 					{
 						if(text[i + 1] == '=')
 						{
-							lexemes.Add(new Lexeme(LexemeType.EqualTo, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.EqualTo, null, curLine, curColumn));
 							i++;
 						}
 						else if(text[i + 1] == '>')
 						{
-							lexemes.Add(new Lexeme(LexemeType.MapsTo, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.MapsTo, null, curLine, curColumn));
 							i++;
 						}
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.Gets, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Gets, null, curLine, curColumn));
 						}
 					}
 					else if(text[i] == '!') // Not or NotEqualTo
 					{
 						if(text[i + 1] != '=')
-							lexemes.Add(new Lexeme(LexemeType.Not, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Not, null, curLine, curColumn));
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.NotEqualTo, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.NotEqualTo, null, curLine, curColumn));
 							i++;
 						}
 					}
 					else if(text[i] == '+') // Plus or PlusGets
 					{
 						if(text[i + 1] != '=')
-							lexemes.Add(new Lexeme(LexemeType.Plus, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Plus, null, curLine, curColumn));
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.PlusGets, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.PlusGets, null, curLine, curColumn));
 							i++;
 						}
 					}
 					else if(text[i] == '-') // Minus or MinusGets
 					{
 						if(text[i + 1] != '=')
-							lexemes.Add(new Lexeme(LexemeType.Minus, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Minus, null, curLine, curColumn));
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.MinusGets, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.MinusGets, null, curLine, curColumn));
 							i++;
 						}
 					}
 					else if(text[i] == '*') // Multiply or MultiplyGets
 					{
 						if(text[i + 1] != '=')
-							lexemes.Add(new Lexeme(LexemeType.Multiply, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Multiply, null, curLine, curColumn));
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.MultiplyGets, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.MultiplyGets, null, curLine, curColumn));
 							i++;
 						}
 					}
 					else if(text[i] == '/') // Multiply or MultiplyGets
 					{
 						if(text[i + 1] != '=')
-							lexemes.Add(new Lexeme(LexemeType.Divide, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.Divide, null, curLine, curColumn));
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.DivideGets, null, curLine, curColumn));
+							lexemes.Add(new ScriptLexeme(ScriptLexemeType.DivideGets, null, curLine, curColumn));
 							i++;
 						}
 					}
 					else if(text[i] == '&' && text[i + 1] == '&') // And
 					{
-						lexemes.Add(new Lexeme(LexemeType.LogicalAnd, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.LogicalAnd, null, curLine, curColumn));
 						i++;
 					}
 					else if(text[i] == '|' && text[i + 1] == '|') // Or
 					{
-						lexemes.Add(new Lexeme(LexemeType.LogicalOr, null, curLine, curColumn));
+						lexemes.Add(new ScriptLexeme(ScriptLexemeType.LogicalOr, null, curLine, curColumn));
 						i++;
 					}
 					else if(char.IsLetter(text[i]) || text[i] == '_') // Identifier
 					{
-						type = LexemeType.Identifier;
+						type = ScriptLexemeType.Identifier;
 						value += text[i];
 					}
 					else if(char.IsNumber(text[i])) // Numeric
 					{
-						type = LexemeType.Numeric;
+						type = ScriptLexemeType.Numeric;
 						value += text[i];
 					}
 				}
-				else if(type == LexemeType.Char) // We're inside a char
+				else if(type == ScriptLexemeType.Char) // We're inside a char
 				{
 					if (text[i] != '\'')
 					{
@@ -243,7 +243,7 @@ namespace Snowsoft.SnowflakeScript
 						output = true;
 					}
 				}
-				else if(type == LexemeType.String) // We're inside a string
+				else if(type == ScriptLexemeType.String) // We're inside a string
 				{
 					if (text[i] != '"')
 					{
@@ -258,7 +258,7 @@ namespace Snowsoft.SnowflakeScript
 						output = true;
 					}
 				}
-				else if(type == LexemeType.Identifier) // We're inside an identifier
+				else if(type == ScriptLexemeType.Identifier) // We're inside an identifier
 				{
 					if (Char.IsLetter(text[i]) || Char.IsNumber(text[i]) || text[i] == '_')
 					{
@@ -270,7 +270,7 @@ namespace Snowsoft.SnowflakeScript
 						i--;
 					}
 				}
-				else if(type == LexemeType.Numeric) // We're inside a numeric
+				else if(type == ScriptLexemeType.Numeric) // We're inside a numeric
 				{
 					if (Char.IsNumber(text[i]))
 					{
@@ -290,107 +290,107 @@ namespace Snowsoft.SnowflakeScript
 
 				if(output) // We've reached the end of a long lexeme
 				{
-					if(type == LexemeType.Identifier)
+					if(type == ScriptLexemeType.Identifier)
 					{
 						string valueToUpper = value.ToUpper();
 
 						switch (valueToUpper)
 						{
 							case "FUNC":
-								lexemes.Add(new Lexeme(LexemeType.Func, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Func, null, line, column));
 								break;
 
 							case "IF":
-								lexemes.Add(new Lexeme(LexemeType.If, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.If, null, line, column));
 								break;
 
 							case "ELSE":
-								lexemes.Add(new Lexeme(LexemeType.Else, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Else, null, line, column));
 								break;
 
 							case "WHILE":
-								lexemes.Add(new Lexeme(LexemeType.While, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.While, null, line, column));
 								break;
 
 							case "FOR":
-								lexemes.Add(new Lexeme(LexemeType.For, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.For, null, line, column));
 								break;
 
 							case "FOREACH":
-								lexemes.Add(new Lexeme(LexemeType.ForEach, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.ForEach, null, line, column));
 								break;
 
 							case "AS":
-								lexemes.Add(new Lexeme(LexemeType.As, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.As, null, line, column));
 								break;
 
 							case "ECHO":
-								lexemes.Add(new Lexeme(LexemeType.Echo, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Echo, null, line, column));
 								break;
 
 							case "NULL":
-								lexemes.Add(new Lexeme(LexemeType.Null, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Null, null, line, column));
 								break;
 
 							case "TRUE":
-								lexemes.Add(new Lexeme(LexemeType.True, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.True, null, line, column));
 								break;
 
 							case "FALSE":
-								lexemes.Add(new Lexeme(LexemeType.False, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.False, null, line, column));
 								break;
 
 							case "ARRAY":
-								lexemes.Add(new Lexeme(LexemeType.Array, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.Array, null, line, column));
 								break;
 
 							case "LIST":
-								lexemes.Add(new Lexeme(LexemeType.List, null, line, column));
+								lexemes.Add(new ScriptLexeme(ScriptLexemeType.List, null, line, column));
 								break;
 
 							default:
-								lexemes.Add(new Lexeme(type, value, line, column));
+								lexemes.Add(new ScriptLexeme(type, value, line, column));
 								break;
 						}						
 					}
-					else if(type == LexemeType.Numeric)
+					else if(type == ScriptLexemeType.Numeric)
 					{
 						if(isFloat)
-							type = LexemeType.Float;
+							type = ScriptLexemeType.Float;
 						else
-							type = LexemeType.Integer;
+							type = ScriptLexemeType.Integer;
 
-						lexemes.Add(new Lexeme(type, value));
+						lexemes.Add(new ScriptLexeme(type, value));
 					}
-					else if(type == LexemeType.Char)
+					else if(type == ScriptLexemeType.Char)
 					{
 						if (value.Length > 1)
 						{
 							if (value.Length > 2 || value[0] != '\\')
 							{
-								throw new ScriptException(ScriptError.ParseError, "Invalid char: " + value + ".");
+								throw new ScriptParseException("Invalid char: " + value + ".");
 							}
 						}
 
-						lexemes.Add(new Lexeme(type, ConvertEscapeCodes(value.Replace("\\'", "'")), line, column));
+						lexemes.Add(new ScriptLexeme(type, ConvertEscapeCodes(value.Replace("\\'", "'")), line, column));
 					}
-					else if(type == LexemeType.String)
+					else if(type == ScriptLexemeType.String)
 					{
-						lexemes.Add(new Lexeme(type, ConvertEscapeCodes(value.Replace("\\\"", "\"")), line, column));
+						lexemes.Add(new ScriptLexeme(type, ConvertEscapeCodes(value.Replace("\\\"", "\"")), line, column));
 					}
 
 					output = false;
-					type = LexemeType.Unknown;
+					type = ScriptLexemeType.Unknown;
 					isFloat = false;
 					value = "";
 				}
 			}
 
-			if (type != LexemeType.Unknown)
-				throw new ScriptException(ScriptError.ParseError, "Unexpected end of file.");
+			if (type != ScriptLexemeType.Unknown)
+				throw new ScriptParseException("Unexpected end of file.");
 
 			// Add an EOF to mark the end of the script.
-			lexemes.Add(new Lexeme(LexemeType.EOF, null, line, column));
+			lexemes.Add(new ScriptLexeme(ScriptLexemeType.EOF, null, line, column));
 
 			return lexemes;
 		}

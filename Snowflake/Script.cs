@@ -15,9 +15,9 @@ namespace Snowsoft.SnowflakeScript
 			public int ExitLocation;
 		}
 
-		List<Lexeme> lexemes;
+		List<ScriptLexeme> lexemes;
 		Dictionary<string, FuncInfo> funcs;
-		VariableStack variableStack;
+		ScriptVariableStack variableStack;
 		bool debug;
 
 		/// <summary>
@@ -32,16 +32,16 @@ namespace Snowsoft.SnowflakeScript
 		/// <summary>
 		/// Private constructor. Use static methods to construct instances.
 		/// </summary>
-		private Script(List<Lexeme> lexemes)
+		private Script(List<ScriptLexeme> lexemes)
 		{
 			this.lexemes = lexemes;
 			this.funcs = new Dictionary<string, FuncInfo>();
-			this.variableStack = new VariableStack();
+			this.variableStack = new ScriptVariableStack();
 			this.debug = false;
 
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
 			{
-				if (this.lexemes[pos].Type == LexemeType.Func)
+				if (this.lexemes[pos].Type == ScriptLexemeType.Func)
 				{
 					FuncInfo funcInfo = this.ParseFunc(ref pos);
 					this.funcs.Add(funcInfo.Name, funcInfo);
@@ -59,7 +59,7 @@ namespace Snowsoft.SnowflakeScript
 			StreamReader sr = File.OpenText(filename);
 			string text = sr.ReadToEnd();
 			
-			return new Script(Lexeme.Parse(text));
+			return new Script(ScriptLexeme.Parse(text));
 		}
 
 		/// <summary>
@@ -69,7 +69,7 @@ namespace Snowsoft.SnowflakeScript
 		/// <returns>Script</returns>
 		public static Script FromString(string script)
 		{
-			return new Script(Lexeme.Parse(script));
+			return new Script(ScriptLexeme.Parse(script));
 		}	
 
 		public void DisplayLexemes()
@@ -78,16 +78,16 @@ namespace Snowsoft.SnowflakeScript
 				OutputLine(i + " => " + lexemes[i]);
 		}
 				
-		private void EnsureLexemeType(LexemeType expected, int pos)
+		private void EnsureLexemeType(ScriptLexemeType expected, int pos)
 		{
 			if (this.lexemes[pos].Type != expected)
-				throw new ScriptException(ScriptError.SyntaxError, expected + " was expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
+				throw new ScriptSyntaxException(expected + " was expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
 		}
 
-		private void EnsureNotLexemeType(LexemeType unexpected, int pos)
+		private void EnsureNotLexemeType(ScriptLexemeType unexpected, int pos)
 		{
 			if (this.lexemes[pos].Type == unexpected)
-				throw new ScriptException(ScriptError.SyntaxError, unexpected + " was not expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
+				throw new ScriptSyntaxException(unexpected + " was not expected at Line " + this.lexemes[pos].Line + " Column " + this.lexemes[pos].Column + ".");
 		}
 
 		/// <summary>
@@ -96,57 +96,57 @@ namespace Snowsoft.SnowflakeScript
 		/// <param name="pos"></param>
 		private void MoveToMatchingBrace(ref int pos)
 		{
-			this.EnsureLexemeType(LexemeType.OpenBrace, pos);
+			this.EnsureLexemeType(ScriptLexemeType.OpenBrace, pos);
 
 			int level = 1;
-			while (level > 0 && this.lexemes[pos].Type != LexemeType.EOF)
+			while (level > 0 && this.lexemes[pos].Type != ScriptLexemeType.EOF)
 			{
 				pos++;
-				if (this.lexemes[pos].Type == LexemeType.OpenBrace)
+				if (this.lexemes[pos].Type == ScriptLexemeType.OpenBrace)
 				{
 					level++;
 				}
-				else if (this.lexemes[pos].Type == LexemeType.CloseBrace)
+				else if (this.lexemes[pos].Type == ScriptLexemeType.CloseBrace)
 				{
 					level--;
 				}
 			}
 
-			this.EnsureLexemeType(LexemeType.CloseBrace, pos);
+			this.EnsureLexemeType(ScriptLexemeType.CloseBrace, pos);
 		}
 
 		private FuncInfo ParseFunc(ref int pos)
 		{
 			FuncInfo funcInfo = new FuncInfo();
 
-			this.EnsureLexemeType(LexemeType.Func, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Func, pos);
 			funcInfo.Location = pos;
 
 			pos++;
-			this.EnsureLexemeType(LexemeType.Identifier, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 
 			funcInfo.Name = this.lexemes[pos].Val;
 
 			pos++;
-			this.EnsureLexemeType(LexemeType.OpenParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
 			pos++;
-			if (this.lexemes[pos].Type == LexemeType.Variable)
+			if (this.lexemes[pos].Type == ScriptLexemeType.Variable)
 			{
 				List<string> argList = new List<string>();
 				
 				pos++;
-				this.EnsureLexemeType(LexemeType.Identifier, pos);
+				this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 				argList.Add(this.lexemes[pos].Val);
 
 				pos++;
-				while (this.lexemes[pos].Type == LexemeType.Comma)
+				while (this.lexemes[pos].Type == ScriptLexemeType.Comma)
 				{
 					pos++;
-					this.EnsureLexemeType(LexemeType.Variable, pos);
+					this.EnsureLexemeType(ScriptLexemeType.Variable, pos);
 
 					pos++;
-					this.EnsureLexemeType(LexemeType.Identifier, pos);
+					this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 					argList.Add(this.lexemes[pos].Val);
 
 					pos++;
@@ -159,15 +159,15 @@ namespace Snowsoft.SnowflakeScript
 				funcInfo.Args = new string[0];
 			}
 
-			this.EnsureLexemeType(LexemeType.CloseParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
 
 			pos++;
-			this.EnsureLexemeType(LexemeType.OpenBrace, pos);
+			this.EnsureLexemeType(ScriptLexemeType.OpenBrace, pos);
 			funcInfo.EntryLocation = pos;
 
 			this.MoveToMatchingBrace(ref pos);
 
-			this.EnsureLexemeType(LexemeType.CloseBrace, pos);
+			this.EnsureLexemeType(ScriptLexemeType.CloseBrace, pos);
 			funcInfo.ExitLocation = pos;
 
 			return funcInfo;
@@ -176,20 +176,20 @@ namespace Snowsoft.SnowflakeScript
 		/// <summary>
 		/// Execute the script.
 		/// </summary>
-		public Variable Execute()
+		public ScriptVariable Execute()
 		{
 			return this.Execute("Main", null);
 		}
 
-		public Variable Execute(string funcName)
+		public ScriptVariable Execute(string funcName)
 		{
 			return this.Execute(funcName, null);
 		}
 
-		public Variable Execute(string funcName, IList<Variable> args)
+		public ScriptVariable Execute(string funcName, IList<ScriptVariable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
-				throw new ScriptException(ScriptError.InvalidFunctionCall, "No function found by the name " + funcName + ".");
+				throw new ScriptFunctionCallException("No function found by the name " + funcName + ".");
 
 			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
@@ -199,11 +199,11 @@ namespace Snowsoft.SnowflakeScript
 			if (args != null)
 			{
 				if (args.Count != funcInfo.Args.Length)
-					throw new ScriptException(ScriptError.InvalidFunctionCall, "Invalid number of args specified for " + funcName + ".");
+					throw new ScriptFunctionCallException("Invalid number of args specified for " + funcName + ".");
 
 				for (int i = 0; i < args.Count; i++)
 				{
-					Variable arg = this.variableStack[funcInfo.Args[i]];
+					ScriptVariable arg = this.variableStack[funcInfo.Args[i]];
 					arg.Gets(args[i]);
 				}
 			}
@@ -219,18 +219,18 @@ namespace Snowsoft.SnowflakeScript
 			return null; // TODO: Implement this.
 		}
 
-		private Variable Statement(ref int pos)
+		private ScriptVariable Statement(ref int pos)
 		{
 			if (this.debug)
 				OutputLine("Statement at " + pos);
 
-			Variable variable = null;
+			ScriptVariable variable = null;
 
-			if (lexemes[pos].Type == LexemeType.Echo)
+			if (lexemes[pos].Type == ScriptLexemeType.Echo)
 			{
 				Echo(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.If)
+			else if (lexemes[pos].Type == ScriptLexemeType.If)
 			{
 				DoIf(ref pos);
 			}
@@ -239,7 +239,7 @@ namespace Snowsoft.SnowflakeScript
 				variable = Expression(ref pos);
 			}
 
-			this.EnsureLexemeType(LexemeType.EndStatement, pos);
+			this.EnsureLexemeType(ScriptLexemeType.EndStatement, pos);
 			pos++;
 
 			return variable;
@@ -250,10 +250,10 @@ namespace Snowsoft.SnowflakeScript
 			if (this.debug)
 				OutputLine("Echo at " + pos);
 
-			this.EnsureLexemeType(LexemeType.Echo, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Echo, pos);
 
 			pos++;
-			Variable variable = Expression(ref pos);
+			ScriptVariable variable = Expression(ref pos);
 
 			if (variable != null)
 				Output(variable.ToString());
@@ -271,31 +271,29 @@ namespace Snowsoft.SnowflakeScript
 		/// <param name="skip">Should the if statement be skipped?</param>
 		private void DoIf(ref int pos, bool skip)
 		{
-			pos++;
-			if (lexemes[pos].Type != LexemeType.OpenParen)
-				throw new ScriptException(ScriptError.SyntaxError, "'(' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(ScriptLexemeType.If, pos);
 
 			pos++;
-			Variable variable = Expression(ref pos);
-
-			if (lexemes[pos].Type != LexemeType.CloseParen)
-				throw new ScriptException(ScriptError.SyntaxError, "')' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
 			pos++;
-			if (lexemes[pos].Type != LexemeType.OpenBrace)
-				throw new ScriptException(ScriptError.SyntaxError, "'{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+			ScriptVariable variable = Expression(ref pos);
+
+			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
+
+			pos++;
+			this.EnsureLexemeType(ScriptLexemeType.OpenBrace, pos);
 
 			pos++;
 			if (variable.ToBoolean() && !skip)
 			{
 				variableStack.Push();
 
-				while (lexemes[pos].Type != LexemeType.CloseBrace)
+				while (lexemes[pos].Type != ScriptLexemeType.CloseBrace)
 				{
 					Statement(ref pos);
 
-					if (lexemes[pos].Type != LexemeType.EndStatement)
-						throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+					this.EnsureLexemeType(ScriptLexemeType.EndStatement, pos);
 
 					pos++;
 				}
@@ -304,45 +302,45 @@ namespace Snowsoft.SnowflakeScript
 
 				pos++;
 
-				if (lexemes[pos].Type == LexemeType.Else)
+				if (lexemes[pos].Type == ScriptLexemeType.Else)
 				{
 					pos++;
 
-					if (lexemes[pos].Type == LexemeType.If)
+					if (lexemes[pos].Type == ScriptLexemeType.If)
 					{
 						DoIf(ref pos, true);
 					}
-					else if (lexemes[pos].Type == LexemeType.OpenBrace)
+					else if (lexemes[pos].Type == ScriptLexemeType.OpenBrace)
 					{
 						pos++;
 
-						while (lexemes[pos].Type != LexemeType.CloseBrace)
+						while (lexemes[pos].Type != ScriptLexemeType.CloseBrace)
 							pos++;
 
 						pos++;
 					}
 					else
 					{
-						throw new ScriptException(ScriptError.SyntaxError, "'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+						throw new ScriptSyntaxException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 					}
 				}
 			}
 			else
 			{
-				while (lexemes[pos].Type != LexemeType.CloseBrace)
+				while (lexemes[pos].Type != ScriptLexemeType.CloseBrace)
 					pos++;
 
 				pos++;
 
-				if (lexemes[pos].Type == LexemeType.Else)
+				if (lexemes[pos].Type == ScriptLexemeType.Else)
 				{
 					pos++;
 
-					if (lexemes[pos].Type == LexemeType.If)
+					if (lexemes[pos].Type == ScriptLexemeType.If)
 					{
 						DoIf(ref pos, skip);
 					}
-					else if (lexemes[pos].Type == LexemeType.OpenBrace)
+					else if (lexemes[pos].Type == ScriptLexemeType.OpenBrace)
 					{
 						pos++;
 
@@ -350,12 +348,11 @@ namespace Snowsoft.SnowflakeScript
 						{
 							variableStack.Push();
 
-							while (lexemes[pos].Type != LexemeType.CloseBrace)
+							while (lexemes[pos].Type != ScriptLexemeType.CloseBrace)
 							{
 								Statement(ref pos);
 
-								if (lexemes[pos].Type != LexemeType.EndStatement) // Check for ;
-									throw new ScriptException(ScriptError.SyntaxError, "; was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+								this.EnsureLexemeType(ScriptLexemeType.EndStatement, pos);
 
 								pos++;
 							}
@@ -364,7 +361,7 @@ namespace Snowsoft.SnowflakeScript
 						}
 						else
 						{
-							while (lexemes[pos].Type != LexemeType.CloseBrace)
+							while (lexemes[pos].Type != ScriptLexemeType.CloseBrace)
 								pos++;
 						}
 
@@ -372,7 +369,7 @@ namespace Snowsoft.SnowflakeScript
 					}
 					else
 					{
-						throw new ScriptException(ScriptError.SyntaxError, "'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
+						throw new ScriptSyntaxException("'if' or '{' was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column);
 					}
 				}
 			}
@@ -386,94 +383,94 @@ namespace Snowsoft.SnowflakeScript
 		{
 		}
 
-		private Variable Expression(ref int pos)
+		private ScriptVariable Expression(ref int pos)
 		{
 			if (this.debug)
 				OutputLine("Expression at " + pos);
 
-			Variable variable = null;
+			ScriptVariable variable = null;
 
-			if (lexemes[pos].Type == LexemeType.Identifier)
+			if (lexemes[pos].Type == ScriptLexemeType.Identifier)
 			{
 				FuncCall(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Variable)
+			else if (lexemes[pos].Type == ScriptLexemeType.Variable)
 			{
 				variable = Variable(ref pos);
 
-				if(lexemes[pos].Type == LexemeType.OpenBracket)
+				if(lexemes[pos].Type == ScriptLexemeType.OpenBracket)
 				{
 					pos++;
 
-					if(lexemes[pos].Type != LexemeType.CloseBracket)
+					if(lexemes[pos].Type != ScriptLexemeType.CloseBracket)
 						variable = variable.AtIndex(Statement(ref pos)); // Key specified
 					else
 						variable = variable.AtIndex(null); // Request next key
 
-					if (lexemes[pos].Type != LexemeType.CloseBracket)
-						this.EnsureLexemeType(LexemeType.CloseBracket, pos);
+					if (lexemes[pos].Type != ScriptLexemeType.CloseBracket)
+						this.EnsureLexemeType(ScriptLexemeType.CloseBracket, pos);
 
 					pos++;
 				}
 
 				// Check for operations
 
-				if (lexemes[pos].Type == LexemeType.Gets)
+				if (lexemes[pos].Type == ScriptLexemeType.Gets)
 				{
 					pos++;
 					variable.Gets(Expression(ref pos));
 				}
-				else if (lexemes[pos].Type == LexemeType.Plus)
+				else if (lexemes[pos].Type == ScriptLexemeType.Plus)
 				{
 					pos++;
 					variable = variable.Add(Expression(ref pos));
 				}
-				else if (lexemes[pos].Type == LexemeType.PlusGets)
+				else if (lexemes[pos].Type == ScriptLexemeType.PlusGets)
 				{
 					pos++;
 					variable.Gets(variable.Add(Expression(ref pos)));
 				}
-				else if (lexemes[pos].Type == LexemeType.Minus)
+				else if (lexemes[pos].Type == ScriptLexemeType.Minus)
 				{
 					pos++;
 					variable = variable.Subtract(Expression(ref pos));
 				}
-				else if (lexemes[pos].Type == LexemeType.MinusGets)
+				else if (lexemes[pos].Type == ScriptLexemeType.MinusGets)
 				{
 					pos++;
 					variable.Gets(variable.Subtract(Expression(ref pos)));
 				}
-				else if (lexemes[pos].Type == LexemeType.EqualTo)
+				else if (lexemes[pos].Type == ScriptLexemeType.EqualTo)
 				{
 					pos++;
 					variable = variable.EqualTo(Expression(ref pos));
 				}
 			}
-			else if (lexemes[pos].Type == LexemeType.Null)
+			else if (lexemes[pos].Type == ScriptLexemeType.Null)
 			{
 				variable = Null(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.True || lexemes[pos].Type == LexemeType.False)
+			else if (lexemes[pos].Type == ScriptLexemeType.True || lexemes[pos].Type == ScriptLexemeType.False)
 			{
 				variable = Boolean(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Char)
+			else if (lexemes[pos].Type == ScriptLexemeType.Char)
 			{
 				variable = Char(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.String)
+			else if (lexemes[pos].Type == ScriptLexemeType.String)
 			{
 				variable = String(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Integer)
+			else if (lexemes[pos].Type == ScriptLexemeType.Integer)
 			{
 				variable = Integer(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Float)
+			else if (lexemes[pos].Type == ScriptLexemeType.Float)
 			{
 				variable = Float(ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Array)
+			else if (lexemes[pos].Type == ScriptLexemeType.Array)
 			{
 				variable = Array(ref pos);
 			}
@@ -481,31 +478,31 @@ namespace Snowsoft.SnowflakeScript
 			return variable;
 		}
 
-		private Variable FuncCall(ref int pos)
+		private ScriptVariable FuncCall(ref int pos)
 		{
-			this.EnsureLexemeType(LexemeType.Identifier, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 			string funcName = this.lexemes[pos].Val;
 
 			pos++;
-			this.EnsureLexemeType(LexemeType.OpenParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
 			pos++;
-			List<Variable> args = new List<Variable>();
+			List<ScriptVariable> args = new List<ScriptVariable>();
 
-			while (this.lexemes[pos].Type != LexemeType.CloseParen &&
-				   this.lexemes[pos].Type != LexemeType.EOF)
+			while (this.lexemes[pos].Type != ScriptLexemeType.CloseParen &&
+				   this.lexemes[pos].Type != ScriptLexemeType.EOF)
 			{
 				args.Add(this.Expression(ref pos));
 
-				if (this.lexemes[pos].Type == LexemeType.Comma)
+				if (this.lexemes[pos].Type == ScriptLexemeType.Comma)
 				{
 					pos++;
 
-					this.EnsureNotLexemeType(LexemeType.CloseParen, pos);
+					this.EnsureNotLexemeType(ScriptLexemeType.CloseParen, pos);
 				}
 			}
 									
-			this.EnsureLexemeType(LexemeType.CloseParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
 			
 			pos++; // Move to just after the FuncCall.
 
@@ -517,87 +514,87 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		/// <param name="pos">The lexeme to read.</param>
 		/// <returns>ScriptVariable</returns>
-		private Variable Variable(ref int pos)
+		private ScriptVariable Variable(ref int pos)
 		{
-			this.EnsureLexemeType(LexemeType.Variable, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Variable, pos);
 
 			pos++;
-			this.EnsureLexemeType(LexemeType.Identifier, pos);
+			this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 
-			Variable variable = this.variableStack[lexemes[pos].Val];
+			ScriptVariable variable = this.variableStack[lexemes[pos].Val];
 			
 			pos++;
 			return variable;
 		}
 
-		private Variable Null(ref int pos)
+		private ScriptVariable Null(ref int pos)
 		{
 			pos++;
-			return new Variable();
+			return new ScriptVariable();
 		}
 
-		private Variable Boolean(ref int pos)
+		private ScriptVariable Boolean(ref int pos)
 		{
 			pos++;
-			if (this.lexemes[pos - 1].Type == LexemeType.True)
-				return new Variable(true);
+			if (this.lexemes[pos - 1].Type == ScriptLexemeType.True)
+				return new ScriptVariable(true);
 			else
-				return new Variable(false);
+				return new ScriptVariable(false);
 		}
 
-		private Variable Char(ref int pos)
+		private ScriptVariable Char(ref int pos)
 		{
-			return new Variable(this.lexemes[pos++].Val);
+			return new ScriptVariable(this.lexemes[pos++].Val);
 		}
 
-		private Variable String(ref int pos)
+		private ScriptVariable String(ref int pos)
 		{
-			return new Variable(this.lexemes[pos++].Val);
+			return new ScriptVariable(this.lexemes[pos++].Val);
 		}
 
-		private Variable Integer(ref int pos)
+		private ScriptVariable Integer(ref int pos)
 		{
-			return new Variable(Int32.Parse(this.lexemes[pos++].Val));
+			return new ScriptVariable(Int32.Parse(this.lexemes[pos++].Val));
 		}
 
-		private Variable Float(ref int pos)
+		private ScriptVariable Float(ref int pos)
 		{
-			return new Variable(Double.Parse(this.lexemes[pos++].Val));
+			return new ScriptVariable(Double.Parse(this.lexemes[pos++].Val));
 		}
 
-		private Variable Array(ref int pos)
+		private ScriptVariable Array(ref int pos)
 		{
 			pos++;
-			this.EnsureLexemeType(LexemeType.OpenParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
-			Dictionary<string, Variable> values = new Dictionary<string, Variable>();
+			Dictionary<string, ScriptVariable> values = new Dictionary<string, ScriptVariable>();
 			pos++;
 
 			int i = 0;
-			while (this.lexemes[pos].Type != LexemeType.CloseParen &&
-				   this.lexemes[pos].Type != LexemeType.EOF)
+			while (this.lexemes[pos].Type != ScriptLexemeType.CloseParen &&
+				   this.lexemes[pos].Type != ScriptLexemeType.EOF)
 			{
-				if (this.lexemes[pos + 1].Type != LexemeType.MapsTo) // No key specified
+				if (this.lexemes[pos + 1].Type != ScriptLexemeType.MapsTo) // No key specified
 				{
 					values.Add((i++).ToString(), Expression(ref pos));
 				}
 				else
 				{
-					Variable key = Expression(ref pos);
+					ScriptVariable key = Expression(ref pos);
 
 					pos++; // =>
 
 					values.Add(key.ToString(), Expression(ref pos));
 				}
 
-				if (this.lexemes[pos].Type == LexemeType.Comma)
+				if (this.lexemes[pos].Type == ScriptLexemeType.Comma)
 					pos++;
 			}
 
-			this.EnsureLexemeType(LexemeType.CloseParen, pos);
+			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
 
 			pos++;
-			return new Variable(values);
+			return new ScriptVariable(values);
 		}
 
 		/// <summary>

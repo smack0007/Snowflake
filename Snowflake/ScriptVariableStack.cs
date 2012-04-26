@@ -6,12 +6,12 @@ namespace Snowsoft.SnowflakeScript
 	/// <summary>
 	/// Represents a stack.
 	/// </summary>
-	public class VariableStack
+	public class ScriptVariableStack
 	{
-		Dictionary<string, Variable> globals;
-		List<Dictionary<string, Variable>> stack;
+		Dictionary<string, ScriptVariable> globals;
+		List<Dictionary<string, ScriptVariable>> stack;
 
-		public Variable this[string name]
+		public ScriptVariable this[string name]
 		{
 			get
 			{
@@ -24,7 +24,7 @@ namespace Snowsoft.SnowflakeScript
 					return this.globals[name];
 
 				// We didn't find the variable so create it.
-				Variable variable = new Variable();
+				ScriptVariable variable = new ScriptVariable();
 
 				// If we have a function stack, add it to that.
 				if (this.stack.Count > 0)
@@ -40,10 +40,10 @@ namespace Snowsoft.SnowflakeScript
 			}
 		}
 
-		public VariableStack()
+		public ScriptVariableStack()
 		{
-			this.globals = new Dictionary<string, Variable>();
-			this.stack = new List<Dictionary<string, Variable>>();
+			this.globals = new Dictionary<string, ScriptVariable>();
+			this.stack = new List<Dictionary<string, ScriptVariable>>();
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace Snowsoft.SnowflakeScript
 		/// </summary>
 		public void Push()
 		{
-			this.stack.Add(new Dictionary<string, Variable>());
+			this.stack.Add(new Dictionary<string, ScriptVariable>());
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace Snowsoft.SnowflakeScript
 		public void Pop()
 		{
 			if (this.stack.Count == 0)
-				throw new ScriptException(ScriptError.VariableStackError, "Cannot pop the variable stack.");
+				throw new InvalidOperationException("Cannot pop the stack.");
 
 			this.stack.RemoveAt(this.stack.Count - 1);
 		}

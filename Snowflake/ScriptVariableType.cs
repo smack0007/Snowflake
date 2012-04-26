@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript
 {
-	public enum VariableType
+	public enum ScriptVariableType
 	{
 		Null = 0,
 

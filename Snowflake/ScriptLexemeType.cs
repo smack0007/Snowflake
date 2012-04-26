@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript
 {
-	public enum LexemeType
+	public enum ScriptLexemeType
 	{
 		/// <summary>
 		/// Used internally to indicate we're currently looking for a lexeme.
