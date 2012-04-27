@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript.Parser
+namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class ScriptSyntaxException : ScriptException
 	{

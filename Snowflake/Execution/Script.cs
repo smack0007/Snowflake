@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Snowsoft.SnowflakeScript.Lexer;
-using Snowsoft.SnowflakeScript.Parser;
+using Snowsoft.SnowflakeScript.Lexing;
+using Snowsoft.SnowflakeScript.Parsing;
 
-namespace Snowsoft.SnowflakeScript.Executor
+namespace Snowsoft.SnowflakeScript.Execution
 {	
 	public class Script
 	{
@@ -17,14 +17,14 @@ namespace Snowsoft.SnowflakeScript.Executor
 			public int ExitLocation;
 		}
 
-		IList<ScriptLexeme> lexemes;
+		IList<Lexeme> lexemes;
 		Dictionary<string, FuncInfo> funcs;
-		ScriptVariableStack variableStack;
+		VariableStack variableStack;
 		
 		/// <summary>
 		/// Creates a new script based on the given lexemes.
 		/// </summary>
-		public Script(IList<ScriptLexeme> lexemes)
+		public Script(IList<Lexeme> lexemes)
 		{
 			if (lexemes == null)
 			{
@@ -33,7 +33,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 
 			this.lexemes = lexemes;
 			this.funcs = new Dictionary<string, FuncInfo>();
-			this.variableStack = new ScriptVariableStack();
+			this.variableStack = new VariableStack();
 			
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
 			{
@@ -140,15 +140,15 @@ namespace Snowsoft.SnowflakeScript.Executor
 			return funcInfo;
 		}
 		
-		public ScriptVariable CallFunc(string funcName)
+		public Variable CallFunc(string funcName)
 		{
 			return this.CallFunc(funcName, null);
 		}
 
-		public ScriptVariable CallFunc(string funcName, IList<ScriptVariable> args)
+		public Variable CallFunc(string funcName, IList<Variable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
-				throw new ScriptFunctionCallException("No function found by the name " + funcName + ".");
+				throw new FuncCallException("No function found by the name " + funcName + ".");
 
 			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
@@ -158,11 +158,11 @@ namespace Snowsoft.SnowflakeScript.Executor
 			if (args != null)
 			{
 				if (args.Count != funcInfo.Args.Length)
-					throw new ScriptFunctionCallException("Invalid number of args specified for " + funcName + ".");
+					throw new FuncCallException("Invalid number of args specified for " + funcName + ".");
 
 				for (int i = 0; i < args.Count; i++)
 				{
-					ScriptVariable arg = this.variableStack[funcInfo.Args[i]];
+					Variable arg = this.variableStack[funcInfo.Args[i]];
 					arg.Gets(args[i]);
 				}
 			}
@@ -178,9 +178,9 @@ namespace Snowsoft.SnowflakeScript.Executor
 			return null; // TODO: Implement this.
 		}
 
-		private ScriptVariable Statement(ref int pos)
+		private Variable Statement(ref int pos)
 		{
-			ScriptVariable variable = null;
+			Variable variable = null;
 
 			if (lexemes[pos].Type == ScriptLexemeType.Echo)
 			{
@@ -206,7 +206,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 			this.EnsureLexemeType(ScriptLexemeType.Echo, pos);
 
 			pos++;
-			ScriptVariable variable = Expression(ref pos);
+			Variable variable = Expression(ref pos);
 
 			if (variable != null)
 				Output(variable.ToString());
@@ -230,7 +230,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
 			pos++;
-			ScriptVariable variable = Expression(ref pos);
+			Variable variable = Expression(ref pos);
 
 			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
 
@@ -336,9 +336,9 @@ namespace Snowsoft.SnowflakeScript.Executor
 		{
 		}
 
-		private ScriptVariable Expression(ref int pos)
+		private Variable Expression(ref int pos)
 		{
-			ScriptVariable variable = null;
+			Variable variable = null;
 
 			if (lexemes[pos].Type == ScriptLexemeType.Identifier)
 			{
@@ -428,7 +428,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 			return variable;
 		}
 
-		private ScriptVariable FuncCall(ref int pos)
+		private Variable FuncCall(ref int pos)
 		{
 			this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 			string funcName = this.lexemes[pos].Val;
@@ -437,7 +437,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
 			pos++;
-			List<ScriptVariable> args = new List<ScriptVariable>();
+			List<Variable> args = new List<Variable>();
 
 			while (this.lexemes[pos].Type != ScriptLexemeType.CloseParen &&
 				   this.lexemes[pos].Type != ScriptLexemeType.EOF)
@@ -464,60 +464,60 @@ namespace Snowsoft.SnowflakeScript.Executor
 		/// </summary>
 		/// <param name="pos">The lexeme to read.</param>
 		/// <returns>ScriptVariable</returns>
-		private ScriptVariable Variable(ref int pos)
+		private Variable Variable(ref int pos)
 		{
 			this.EnsureLexemeType(ScriptLexemeType.Variable, pos);
 
 			pos++;
 			this.EnsureLexemeType(ScriptLexemeType.Identifier, pos);
 
-			ScriptVariable variable = this.variableStack[lexemes[pos].Val];
+			Variable variable = this.variableStack[lexemes[pos].Val];
 			
 			pos++;
 			return variable;
 		}
 
-		private ScriptVariable Null(ref int pos)
+		private Variable Null(ref int pos)
 		{
 			pos++;
-			return new ScriptVariable();
+			return new Variable();
 		}
 
-		private ScriptVariable Boolean(ref int pos)
+		private Variable Boolean(ref int pos)
 		{
 			pos++;
 			if (this.lexemes[pos - 1].Type == ScriptLexemeType.True)
-				return new ScriptVariable(true);
+				return new Variable(true);
 			else
-				return new ScriptVariable(false);
+				return new Variable(false);
 		}
 
-		private ScriptVariable Char(ref int pos)
+		private Variable Char(ref int pos)
 		{
-			return new ScriptVariable(this.lexemes[pos++].Val);
+			return new Variable(this.lexemes[pos++].Val);
 		}
 
-		private ScriptVariable String(ref int pos)
+		private Variable String(ref int pos)
 		{
-			return new ScriptVariable(this.lexemes[pos++].Val);
+			return new Variable(this.lexemes[pos++].Val);
 		}
 
-		private ScriptVariable Integer(ref int pos)
+		private Variable Integer(ref int pos)
 		{
-			return new ScriptVariable(Int32.Parse(this.lexemes[pos++].Val));
+			return new Variable(Int32.Parse(this.lexemes[pos++].Val));
 		}
 
-		private ScriptVariable Float(ref int pos)
+		private Variable Float(ref int pos)
 		{
-			return new ScriptVariable(Double.Parse(this.lexemes[pos++].Val));
+			return new Variable(Double.Parse(this.lexemes[pos++].Val));
 		}
 
-		private ScriptVariable Array(ref int pos)
+		private Variable Array(ref int pos)
 		{
 			pos++;
 			this.EnsureLexemeType(ScriptLexemeType.OpenParen, pos);
 
-			Dictionary<string, ScriptVariable> values = new Dictionary<string, ScriptVariable>();
+			Dictionary<string, Variable> values = new Dictionary<string, Variable>();
 			pos++;
 
 			int i = 0;
@@ -530,7 +530,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 				}
 				else
 				{
-					ScriptVariable key = Expression(ref pos);
+					Variable key = Expression(ref pos);
 
 					pos++; // =>
 
@@ -544,7 +544,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 			this.EnsureLexemeType(ScriptLexemeType.CloseParen, pos);
 
 			pos++;
-			return new ScriptVariable(values);
+			return new Variable(values);
 		}
 
 		/// <summary>

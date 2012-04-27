@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript.Lexer
+namespace Snowsoft.SnowflakeScript.Lexing
 {
-	public class ScriptLexeme
+	public class Lexeme
 	{
 		public ScriptLexemeType Type
 		{
@@ -29,7 +29,7 @@ namespace Snowsoft.SnowflakeScript.Lexer
 			private set;
 		}
 
-		public ScriptLexeme(ScriptLexemeType type, string val, int line, int column)
+		public Lexeme(ScriptLexemeType type, string val, int line, int column)
 		{
 			this.Type = type;
 

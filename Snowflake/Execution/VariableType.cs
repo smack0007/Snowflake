@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript.Executor
+namespace Snowsoft.SnowflakeScript.Execution
 {
-	public enum ScriptVariableType
+	public enum VariableType
 	{
 		Null = 0,
 

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Snowsoft.SnowflakeScript.Lexer;
-using Snowsoft.SnowflakeScript.Parser;
-using Snowsoft.SnowflakeScript.Executor;
+using Snowsoft.SnowflakeScript.Lexing;
+using Snowsoft.SnowflakeScript.Parsing;
+using Snowsoft.SnowflakeScript.Execution;
 
 namespace Snowsoft.SnowflakeScript
 {
 	public class ScriptEngine
 	{
-		IScriptLexer lexer;
+		ILexer lexer;
 
 		Script script;
 
@@ -18,7 +18,7 @@ namespace Snowsoft.SnowflakeScript
 		{
 		}
 
-		public ScriptEngine(IScriptLexer parser)
+		public ScriptEngine(ILexer parser)
 		{
 			if (parser == null)
 			{

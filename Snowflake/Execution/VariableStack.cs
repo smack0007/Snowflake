@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript.Executor
+namespace Snowsoft.SnowflakeScript.Execution
 {
 	/// <summary>
 	/// Represents a stack.
 	/// </summary>
-	public class ScriptVariableStack
+	public class VariableStack
 	{
-		Dictionary<string, ScriptVariable> globals;
-		List<Dictionary<string, ScriptVariable>> stack;
+		Dictionary<string, Variable> globals;
+		List<Dictionary<string, Variable>> stack;
 
-		public ScriptVariable this[string name]
+		public Variable this[string name]
 		{
 			get
 			{
@@ -24,7 +24,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 					return this.globals[name];
 
 				// We didn't find the variable so create it.
-				ScriptVariable variable = new ScriptVariable();
+				Variable variable = new Variable();
 
 				// If we have a function stack, add it to that.
 				if (this.stack.Count > 0)
@@ -40,10 +40,10 @@ namespace Snowsoft.SnowflakeScript.Executor
 			}
 		}
 
-		public ScriptVariableStack()
+		public VariableStack()
 		{
-			this.globals = new Dictionary<string, ScriptVariable>();
-			this.stack = new List<Dictionary<string, ScriptVariable>>();
+			this.globals = new Dictionary<string, Variable>();
+			this.stack = new List<Dictionary<string, Variable>>();
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace Snowsoft.SnowflakeScript.Executor
 		/// </summary>
 		public void Push()
 		{
-			this.stack.Add(new Dictionary<string, ScriptVariable>());
+			this.stack.Add(new Dictionary<string, Variable>());
 		}
 
 		/// <summary>
