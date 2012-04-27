@@ -12,35 +12,35 @@ namespace Snowflake.Tests
 	{
 		private void ParseScript(string script)
 		{
-			ScriptParser parser = new ScriptParser();
-			parser.Parse(script);
+			ScriptLexer parser = new ScriptLexer();
+			parser.Lex(script);
 		}
 
-		[Test, ExpectedException(typeof(ScriptParserException))]
+		[Test, ExpectedException(typeof(ScriptLexerException))]
 		public void Char_WithNoEscapeCodeMoreThanOneChar()
 		{
 			this.ParseScript("'aa'");
 		}
 
-		[Test, ExpectedException(typeof(ScriptParserException))]
+		[Test, ExpectedException(typeof(ScriptLexerException))]
 		public void Char_WithEscapeCodeMoreThanOneChar()
 		{
 			this.ParseScript("'\\aa'");
 		}
 
-		[Test, ExpectedException(typeof(ScriptParserException))]
+		[Test, ExpectedException(typeof(ScriptLexerException))]
 		public void UnexpectedEndOfFile_UnclosedChar()
 		{
 			this.ParseScript("\'a");
 		}
 
-		[Test, ExpectedException(typeof(ScriptParserException))]
+		[Test, ExpectedException(typeof(ScriptLexerException))]
 		public void UnexpectedEndOfFile_UnclosedString()
 		{
 			this.ParseScript("\"aa");
 		}
 
-		[Test, ExpectedException(typeof(ScriptParserException))]
+		[Test, ExpectedException(typeof(ScriptLexerException))]
 		public void UnexpectedEndOfFile_FloatEndsWithDecimal()
 		{
 			this.ParseScript("123.");

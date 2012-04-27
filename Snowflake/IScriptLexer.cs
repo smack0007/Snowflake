@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript
 {
-	public interface IScriptParser
+	public interface IScriptLexer
 	{
-		ScriptSyntaxTreeNode Parse(IList<ScriptLexeme> lexemes);
+		IList<ScriptLexeme> Lex(string text);
 	}
 }

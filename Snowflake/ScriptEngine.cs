@@ -6,23 +6,23 @@ namespace Snowsoft.SnowflakeScript
 {
 	public class ScriptEngine
 	{
-		IScriptParser parser;
+		IScriptLexer lexer;
 
 		Script script;
 
 		public ScriptEngine()
-			: this(new ScriptParser())
+			: this(new ScriptLexer())
 		{
 		}
 
-		public ScriptEngine(IScriptParser parser)
+		public ScriptEngine(IScriptLexer parser)
 		{
 			if (parser == null)
 			{
 				throw new ArgumentNullException("parser");
 			}
 
-			this.parser = parser;
+			this.lexer = parser;
 		}
 
 		/// <summary>
@@ -43,7 +43,7 @@ namespace Snowsoft.SnowflakeScript
 		/// <returns>Script</returns>
 		public void LoadFromString(string script)
 		{
-			this.script = new Script(this.parser.Parse(script));
+			this.script = new Script(this.lexer.Lex(script));
 		}
 
 		public void Run()

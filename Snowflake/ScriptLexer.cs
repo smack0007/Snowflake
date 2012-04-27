@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript
 {
-	public class ScriptParser : IScriptParser
+	public class ScriptLexer : IScriptLexer
 	{
 		private string ConvertEscapeCodes(string input)
 		{
@@ -11,7 +11,7 @@ namespace Snowsoft.SnowflakeScript
 						.Replace("\\t", "\t");
 		}
 
-		public IList<ScriptLexeme> Parse(string text)
+		public IList<ScriptLexeme> Lex(string text)
 		{
 			List<ScriptLexeme> lexemes = new List<ScriptLexeme>();
 
@@ -323,7 +323,7 @@ namespace Snowsoft.SnowflakeScript
 						{
 							if (value.Length > 2 || value[0] != '\\')
 							{
-								throw new ScriptParserException("Invalid char: " + value + ".");
+								throw new ScriptLexerException("Invalid char: " + value + ".");
 							}
 						}
 
@@ -342,7 +342,7 @@ namespace Snowsoft.SnowflakeScript
 			}
 
 			if (type != ScriptLexemeType.Unknown)
-				throw new ScriptParserException("Unexpected end of file.");
+				throw new ScriptLexerException("Unexpected end of file.");
 
 			// Add an EOF to mark the end of the script.
 			lexemes.Add(new ScriptLexeme(ScriptLexemeType.EOF, null, line, column));
