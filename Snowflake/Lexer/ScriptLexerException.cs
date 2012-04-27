@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowsoft.SnowflakeScript.Lexer
 {
 	public class ScriptLexerException : ScriptException
 	{

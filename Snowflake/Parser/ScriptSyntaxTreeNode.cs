@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowsoft.SnowflakeScript.Parser
 {
 	/// <summary>
 	/// Base class for syntax tree nodes.

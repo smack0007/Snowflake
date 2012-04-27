@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Snowsoft.SnowflakeScript.Lexer;
+using Snowsoft.SnowflakeScript.Parser;
+using Snowsoft.SnowflakeScript.Executor;
 
 namespace Snowsoft.SnowflakeScript
 {

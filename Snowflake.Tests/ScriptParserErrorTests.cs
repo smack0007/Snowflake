@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Snowsoft.SnowflakeScript;
+using Snowsoft.SnowflakeScript.Lexer;
 
 namespace Snowflake.Tests
 {

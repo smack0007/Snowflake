@@ -66,23 +66,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IScriptLexer.cs" />
-    <Compile Include="IScriptParser.cs" />
+    <Compile Include="Lexer\IScriptLexer.cs" />
+    <Compile Include="Parser\IScriptParser.cs" />
     <Compile Include="ScriptEngine.cs" />
-    <Compile Include="ScriptFunctionCallException.cs" />
-    <Compile Include="ScriptLexeme.cs" />
-    <Compile Include="ScriptLexemeType.cs" />
+    <Compile Include="Executor\ScriptFunctionCallException.cs" />
+    <Compile Include="Lexer\ScriptLexeme.cs" />
+    <Compile Include="Lexer\ScriptLexemeType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Script.cs" />
+    <Compile Include="Executor\Script.cs" />
     <Compile Include="ScriptException.cs" />
-    <Compile Include="ScriptLexerException.cs" />
-    <Compile Include="ScriptLexer.cs" />
-    <Compile Include="ScriptSyntaxException.cs" />
-    <Compile Include="ScriptSyntaxTreeNode.cs" />
-    <Compile Include="ScriptVariableException.cs" />
-    <Compile Include="ScriptVariable.cs" />
-    <Compile Include="ScriptVariableStack.cs" />
-    <Compile Include="ScriptVariableType.cs" />
+    <Compile Include="Lexer\ScriptLexerException.cs" />
+    <Compile Include="Lexer\ScriptLexer.cs" />
+    <Compile Include="Parser\ScriptSyntaxException.cs" />
+    <Compile Include="Parser\ScriptSyntaxTreeNode.cs" />
+    <Compile Include="Executor\ScriptVariableException.cs" />
+    <Compile Include="Executor\ScriptVariable.cs" />
+    <Compile Include="Executor\ScriptVariableStack.cs" />
+    <Compile Include="Executor\ScriptVariableType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />

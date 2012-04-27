@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowsoft.SnowflakeScript.Executor
 {
 	/// <summary>
 	/// Represents a stack.
