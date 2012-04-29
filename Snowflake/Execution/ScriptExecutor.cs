@@ -6,9 +6,9 @@ using Snowsoft.SnowflakeScript.Parsing;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class Executor : IExecutor
+	public class ScriptExecutor : IScriptExecutor
 	{
-		public Executor()
+		public ScriptExecutor()
 		{
 		}
 

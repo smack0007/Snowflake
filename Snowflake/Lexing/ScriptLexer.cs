@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Lexing
 {
-	public class Lexer : ILexer
+	public class ScriptLexer : IScriptLexer
 	{
 		private string ConvertEscapeCodes(string input)
 		{

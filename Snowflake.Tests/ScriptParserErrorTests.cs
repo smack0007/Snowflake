@@ -13,7 +13,7 @@ namespace Snowflake.Tests
 	{
 		private void ParseScript(string script)
 		{
-			Lexer parser = new Lexer();
+			ScriptLexer parser = new ScriptLexer();
 			parser.Lex(script);
 		}
 

@@ -4,7 +4,7 @@ using Snowsoft.SnowflakeScript.Lexing;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class Parser : IParser
+	public class ScriptParser : IScriptParser
 	{
 		private void EnsureLexemeType(IList<Lexeme> lexemes, LexemeType expected, int pos)
 		{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Lexing
 {
-	public interface ILexer
+	public interface IScriptLexer
 	{
 		IList<Lexeme> Lex(string text);
 	}

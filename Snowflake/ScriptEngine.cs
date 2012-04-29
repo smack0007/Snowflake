@@ -9,19 +9,19 @@ namespace Snowsoft.SnowflakeScript
 {
 	public class ScriptEngine
 	{
-		ILexer lexer;
-		IParser parser;
-		IExecutor executor;
+		IScriptLexer lexer;
+		IScriptParser parser;
+		IScriptExecutor executor;
 
 		ScriptNode script;
 		VariableStack stack;
 
 		public ScriptEngine()
-			: this(new Lexer(), new Parser(), new Executor())
+			: this(new ScriptLexer(), new ScriptParser(), new ScriptExecutor())
 		{
 		}
 
-		public ScriptEngine(ILexer lexer, IParser parser, IExecutor executor)
+		public ScriptEngine(IScriptLexer lexer, IScriptParser parser, IScriptExecutor executor)
 		{
 			if (lexer == null)
 			{
