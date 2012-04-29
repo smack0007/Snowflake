@@ -10,22 +10,39 @@ namespace Snowsoft.SnowflakeScript
 	public class ScriptEngine
 	{
 		ILexer lexer;
+		IParser parser;
+		IExecutor executor;
 
-		Script script;
+		ScriptNode script;
+		VariableStack stack;
 
 		public ScriptEngine()
-			: this(new ScriptLexer())
+			: this(new Lexer(), new Parser(), new Executor())
 		{
 		}
 
-		public ScriptEngine(ILexer parser)
+		public ScriptEngine(ILexer lexer, IParser parser, IExecutor executor)
 		{
+			if (lexer == null)
+			{
+				throw new ArgumentNullException("lexer");
+			}
+
 			if (parser == null)
 			{
 				throw new ArgumentNullException("parser");
 			}
 
-			this.lexer = parser;
+			if (executor == null)
+			{
+				throw new ArgumentNullException("executor");
+			}
+
+			this.lexer = lexer;
+			this.parser = parser;
+			this.executor = executor;
+
+			this.stack = new VariableStack();
 		}
 
 		/// <summary>
@@ -46,7 +63,7 @@ namespace Snowsoft.SnowflakeScript
 		/// <returns>Script</returns>
 		public void LoadFromString(string script)
 		{
-			this.script = new Script(this.lexer.Lex(script));
+			this.script = this.parser.Parse(this.lexer.Lex(script));
 		}
 
 		public void Run()
@@ -54,7 +71,7 @@ namespace Snowsoft.SnowflakeScript
 			if (this.script == null)
 				throw new InvalidOperationException("No Script currently loaded.");
 
-			this.script.CallFunc("Main");
+			this.executor.CallFunc(this.script, "Main", null, this.stack);
 		}
 	}
 }

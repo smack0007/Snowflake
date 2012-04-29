@@ -1,11 +1,4 @@
 ﻿func Main()
 {
-	$name = "smack0007";
-	SaySomething($name);
-	SaySomething("Hello World!");
-}
-
-func SaySomething($text)
-{
-	echo $text + '\n';
+	echo "Hello World!\n";
 }

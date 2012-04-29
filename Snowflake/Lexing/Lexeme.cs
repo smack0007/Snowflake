@@ -5,7 +5,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 {
 	public class Lexeme
 	{
-		public ScriptLexemeType Type
+		public LexemeType Type
 		{
 			get;
 			private set;
@@ -29,7 +29,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 			private set;
 		}
 
-		public Lexeme(ScriptLexemeType type, string val, int line, int column)
+		public Lexeme(LexemeType type, string val, int line, int column)
 		{
 			this.Type = type;
 

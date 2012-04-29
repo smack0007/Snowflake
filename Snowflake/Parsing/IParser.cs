@@ -4,8 +4,8 @@ using Snowsoft.SnowflakeScript.Lexing;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public interface IScriptParser
+	public interface IParser
 	{
-		ScriptSyntaxTreeNode Parse(IList<Lexeme> lexemes);
+		ScriptNode Parse(IList<Lexeme> lexemes);
 	}
 }
