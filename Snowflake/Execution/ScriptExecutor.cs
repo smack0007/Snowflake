@@ -12,6 +12,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 		}
 
+		private void ThrowUnableToExecuteException(string executionType, SyntaxTreeNode node)
+		{
+			throw new ExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionType + ".");
+		}
+
 		public Variable CallFunc(ScriptNode script, string funcName, IList<Variable> args, VariableStack stack)
 		{
 			foreach (FuncNode func in script.Funcs)
@@ -32,7 +37,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 						}
 					}
 
-					foreach (StatementNode statement in func.Statements)
+					foreach (StatementNode statement in func.StatementBlock.Statements)
 					{
 						this.ExecuteStatement(statement, stack);
 					}
@@ -44,27 +49,77 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return null;
 		}
 
-		public void ExecuteStatement(StatementNode statement, VariableStack stack)
+		private void ExecuteStatement(StatementNode statement, VariableStack stack)
 		{
 			if (statement is EchoNode)
 			{
 				this.ExecuteEcho((EchoNode)statement, stack);
 			}
+			else if (statement is ExpressionNode)
+			{
+				this.ExecuteExpression((ExpressionNode)statement, stack);
+			}
+			else
+			{
+				throw new ExecutionException("Unable to handle node in script tree.");
+			}
 		}
 
-		public void ExecuteEcho(EchoNode echo, VariableStack stack)
+		private void ExecuteEcho(EchoNode echo, VariableStack stack)
 		{
 			Console.Write(this.ExecuteExpression(echo.Expression, stack));
 		}
 
-		public Variable ExecuteExpression(ExpressionNode expression, VariableStack stack)
+		private Variable ExecuteExpression(ExpressionNode expression, VariableStack stack)
 		{
-			if (expression is StringValueNode)
+			Variable result = null;
+
+			if (expression is OperationNode)
 			{
-				return new Variable(((StringValueNode)expression).Value);
+				OperationNode operation = (OperationNode)expression;
+				result = this.ExecuteExpression(operation.LHS, stack);
+				Variable rhs = this.ExecuteExpression(operation.RHS, stack);
+
+				switch (operation.Type)
+				{
+					case OperationType.Gets:
+						result.Gets(rhs);
+						break;
+
+					case OperationType.Add:
+						result = result.Add(rhs);
+						break;
+				}
+			}
+			else if (expression is VariableNode)
+			{
+				result = stack[((VariableNode)expression).VariableName];
+			}
+			else if (expression is NullValueNode)
+			{
+				result = Variable.Null;
+			}
+			else if (expression is StringValueNode)
+			{
+				result = new Variable(((StringValueNode)expression).Value);
+			}
+			else if (expression is CharValueNode)
+			{
+				result = new Variable(((CharValueNode)expression).Value);
+			}
+			else if (expression is IntegerValueNode)
+			{
+				result = new Variable(((IntegerValueNode)expression).Value);
+			}
+			else if (expression is FloatValueNode)
+			{
+				result = new Variable(((FloatValueNode)expression).Value);
 			}
 
-			return null;
+			if (result == null)
+				this.ThrowUnableToExecuteException("Expression", expression);
+
+			return result;
 		}
 	}
 }

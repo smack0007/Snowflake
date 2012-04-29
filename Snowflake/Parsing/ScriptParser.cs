@@ -4,7 +4,7 @@ using Snowsoft.SnowflakeScript.Lexing;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class ScriptParser : IScriptParser
+	public class Parser : IScriptParser
 	{
 		private void EnsureLexemeType(IList<Lexeme> lexemes, LexemeType expected, int pos)
 		{
@@ -16,6 +16,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			if (lexemes[pos].Type == unexpected)
 				throw new SyntaxException(unexpected + " was not expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column + ".");
+		}
+
+		private void ThrowUnableToParseException(string parseType, IList<Lexeme> lexemes, int pos)
+		{
+			throw new SyntaxException("Unable to parse lexeme type \"" + lexemes[pos].Type + "\" as \"" + parseType + "\" at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column + ".");
 		}
 
 		/// <summary>
@@ -68,7 +73,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
 
-			node.Name = lexemes[pos].Val;
+			node.Name = lexemes[pos].Value;
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
@@ -78,7 +83,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				pos++;
 				this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-				node.Args.Add(lexemes[pos].Val);
+				node.Args.Add(lexemes[pos].Value);
 
 				pos++;
 				while (lexemes[pos].Type == LexemeType.Comma)
@@ -88,7 +93,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 					pos++;
 					this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-					node.Args.Add(lexemes[pos].Val);
+					node.Args.Add(lexemes[pos].Value);
 
 					pos++;
 				}
@@ -97,7 +102,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 
 			pos++;
+			node.StatementBlock = this.StatementBlock(lexemes, ref pos);
+			
+			return node;
+		}
+
+		private StatementBlockNode StatementBlock(IList<Lexeme> lexemes, ref int pos)
+		{			
 			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
+
+			StatementBlockNode node = new StatementBlockNode();
 
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseBrace &&
@@ -150,13 +164,75 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			switch (lexemes[pos].Type)
 			{
+				case LexemeType.Variable:
+					node = this.Variable(lexemes, ref pos);
+					break;
+
+				case LexemeType.Null:
+					node = new NullValueNode();
+					pos++;
+					break;
+
 				case LexemeType.String:
-					node = new StringValueNode() { Value = lexemes[pos].Val };
+					node = new StringValueNode() { Value = lexemes[pos].Value };
+					pos++;
+					break;
+
+				case LexemeType.Char:
+					node = new CharValueNode() { Value = lexemes[pos].Value[0] };
+					pos++;
+					break;
+
+				case LexemeType.Integer:
+					node = new IntegerValueNode() { Value = int.Parse(lexemes[pos].Value) };
+					pos++;
+					break;
+
+				case LexemeType.Float:
+					node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value) }; // TODO: Specify always use '.' for decimal place.
+					pos++;
 					break;
 			}
 
-			pos++;
+			if (node == null)
+				this.ThrowUnableToParseException("Expression", lexemes, pos);
+						
+			switch (lexemes[pos].Type)
+			{
+				case LexemeType.Gets:
+					pos++;
+					node = new OperationNode()
+					{
+						Type = OperationType.Gets,
+						LHS = node,
+						RHS = this.Expression(lexemes, ref pos)
+					};
+					break;
 
+				case LexemeType.Plus:
+					pos++;
+					node = new OperationNode()
+					{
+						Type = OperationType.Add,
+						LHS = node,
+						RHS = this.Expression(lexemes, ref pos)
+					};
+					break;
+			}
+
+			return node;
+		}
+
+		private VariableNode Variable(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.Variable, pos);
+			
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+
+			VariableNode node = new VariableNode() { VariableName = lexemes[pos].Value };
+
+			pos++;
 			return node;
 		}
 	}

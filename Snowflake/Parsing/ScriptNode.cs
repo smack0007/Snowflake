@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class ScriptNode
+	public class ScriptNode : SyntaxTreeNode
 	{
 		public IList<FuncNode> Funcs
 		{

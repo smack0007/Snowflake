@@ -11,7 +11,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 			private set;
 		}
 
-		public string Val
+		public string Value
 		{
 			get;
 			private set;
@@ -34,9 +34,9 @@ namespace Snowsoft.SnowflakeScript.Lexing
 			this.Type = type;
 
 			if(val != null)
-				this.Val = val;
+				this.Value = val;
 			else
-				this.Val = null;
+				this.Value = null;
 
 			this.Line = line;
 			this.Column = column;
@@ -44,7 +44,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 
 		public override string ToString()
 		{
-			return "{" + this.Type + ", " + this.Val + ", " + this.Line + ", " + this.Column + "}";
+			return "{" + this.Type + ", " + this.Value + ", " + this.Line + ", " + this.Column + "}";
 		}
 	}
 }

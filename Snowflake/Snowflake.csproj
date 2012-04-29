@@ -67,17 +67,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\ExecutionException.cs" />
-    <Compile Include="Execution\Executor.cs" />
-    <Compile Include="Execution\IExecutor.cs" />
-    <Compile Include="Lexing\ILexer.cs" />
+    <Compile Include="Execution\ScriptExecutor.cs" />
+    <Compile Include="Execution\IScriptExecutor.cs" />
+    <Compile Include="Lexing\IScriptLexer.cs" />
+    <Compile Include="Parsing\CharValueNode.cs" />
     <Compile Include="Parsing\EchoNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
+    <Compile Include="Parsing\FloatValueNode.cs" />
     <Compile Include="Parsing\FuncNode.cs" />
-    <Compile Include="Parsing\IParser.cs" />
-    <Compile Include="Parsing\Parser.cs" />
+    <Compile Include="Parsing\IntegerValueNode.cs" />
+    <Compile Include="Parsing\IScriptParser.cs" />
+    <Compile Include="Parsing\NullValueNode.cs" />
+    <Compile Include="Parsing\OperationNode.cs" />
+    <Compile Include="Parsing\OperationType.cs" />
+    <Compile Include="Parsing\ScriptParser.cs" />
+    <Compile Include="Parsing\StatementBlockNode.cs" />
     <Compile Include="Parsing\StatementNode.cs" />
     <Compile Include="Parsing\StringValueNode.cs" />
     <Compile Include="Parsing\ScriptNode.cs" />
+    <Compile Include="Parsing\SyntaxTreeNode.cs" />
+    <Compile Include="Parsing\VariableNode.cs" />
     <Compile Include="ScriptEngine.cs" />
     <Compile Include="Execution\FuncCallException.cs" />
     <Compile Include="Lexing\Lexeme.cs" />
@@ -86,7 +95,7 @@
     <Compile Include="Execution\Script.cs" />
     <Compile Include="ScriptException.cs" />
     <Compile Include="Lexing\LexerException.cs" />
-    <Compile Include="Lexing\Lexer.cs" />
+    <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
     <Compile Include="Execution\VariableException.cs" />
     <Compile Include="Execution\Variable.cs" />

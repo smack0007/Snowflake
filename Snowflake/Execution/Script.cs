@@ -92,7 +92,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			pos++;
 			this.EnsureLexemeType(LexemeType.Identifier, pos);
 
-			funcInfo.Name = this.lexemes[pos].Val;
+			funcInfo.Name = this.lexemes[pos].Value;
 
 			pos++;
 			this.EnsureLexemeType(LexemeType.OpenParen, pos);
@@ -104,7 +104,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 				
 				pos++;
 				this.EnsureLexemeType(LexemeType.Identifier, pos);
-				argList.Add(this.lexemes[pos].Val);
+				argList.Add(this.lexemes[pos].Value);
 
 				pos++;
 				while (this.lexemes[pos].Type == LexemeType.Comma)
@@ -114,7 +114,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 					pos++;
 					this.EnsureLexemeType(LexemeType.Identifier, pos);
-					argList.Add(this.lexemes[pos].Val);
+					argList.Add(this.lexemes[pos].Value);
 
 					pos++;
 				}
@@ -431,7 +431,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		private Variable FuncCall(ref int pos)
 		{
 			this.EnsureLexemeType(LexemeType.Identifier, pos);
-			string funcName = this.lexemes[pos].Val;
+			string funcName = this.lexemes[pos].Value;
 
 			pos++;
 			this.EnsureLexemeType(LexemeType.OpenParen, pos);
@@ -471,7 +471,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			pos++;
 			this.EnsureLexemeType(LexemeType.Identifier, pos);
 
-			Variable variable = this.variableStack[lexemes[pos].Val];
+			Variable variable = this.variableStack[lexemes[pos].Value];
 			
 			pos++;
 			return variable;
@@ -494,22 +494,22 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		private Variable Char(ref int pos)
 		{
-			return new Variable(this.lexemes[pos++].Val);
+			return new Variable(this.lexemes[pos++].Value);
 		}
 
 		private Variable String(ref int pos)
 		{
-			return new Variable(this.lexemes[pos++].Val);
+			return new Variable(this.lexemes[pos++].Value);
 		}
 
 		private Variable Integer(ref int pos)
 		{
-			return new Variable(Int32.Parse(this.lexemes[pos++].Val));
+			return new Variable(Int32.Parse(this.lexemes[pos++].Value));
 		}
 
 		private Variable Float(ref int pos)
 		{
-			return new Variable(Double.Parse(this.lexemes[pos++].Val));
+			return new Variable(Double.Parse(this.lexemes[pos++].Value));
 		}
 
 		private Variable Array(ref int pos)

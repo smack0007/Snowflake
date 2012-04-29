@@ -5,7 +5,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public class Variable
 	{
-		public object Val
+		public static readonly Variable Null = new Variable();
+
+		public object Value
 		{
 			get;
 			private set;
@@ -24,43 +26,43 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		public Variable(bool val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.Boolean;
 		}
 
 		public Variable(char val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.Char;
 		}
 
 		public Variable(string val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.String;
 		}
 
 		public Variable(int val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.Integer;
 		}
 
 		public Variable(double val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.Float;
 		}
 
 		public Variable(Dictionary<string, Variable> val)
 		{
-			this.Val = val;
+			this.Value = val;
 			this.Type = VariableType.Array;
 		}
 
 		public void Gets(Variable variable)
 		{
-			this.Val = variable.Val;
+			this.Value = variable.Value;
 			this.Type = variable.Type;
 		}
 
@@ -84,13 +86,18 @@ namespace Snowsoft.SnowflakeScript.Execution
 				{
 					return new Variable(this.ToFloat() + variable.ToFloat());
 				}
+				else if (variable.Type == VariableType.String ||
+						 variable.Type == VariableType.Char)
+				{
+					return new Variable(this.ToString() + variable.ToString());
+				}
 			}
 			else if(this.Type == VariableType.Float)
 			{
 				return new Variable(this.ToFloat() + variable.ToFloat());
 			}
 
-			throw new VariableException("Add not available for type " + this.Type.ToString());
+			throw new VariableException("Add not available for type " + this.Type + " to " + variable.Type + ".");
 		}
 
 		public Variable Subtract(Variable variable)
@@ -141,14 +148,14 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				string key = index.ToString();
 
-				if (((Dictionary<string, Variable>)this.Val).ContainsKey(key))
+				if (((Dictionary<string, Variable>)this.Value).ContainsKey(key))
 				{
-					return ((Dictionary<string, Variable>)this.Val)[key];
+					return ((Dictionary<string, Variable>)this.Value)[key];
 				}
 				else
 				{
 					Variable variable = new Variable();
-					((Dictionary<string, Variable>)this.Val).Add(key, variable);
+					((Dictionary<string, Variable>)this.Value).Add(key, variable);
 
 					return variable;
 				}
@@ -157,7 +164,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				Variable variable = new Variable();
 
-				((Dictionary<string, Variable>)this.Val).Add(((Dictionary<string, Variable>)this.Val).Count.ToString(), variable);
+				((Dictionary<string, Variable>)this.Value).Add(((Dictionary<string, Variable>)this.Value).Count.ToString(), variable);
 
 				return variable;
 			}
@@ -168,7 +175,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if(this.Type == VariableType.Null)
 				return false;
 			else if(this.Type == VariableType.Boolean)
-				return (bool)this.Val;
+				return (bool)this.Value;
 			else if(this.Type == VariableType.String)
 			{
 				string s = this.ToString().ToUpper();
@@ -212,27 +219,27 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (this.Type == VariableType.Boolean)
 			{
-				return ((bool)this.Val).ToString();
+				return ((bool)this.Value).ToString();
 			}
 			else if (this.Type == VariableType.Char)
 			{
-				return ((char)this.Val).ToString();
+				return ((char)this.Value).ToString();
 			}
 			else if (this.Type == VariableType.String)
 			{
-				return (string)this.Val;
+				return (string)this.Value;
 			}
 			else if (this.Type == VariableType.Integer)
 			{
-				return ((int)this.Val).ToString();
+				return ((int)this.Value).ToString();
 			}
 			else if (this.Type == VariableType.Float)
 			{
-				return ((double)this.Val).ToString();
+				return ((double)this.Value).ToString();
 			}
 			else if (this.Type == VariableType.Array)
 			{
-				Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)this.Val);
+				Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)this.Value);
 
 				string s = "";
 				foreach (string key in dictionary.Keys)
@@ -257,7 +264,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (this.Type == VariableType.Integer || this.Type == VariableType.Float)
 			{
-				return (int)this.Val;
+				return (int)this.Value;
 			}
 
 			throw new VariableException("Integer conversion not available for type " + this.Type.ToString());
@@ -271,11 +278,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (this.Type == VariableType.Integer)
 			{
-				return (double)this.Val;
+				return (double)this.Value;
 			}
 			else if (this.Type == VariableType.Float)
 			{
-				return (double)this.Val;
+				return (double)this.Value;
 			}
 
 			throw new VariableException("Float conversion not available for type " + this.Type.ToString());

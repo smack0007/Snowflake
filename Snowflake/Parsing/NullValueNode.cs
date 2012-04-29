@@ -2,9 +2,9 @@
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class StatementNode : SyntaxTreeNode
+	public class NullValueNode : ExpressionNode
 	{
-		public StatementNode()
+		public NullValueNode()
 			: base()
 		{
 		}

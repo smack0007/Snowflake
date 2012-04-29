@@ -17,7 +17,7 @@ namespace Snowsoft.SnowflakeScript
 		VariableStack stack;
 
 		public ScriptEngine()
-			: this(new ScriptLexer(), new ScriptParser(), new ScriptExecutor())
+			: this(new ScriptLexer(), new Parser(), new ScriptExecutor())
 		{
 		}
 

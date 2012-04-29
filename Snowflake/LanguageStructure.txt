@@ -1,28 +1,31 @@
 Script : { Func } EOF
 
-Func : [func] Identifier [(] { Expression [,]! } [)] [{] { Statement } [}]
+Func : [func] Identifier [(] { Variable [,]! } [)] StatementBlock
 
 Identifier : [A-Za-z_][A-Za-z0-9_]*
 
 Variable : [$] Identifier
 
+StatementBlock : [{] { Statement } [}]
+
 Statement : ( Echo | If | Expression ) [;]
 
 Echo : [echo] Expression
 
-If : [if] [(] Expression [)] [{] { Statement } [}] | [if] [(] Expression [)] [{] { Statement } [}] [else] [{] { Statement } [}]
+If : [if] [(] Expression [)] StatementBlock |
+     [if] [(] Expression [)] StatementBlock [else] StatementBlock
 
-Expression : FuncCall | Variable | Variable Operation Expression | Null | String | MagicString | Integer | Float | Array | List
+Expression : FuncCall | Variable | Variable Operation Expression | Value | Value Operation Expression
 
 FuncCall : Identifier [(] { Expression [,]! } [)]
 
 Operation : [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
 
+Value : Null | String | Char | Integer | Float | Array | Map
+
 Null : [null]
 
 String : ['] [chars]* [']
-
-MagicString : ["] [chars]* ["]
 
 Integer : [1-9]*
 
@@ -30,10 +33,11 @@ Float : [1-9]*[.][1-9]*
 
 Array : [array] [(] { Expression [,]! } [)]
 
-List : [list] [(] { Expression [=][>] Expression [,]! } [)]
+List : [map] [(] { Expression [=][>] Expression [,]! } [)]
 
 Legend:
-	*       Any number of
+	*       0 or more
+	+       1 or more
 	|		Or
 	( )		Grouping
 	[ ]		Symbol or Keyword

@@ -1,4 +1,7 @@
 ﻿func Main()
 {
-	echo "Hello World!\n";
+	$var1 = "Hello World!" + '\n';
+	$var2 = 1 + 2 + 3 + 4;
+	echo $var1;
+	echo $var2 + '\n';
 }
