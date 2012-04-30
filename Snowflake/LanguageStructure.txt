@@ -8,12 +8,14 @@ Variable : [$] Identifier
 
 StatementBlock : [{] { Statement } [}]
 
-Statement : ( Echo | If | Expression ) [;]
+Statement : ( Echo | If | Return | Expression ) [;]
 
 Echo : [echo] Expression
 
 If : [if] [(] Expression [)] StatementBlock |
      [if] [(] Expression [)] StatementBlock [else] StatementBlock
+
+Return : [return] Expression
 
 Expression : FuncCall | Variable | Variable Operation Expression | Value | Value Operation Expression
 
@@ -25,7 +27,7 @@ Value : Null | String | Char | Integer | Float | Array | Map
 
 Null : [null]
 
-String : ['] [chars]* [']
+String : ["] [chars]* ["]
 
 Integer : [1-9]*
 

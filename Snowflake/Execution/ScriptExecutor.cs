@@ -8,18 +8,26 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public class ScriptExecutor : IScriptExecutor
 	{
+		ScriptNode scriptNode;
+		bool shouldReturn;
+		Variable returnValue;
+
 		public ScriptExecutor()
 		{
 		}
 
-		private void ThrowUnableToExecuteException(string executionType, SyntaxTreeNode node)
+		private void ThrowUnableToExecuteException(string executionStage, SyntaxTreeNode node)
 		{
-			throw new ExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionType + ".");
+			throw new ExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public Variable CallFunc(ScriptNode script, string funcName, IList<Variable> args, VariableStack stack)
+		public Variable CallFunction(ScriptNode node, string funcName, IList<Variable> args, VariableStack stack)
 		{
-			foreach (FunctionNode func in script.Functions)
+			this.scriptNode = node; // TODO: Change this.
+
+			Variable functionReturnValue = Variable.Null;
+
+			foreach (FunctionNode func in node.Functions)
 			{
 				if (func.Name == funcName)
 				{
@@ -37,27 +45,44 @@ namespace Snowsoft.SnowflakeScript.Execution
 						}
 					}
 
+					this.shouldReturn = false;
+					this.returnValue = null;
+
 					foreach (StatementNode statement in func.StatementBlock.Statements)
 					{
 						this.ExecuteStatement(statement, stack);
+
+						if (this.shouldReturn)
+						{
+							functionReturnValue = this.returnValue;
+
+							this.returnValue = null;
+							this.shouldReturn = false;
+
+							break;
+						}
 					}
 
 					stack.Pop();
 				}
 			}
 
-			return null;
+			return functionReturnValue;
 		}
 
-		private void ExecuteStatement(StatementNode statement, VariableStack stack)
+		private void ExecuteStatement(StatementNode node, VariableStack stack)
 		{
-			if (statement is EchoNode)
+			if (node is EchoNode)
 			{
-				this.ExecuteEcho((EchoNode)statement, stack);
+				this.ExecuteEcho((EchoNode)node, stack);
 			}
-			else if (statement is ExpressionNode)
+			else if (node is ReturnNode)
 			{
-				this.ExecuteExpression((ExpressionNode)statement, stack);
+				this.ExecuteReturn((ReturnNode)node, stack);
+			}
+			else if (node is ExpressionNode)
+			{
+				this.ExecuteExpression((ExpressionNode)node, stack);
 			}
 			else
 			{
@@ -65,18 +90,36 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 		}
 
-		private void ExecuteEcho(EchoNode echo, VariableStack stack)
+		private void ExecuteEcho(EchoNode node, VariableStack stack)
 		{
-			Console.Write(this.ExecuteExpression(echo.Expression, stack));
+			Console.Write(this.ExecuteExpression(node.Expression, stack));
 		}
 
-		private Variable ExecuteExpression(ExpressionNode expression, VariableStack stack)
+		private void ExecuteReturn(ReturnNode node, VariableStack stack)
+		{
+			this.shouldReturn = true;
+			this.returnValue = this.ExecuteExpression(node.Expression, stack);
+		}
+
+		private Variable ExecuteExpression(ExpressionNode node, VariableStack stack)
 		{
 			Variable result = null;
 
-			if (expression is OperationNode)
+			if (node is FunctionCallNode)
 			{
-				OperationNode operation = (OperationNode)expression;
+				FunctionCallNode functionCall = (FunctionCallNode)node;
+
+				List<Variable> args = new List<Variable>();
+				foreach (ExpressionNode expression in functionCall.ArgExpressions)
+				{
+					args.Add(this.ExecuteExpression(expression, stack));
+				}
+
+				result = this.CallFunction(this.scriptNode, functionCall.FunctionName, args, stack);
+			}
+			else if (node is OperationNode)
+			{
+				OperationNode operation = (OperationNode)node;
 				result = this.ExecuteExpression(operation.LHS, stack);
 				Variable rhs = this.ExecuteExpression(operation.RHS, stack);
 
@@ -91,33 +134,33 @@ namespace Snowsoft.SnowflakeScript.Execution
 						break;
 				}
 			}
-			else if (expression is VariableNode)
+			else if (node is VariableNode)
 			{
-				result = stack[((VariableNode)expression).VariableName];
+				result = stack[((VariableNode)node).VariableName];
 			}
-			else if (expression is NullValueNode)
+			else if (node is NullValueNode)
 			{
 				result = Variable.Null;
 			}
-			else if (expression is StringValueNode)
+			else if (node is StringValueNode)
 			{
-				result = new Variable(((StringValueNode)expression).Value);
+				result = new Variable(((StringValueNode)node).Value);
 			}
-			else if (expression is CharValueNode)
+			else if (node is CharValueNode)
 			{
-				result = new Variable(((CharValueNode)expression).Value);
+				result = new Variable(((CharValueNode)node).Value);
 			}
-			else if (expression is IntegerValueNode)
+			else if (node is IntegerValueNode)
 			{
-				result = new Variable(((IntegerValueNode)expression).Value);
+				result = new Variable(((IntegerValueNode)node).Value);
 			}
-			else if (expression is FloatValueNode)
+			else if (node is FloatValueNode)
 			{
-				result = new Variable(((FloatValueNode)expression).Value);
+				result = new Variable(((FloatValueNode)node).Value);
 			}
 
 			if (result == null)
-				this.ThrowUnableToExecuteException("Expression", expression);
+				this.ThrowUnableToExecuteException("Expression", node);
 
 			return result;
 		}

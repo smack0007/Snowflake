@@ -4,4 +4,13 @@
 	$var2 = 1 + 2 + 3 + 4;
 	echo $var1;
 	echo $var2 + '\n';
+
+	$var3 = DoIt();
+	echo $var3 + '\n';
+}
+
+function DoIt()
+{
+	echo "DoIt()\n";
+	return 42;
 }

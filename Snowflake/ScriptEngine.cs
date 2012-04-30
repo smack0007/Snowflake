@@ -71,7 +71,7 @@ namespace Snowsoft.SnowflakeScript
 			if (this.script == null)
 				throw new InvalidOperationException("No Script currently loaded.");
 
-			this.executor.CallFunc(this.script, "Main", null, this.stack);
+			this.executor.CallFunction(this.script, "Main", null, this.stack);
 		}
 	}
 }
