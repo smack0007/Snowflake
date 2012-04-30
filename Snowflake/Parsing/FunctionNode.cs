@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class FuncNode : SyntaxTreeNode
+	public class FunctionNode : SyntaxTreeNode
 	{
 		public string Name
 		{
@@ -23,7 +23,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public FuncNode()
+		public FunctionNode()
 			: base()
 		{
 			this.Args = new List<string>();

@@ -5,7 +5,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class ScriptNode : SyntaxTreeNode
 	{
-		public IList<FuncNode> Funcs
+		public IList<FunctionNode> Functions
 		{
 			get;
 			private set;
@@ -13,7 +13,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		public ScriptNode()
 		{
-			this.Funcs = new List<FuncNode>();
+			this.Functions = new List<FunctionNode>();
 		}
 	}
 }

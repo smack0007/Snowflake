@@ -58,17 +58,17 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			int pos = 0;
 			while (lexemes[pos].Type != LexemeType.EOF)
 			{
-				node.Funcs.Add(this.Func(lexemes, ref pos));
+				node.Functions.Add(this.Func(lexemes, ref pos));
 			}
 
 			return node;
 		}
 
-		private FuncNode Func(IList<Lexeme> lexemes, ref int pos)
+		private FunctionNode Func(IList<Lexeme> lexemes, ref int pos)
 		{
-			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
+			this.EnsureLexemeType(lexemes, LexemeType.Function, pos);
 
-			FuncNode node = new FuncNode();
+			FunctionNode node = new FunctionNode();
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);

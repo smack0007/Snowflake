@@ -19,7 +19,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		public Variable CallFunc(ScriptNode script, string funcName, IList<Variable> args, VariableStack stack)
 		{
-			foreach (FuncNode func in script.Funcs)
+			foreach (FunctionNode func in script.Functions)
 			{
 				if (func.Name == funcName)
 				{

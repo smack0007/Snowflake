@@ -37,7 +37,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
 			{
-				if (this.lexemes[pos].Type == LexemeType.Func)
+				if (this.lexemes[pos].Type == LexemeType.Function)
 				{
 					FuncInfo funcInfo = this.ParseFunc(ref pos);
 					this.funcs.Add(funcInfo.Name, funcInfo);
@@ -86,7 +86,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			FuncInfo funcInfo = new FuncInfo();
 
-			this.EnsureLexemeType(LexemeType.Func, pos);
+			this.EnsureLexemeType(LexemeType.Function, pos);
 			funcInfo.Location = pos;
 
 			pos++;

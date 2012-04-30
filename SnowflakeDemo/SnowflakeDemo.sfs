@@ -1,4 +1,4 @@
-﻿func Main()
+﻿function Main()
 {
 	$var1 = "Hello World!" + '\n';
 	$var2 = 1 + 2 + 3 + 4;

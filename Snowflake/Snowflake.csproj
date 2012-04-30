@@ -74,7 +74,7 @@
     <Compile Include="Parsing\EchoNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
     <Compile Include="Parsing\FloatValueNode.cs" />
-    <Compile Include="Parsing\FuncNode.cs" />
+    <Compile Include="Parsing\FunctionNode.cs" />
     <Compile Include="Parsing\IntegerValueNode.cs" />
     <Compile Include="Parsing\IScriptParser.cs" />
     <Compile Include="Parsing\NullValueNode.cs" />
