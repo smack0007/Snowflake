@@ -8,12 +8,24 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public class ScriptExecutor : IScriptExecutor
 	{
-		ScriptNode scriptNode;
+		ScriptNode script;
 		bool shouldReturn;
 		Variable returnValue;
 
+		public VariableStack Stack
+		{
+			get;
+			private set;
+		}
+
 		public ScriptExecutor()
 		{
+			this.Stack = new VariableStack();
+		}
+
+		public void SetScript(ScriptNode script)
+		{
+			this.script = script;
 		}
 
 		private void ThrowUnableToExecuteException(string executionStage, SyntaxTreeNode node)
@@ -21,26 +33,29 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public Variable CallFunction(ScriptNode node, string funcName, IList<Variable> args, VariableStack stack)
+		public Variable CallFunction(string funcName, IList<Variable> args)
 		{
-			this.scriptNode = node; // TODO: Change this.
+			if (this.script == null)
+			{
+				throw new InvalidOperationException("No script loaded for execution.");
+			}
 
 			Variable functionReturnValue = Variable.Null;
 
-			foreach (FunctionNode func in node.Functions)
+			foreach (FunctionNode func in this.script.Functions)
 			{
 				if (func.Name == funcName)
 				{
 					if (args != null && args.Count != func.Args.Count)
 						throw new ExecutionException("Invalid number of arguments specified when calling \"" + funcName + "\".");
 
-					stack.Push();
+					this.Stack.Push();
 
 					if (args != null)
 					{
 						for (int i = 0; i < args.Count; i++)
 						{
-							Variable variable = stack[func.Args[i]];
+							Variable variable = Stack[func.Args[i]];
 							variable.Gets(args[i]);
 						}
 					}
@@ -50,7 +65,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 					foreach (StatementNode statement in func.StatementBlock.Statements)
 					{
-						this.ExecuteStatement(statement, stack);
+						this.ExecuteStatement(statement);
 
 						if (this.shouldReturn)
 						{
@@ -63,26 +78,26 @@ namespace Snowsoft.SnowflakeScript.Execution
 						}
 					}
 
-					stack.Pop();
+					this.Stack.Pop();
 				}
 			}
 
 			return functionReturnValue;
 		}
 
-		private void ExecuteStatement(StatementNode node, VariableStack stack)
+		private void ExecuteStatement(StatementNode node)
 		{
 			if (node is EchoNode)
 			{
-				this.ExecuteEcho((EchoNode)node, stack);
+				this.ExecuteEcho((EchoNode)node);
 			}
 			else if (node is ReturnNode)
 			{
-				this.ExecuteReturn((ReturnNode)node, stack);
+				this.ExecuteReturn((ReturnNode)node);
 			}
 			else if (node is ExpressionNode)
 			{
-				this.ExecuteExpression((ExpressionNode)node, stack);
+				this.ExecuteExpression((ExpressionNode)node);
 			}
 			else
 			{
@@ -90,18 +105,18 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 		}
 
-		private void ExecuteEcho(EchoNode node, VariableStack stack)
+		private void ExecuteEcho(EchoNode node)
 		{
-			Console.Write(this.ExecuteExpression(node.Expression, stack));
+			Console.Write(this.ExecuteExpression(node.Expression));
 		}
 
-		private void ExecuteReturn(ReturnNode node, VariableStack stack)
+		private void ExecuteReturn(ReturnNode node)
 		{
 			this.shouldReturn = true;
-			this.returnValue = this.ExecuteExpression(node.Expression, stack);
+			this.returnValue = this.ExecuteExpression(node.Expression);
 		}
 
-		private Variable ExecuteExpression(ExpressionNode node, VariableStack stack)
+		private Variable ExecuteExpression(ExpressionNode node)
 		{
 			Variable result = null;
 
@@ -112,16 +127,16 @@ namespace Snowsoft.SnowflakeScript.Execution
 				List<Variable> args = new List<Variable>();
 				foreach (ExpressionNode expression in functionCall.ArgExpressions)
 				{
-					args.Add(this.ExecuteExpression(expression, stack));
+					args.Add(this.ExecuteExpression(expression));
 				}
 
-				result = this.CallFunction(this.scriptNode, functionCall.FunctionName, args, stack);
+				result = this.CallFunction(functionCall.FunctionName, args);
 			}
 			else if (node is OperationNode)
 			{
 				OperationNode operation = (OperationNode)node;
-				result = this.ExecuteExpression(operation.LHS, stack);
-				Variable rhs = this.ExecuteExpression(operation.RHS, stack);
+				result = this.ExecuteExpression(operation.LHS);
+				Variable rhs = this.ExecuteExpression(operation.RHS);
 
 				switch (operation.Type)
 				{
@@ -136,7 +151,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (node is VariableNode)
 			{
-				result = stack[((VariableNode)node).VariableName];
+				result = this.Stack[((VariableNode)node).VariableName];
 			}
 			else if (node is NullValueNode)
 			{

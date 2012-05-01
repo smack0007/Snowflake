@@ -63,15 +63,12 @@ namespace Snowsoft.SnowflakeScript
 		/// <returns>Script</returns>
 		public void LoadFromString(string script)
 		{
-			this.script = this.parser.Parse(this.lexer.Lex(script));
+			this.executor.SetScript(this.parser.Parse(this.lexer.Lex(script)));
 		}
 
 		public void Run()
 		{
-			if (this.script == null)
-				throw new InvalidOperationException("No Script currently loaded.");
-
-			this.executor.CallFunction(this.script, "Main", null, this.stack);
+			this.executor.CallFunction("Main", null);
 		}
 	}
 }

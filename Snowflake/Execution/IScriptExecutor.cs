@@ -6,6 +6,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public interface IScriptExecutor
 	{
-		Variable CallFunction(ScriptNode script, string funcName, IList<Variable> args, VariableStack stack);
+		VariableStack Stack { get; }
+
+		void SetScript(ScriptNode scriptNode);
+
+		Variable CallFunction(string funcName, IList<Variable> args);
 	}
 }
