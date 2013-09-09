@@ -247,8 +247,8 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					{
 						switch (value)
 						{
-							case "function":
-								lexemes.Add(new Lexeme(LexemeType.Function, null, line, column));
+							case "func":
+								lexemes.Add(new Lexeme(LexemeType.Func, null, line, column));
 								break;
 
 							case "return":

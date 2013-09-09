@@ -1,4 +1,4 @@
-﻿function Main()
+﻿func Main()
 {
 	$var1 = "Hello World!" + '\n';
 	$var2 = 1 + 2 + 3 + 4;
@@ -9,7 +9,7 @@
 	echo $var3 + '\n';
 }
 
-function DoIt()
+func DoIt()
 {
 	echo "DoIt()\n";
 	return 42;

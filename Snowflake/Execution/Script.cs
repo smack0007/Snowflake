@@ -37,7 +37,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			
 			for (int pos = 0; pos < this.lexemes.Count; pos++)
 			{
-				if (this.lexemes[pos].Type == LexemeType.Function)
+				if (this.lexemes[pos].Type == LexemeType.Func)
 				{
 					FuncInfo funcInfo = this.ParseFunc(ref pos);
 					this.funcs.Add(funcInfo.Name, funcInfo);
@@ -86,7 +86,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			FuncInfo funcInfo = new FuncInfo();
 
-			this.EnsureLexemeType(LexemeType.Function, pos);
+			this.EnsureLexemeType(LexemeType.Func, pos);
 			funcInfo.Location = pos;
 
 			pos++;
@@ -148,7 +148,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public Variable CallFunc(string funcName, IList<Variable> args)
 		{
 			if (!this.funcs.ContainsKey(funcName))
-				throw new FuncCallException("No function found by the name " + funcName + ".");
+				throw new FunctionCallException("No function found by the name " + funcName + ".");
 
 			FuncInfo funcInfo = this.funcs[funcName];
 			int pos = funcInfo.EntryLocation;
@@ -158,7 +158,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (args != null)
 			{
 				if (args.Count != funcInfo.Args.Length)
-					throw new FuncCallException("Invalid number of args specified for " + funcName + ".");
+					throw new FunctionCallException("Invalid number of args specified for " + funcName + ".");
 
 				for (int i = 0; i < args.Count; i++)
 				{

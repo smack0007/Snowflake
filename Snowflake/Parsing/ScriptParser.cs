@@ -41,7 +41,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		private FunctionNode ParseFunction(IList<Lexeme> lexemes, ref int pos)
 		{
-			this.EnsureLexemeType(lexemes, LexemeType.Function, pos);
+			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
 
 			FunctionNode node = new FunctionNode();
 

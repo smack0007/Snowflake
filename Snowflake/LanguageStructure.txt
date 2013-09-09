@@ -1,6 +1,6 @@
 Script : { Func } EOF
 
-Function : [function] Identifier [(] { Variable [,]! } [)] StatementBlock
+Function : [func] Identifier [(] { Variable [,]! } [)] StatementBlock
 
 Identifier : [A-Za-z_][A-Za-z0-9_]*
 

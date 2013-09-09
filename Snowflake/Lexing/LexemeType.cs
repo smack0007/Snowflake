@@ -25,9 +25,9 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		Identifier,
 
 		/// <summary>
-		/// function
+		/// func
 		/// </summary>
-		Function,
+		Func,
 
 		/// <summary>
 		/// return
