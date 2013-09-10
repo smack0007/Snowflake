@@ -1,16 +1,12 @@
-﻿func Main()
-{
-	$var1 = "Hello World!" + '\n';
-	$var2 = 1 + 2 + 3 + 4;
-	echo $var1;
-	echo $var2 + '\n';
+﻿echo "Hello World!\n";
 
-	$var3 = DoIt();
-	echo $var3 + '\n';
-}
+var x = 5;
+echo x + "\n";
 
-func DoIt()
-{
-	echo "DoIt()\n";
-	return 42;
-}
+var DoIt = func() {
+	echo "Test\n";
+};
+
+DoIt();
+DoIt();
+DoIt();

@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class VariableNode : ExpressionNode
+	public class VariableReferenceNode : ExpressionNode
 	{
 		public string VariableName
 		{
@@ -10,7 +10,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public VariableNode()
+		public VariableReferenceNode()
 			: base()
 		{
 		}

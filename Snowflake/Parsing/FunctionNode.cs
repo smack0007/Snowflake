@@ -3,14 +3,8 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class FunctionNode : SyntaxTreeNode
-	{
-		public string Name
-		{
-			get;
-			set;
-		}
-
+	public class FunctionNode : ExpressionNode
+	{		
 		public IList<string> Args
 		{
 			get;

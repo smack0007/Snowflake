@@ -10,6 +10,6 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		void SetScript(ScriptNode scriptNode);
 
-		Variable CallFunction(string funcName, IList<Variable> args);
+		void Run();
 	}
 }

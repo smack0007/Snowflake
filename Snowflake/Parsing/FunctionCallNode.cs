@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
@@ -13,7 +11,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public IList<ExpressionNode> ArgExpressions
+		public IList<ExpressionNode> Arguments
 		{
 			get;
 			set;
@@ -22,7 +20,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		public FunctionCallNode()
 			: base()
 		{
-			this.ArgExpressions = new List<ExpressionNode>();
+			this.Arguments = new List<ExpressionNode>();
 		}
 	}
 }

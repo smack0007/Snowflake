@@ -1,41 +1,37 @@
-Script : { Func } EOF
+Script: { Statement } EOF
 
-Function : [func] Identifier [(] { Variable [,]! } [)] StatementBlock
+StatementBlock: [{] { Statement } [}]
 
-Identifier : [A-Za-z_][A-Za-z0-9_]*
+Statement: ( VariableDeclaration | Echo | If | Return | Expression ) [;]
 
-Variable : [$] Identifier
+VariableDeclaration: [var] Identifier | [var] Identifier [=] Expression
 
-StatementBlock : [{] { Statement } [}]
+Echo: [echo] Expression
 
-Statement : ( Echo | If | Return | Expression ) [;]
+If: [if] [(] Expression [)] StatementBlock |
+    [if] [(] Expression [)] StatementBlock [else] StatementBlock
 
-Echo : [echo] Expression
+Return: [return] Expression
 
-If : [if] [(] Expression [)] StatementBlock |
-     [if] [(] Expression [)] StatementBlock [else] StatementBlock
+Expression: Function | FunctionCall | Identifier | Identifier Operation Expression | Value | Value Operation Expression
 
-Return : [return] Expression
+Function: [func] [(] { Variable [,]! } [)] StatementBlock
 
-Expression : FuncCall | Variable | Variable Operation Expression | Value | Value Operation Expression
+FunctionCall: Identifier [(] { Expression [,]! } [)]
 
-FuncCall : Identifier [(] { Expression [,]! } [)]
+Identifier: [A-Za-z_][A-Za-z0-9_]*
 
-Operation : [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
+Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
 
-Value : Null | String | Char | Integer | Float | Array | Map
+Value: Null | String | Char | Integer | Float 
 
-Null : [null]
+Null: [null]
 
-String : ["] [chars]* ["]
+String: ["] [chars]* ["]
 
-Integer : [1-9]*
+Integer: [1-9]*
 
-Float : [1-9]*[.][1-9]*
-
-Array : [array] [(] { Expression [,]! } [)]
-
-List : [map] [(] { Expression [=][>] Expression [,]! } [)]
+Float: [1-9]*[.][1-9]*
 
 Legend:
 	*       0 or more

@@ -6,6 +6,8 @@ namespace Snowsoft.SnowflakeScript.Execution
 	{
 		Null = 0,
 
+		Function,
+
 		Boolean,
 
 		Char,
@@ -15,7 +17,5 @@ namespace Snowsoft.SnowflakeScript.Execution
 		Integer,
 
 		Float,
-
-		Array
 	}
 }

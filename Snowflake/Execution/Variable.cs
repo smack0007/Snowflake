@@ -24,6 +24,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 			this.Type = VariableType.Null;
 		}
 
+		public Variable(ScriptFunction function)
+		{
+			this.Value = function;
+			this.Type = VariableType.Function;
+		}
+
 		public Variable(bool val)
 		{
 			this.Value = val;
@@ -52,12 +58,6 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			this.Value = val;
 			this.Type = VariableType.Float;
-		}
-
-		public Variable(Dictionary<string, Variable> val)
-		{
-			this.Value = val;
-			this.Type = VariableType.Array;
 		}
 
 		public void Gets(Variable variable)
@@ -139,70 +139,74 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new VariableException("EqualTo not available for type " + this.Type.ToString());
 		}
 
-		public Variable AtIndex(Variable index)
-		{
-			if(this.Type != VariableType.Array)
-				throw new VariableException("Variable is not an array");
+		//public Variable AtIndex(Variable index)
+		//{
+		//	if(this.Type != VariableType.Array)
+		//		throw new VariableException("Variable is not an array");
 
-			if(index != null) // Key was specified
-			{
-				string key = index.ToString();
+		//	if(index != null) // Key was specified
+		//	{
+		//		string key = index.ToString();
 
-				if (((Dictionary<string, Variable>)this.Value).ContainsKey(key))
-				{
-					return ((Dictionary<string, Variable>)this.Value)[key];
-				}
-				else
-				{
-					Variable variable = new Variable();
-					((Dictionary<string, Variable>)this.Value).Add(key, variable);
+		//		if (((Dictionary<string, Variable>)this.Value).ContainsKey(key))
+		//		{
+		//			return ((Dictionary<string, Variable>)this.Value)[key];
+		//		}
+		//		else
+		//		{
+		//			Variable variable = new Variable();
+		//			((Dictionary<string, Variable>)this.Value).Add(key, variable);
 
-					return variable;
-				}
-			}
-			else // Generate a new variable and return it
-			{
-				Variable variable = new Variable();
+		//			return variable;
+		//		}
+		//	}
+		//	else // Generate a new variable and return it
+		//	{
+		//		Variable variable = new Variable();
 
-				((Dictionary<string, Variable>)this.Value).Add(((Dictionary<string, Variable>)this.Value).Count.ToString(), variable);
+		//		((Dictionary<string, Variable>)this.Value).Add(((Dictionary<string, Variable>)this.Value).Count.ToString(), variable);
 
-				return variable;
-			}
-		}
+		//		return variable;
+		//	}
+		//}
 
 		public bool ToBoolean()
 		{
-			if(this.Type == VariableType.Null)
+			if (this.Type == VariableType.Null)
+			{
 				return false;
-			else if(this.Type == VariableType.Boolean)
+			}
+			else if (this.Type == VariableType.Boolean)
+			{
 				return (bool)this.Value;
-			else if(this.Type == VariableType.String)
+			}
+			else if (this.Type == VariableType.String)
 			{
 				string s = this.ToString().ToUpper();
 
-				if(s == "TRUE" || s == "T")
+				if (s == "TRUE" || s == "T")
 				{
 					return true;
 				}
-				else if(s == "FALSE" || s == "F")
+				else if (s == "FALSE" || s == "F")
 				{
 					return false;
 				}
 			}
-			else if(this.Type == VariableType.Integer)
+			else if (this.Type == VariableType.Integer)
 			{
 				int i = this.ToInteger();
 
-				if(i == 0)
+				if (i == 0)
 					return false;
 
 				return true;
 			}
-			else if(this.Type == VariableType.Float)
+			else if (this.Type == VariableType.Float)
 			{
 				double f = this.ToFloat();
 
-				if(f == 0.0)
+				if (f == 0.0)
 					return false;
 
 				return true;
@@ -237,21 +241,21 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				return ((double)this.Value).ToString();
 			}
-			else if (this.Type == VariableType.Array)
-			{
-				Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)this.Value);
+			//else if (this.Type == VariableType.Array)
+			//{
+			//	Dictionary<string, Variable> dictionary = ((Dictionary<string, Variable>)this.Value);
 
-				string s = "";
-				foreach (string key in dictionary.Keys)
-				{
-					if (s != "")
-						s += ", ";
+			//	string s = "";
+			//	foreach (string key in dictionary.Keys)
+			//	{
+			//		if (s != "")
+			//			s += ", ";
 
-					s += key + " => " + dictionary[key];
-				}
+			//		s += key + " => " + dictionary[key];
+			//	}
 
-				return '{' + s + '}';
-			}
+			//	return '{' + s + '}';
+			//}
 
 			throw new VariableException("String conversion not available for type " + this.Type.ToString());
 		}

@@ -68,7 +68,7 @@ namespace Snowsoft.SnowflakeScript
 
 		public void Run()
 		{
-			this.executor.CallFunction("Main", null);
+			this.executor.Run();
 		}
 	}
 }

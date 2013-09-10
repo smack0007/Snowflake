@@ -57,10 +57,6 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					{
 						lexemes.Add(new Lexeme(LexemeType.EndStatement, null, curLine, curColumn));
 					}
-					else if (text[i] == '$') // Variable
-					{
-						lexemes.Add(new Lexeme(LexemeType.Variable, null, curLine, curColumn));
-					}
 					else if (text[i] == '.') // Period
 					{
 						lexemes.Add(new Lexeme(LexemeType.Period, null, curLine, curColumn));
@@ -95,14 +91,9 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '=') // Gets or EqualTo or MapsTo
 					{
-						if (text[i + 1] == '=')
+						if (i + 1 < text.Length && text[i + 1] == '=')
 						{
 							lexemes.Add(new Lexeme(LexemeType.EqualTo, null, curLine, curColumn));
-							i++;
-						}
-						else if (text[i + 1] == '>')
-						{
-							lexemes.Add(new Lexeme(LexemeType.MapsTo, null, curLine, curColumn));
 							i++;
 						}
 						else
@@ -112,8 +103,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '!') // Not or NotEqualTo
 					{
-						if (text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] != '=')
+						{
 							lexemes.Add(new Lexeme(LexemeType.Not, null, curLine, curColumn));
+						}
 						else
 						{
 							lexemes.Add(new Lexeme(LexemeType.NotEqualTo, null, curLine, curColumn));
@@ -122,8 +115,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '+') // Plus or PlusGets
 					{
-						if (text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] != '=')
+						{
 							lexemes.Add(new Lexeme(LexemeType.Plus, null, curLine, curColumn));
+						}
 						else
 						{
 							lexemes.Add(new Lexeme(LexemeType.PlusGets, null, curLine, curColumn));
@@ -132,8 +127,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '-') // Minus or MinusGets
 					{
-						if (text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] != '=')
+						{
 							lexemes.Add(new Lexeme(LexemeType.Minus, null, curLine, curColumn));
+						}
 						else
 						{
 							lexemes.Add(new Lexeme(LexemeType.MinusGets, null, curLine, curColumn));
@@ -142,8 +139,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '*') // Multiply or MultiplyGets
 					{
-						if (text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] != '=')
+						{
 							lexemes.Add(new Lexeme(LexemeType.Multiply, null, curLine, curColumn));
+						}
 						else
 						{
 							lexemes.Add(new Lexeme(LexemeType.MultiplyGets, null, curLine, curColumn));
@@ -152,20 +151,22 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '/') // Multiply or MultiplyGets
 					{
-						if (text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] != '=')
+						{
 							lexemes.Add(new Lexeme(LexemeType.Divide, null, curLine, curColumn));
+						}
 						else
 						{
 							lexemes.Add(new Lexeme(LexemeType.DivideGets, null, curLine, curColumn));
 							i++;
 						}
 					}
-					else if (text[i] == '&' && text[i + 1] == '&') // And
+					else if (text[i] == '&' && i + 1 < text.Length && text[i + 1] == '&') // And
 					{
 						lexemes.Add(new Lexeme(LexemeType.LogicalAnd, null, curLine, curColumn));
 						i++;
 					}
-					else if (text[i] == '|' && text[i + 1] == '|') // Or
+					else if (text[i] == '|' && i + 1 < text.Length && text[i + 1] == '|') // Or
 					{
 						lexemes.Add(new Lexeme(LexemeType.LogicalOr, null, curLine, curColumn));
 						i++;
@@ -247,6 +248,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					{
 						switch (value)
 						{
+							case "var":
+								lexemes.Add(new Lexeme(LexemeType.Var, null, curLine, curColumn));
+								break;
+
 							case "func":
 								lexemes.Add(new Lexeme(LexemeType.Func, null, line, column));
 								break;
@@ -293,14 +298,6 @@ namespace Snowsoft.SnowflakeScript.Lexing
 
 							case "false":
 								lexemes.Add(new Lexeme(LexemeType.False, null, line, column));
-								break;
-
-							case "array":
-								lexemes.Add(new Lexeme(LexemeType.Array, null, line, column));
-								break;
-
-							case "list":
-								lexemes.Add(new Lexeme(LexemeType.List, null, line, column));
 								break;
 
 							default:

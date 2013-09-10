@@ -5,7 +5,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class StatementBlockNode : SyntaxTreeNode
 	{
-		public IList<StatementNode> Statements
+		public List<StatementNode> Statements
 		{
 			get;
 			private set;

@@ -83,17 +83,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		/// false
 		/// </summary>
 		False,
-		
-		/// <summary>
-		/// array
-		/// </summary>
-		Array,
-
-		/// <summary>
-		/// list
-		/// </summary>
-		List,
-
+				
 		/// <summary>
 		/// Unidentified numeric value. This should not be output.
 		/// </summary>
@@ -115,9 +105,9 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		EndStatement,
 		
 		/// <summary>
-		/// $
+		/// var
 		/// </summary>
-		Variable,
+		Var,
 		
 		/// <summary>
 		/// .
@@ -228,12 +218,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		/// ||
 		/// </summary>
 		LogicalOr,
-
-		/// <summary>
-		/// =>
-		/// </summary>
-		MapsTo,
-
+				
 		/// <summary>
 		/// Used to indicate the end of a list of Lexemes.
 		/// </summary>
