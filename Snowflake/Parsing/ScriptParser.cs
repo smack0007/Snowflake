@@ -4,7 +4,7 @@ using Snowsoft.SnowflakeScript.Lexing;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class Parser : IScriptParser
+	public class ScriptParser
 	{
 		private void EnsureLexemeType(IList<Lexeme> lexemes, LexemeType expected, int pos)
 		{
@@ -152,6 +152,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 				case LexemeType.Null:
 					node = new NullValueNode();
+					pos++;
+					break;
+
+				case LexemeType.True:
+					node = new BooleanValueNode() { Value = true };
+					pos++;
+					break;
+
+				case LexemeType.False:
+					node = new BooleanValueNode() { Value = false };
 					pos++;
 					break;
 

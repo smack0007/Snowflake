@@ -6,54 +6,57 @@ using Snowsoft.SnowflakeScript.Parsing;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptExecutor : IScriptExecutor
+	public class ScriptExecutor
 	{
-		ScriptNode script;
-		bool shouldReturn;
-		Variable returnValue;
-
-		public VariableStack Stack
+		class ExecutionContext
 		{
-			get;
-			private set;
+			public ScriptStack Stack;
+			public bool ShouldReturn;
+			public ScriptVariable ReturnValue;
 		}
 
 		public ScriptExecutor()
 		{
-			this.Stack = new VariableStack();
 		}
-
-		public void SetScript(ScriptNode script)
-		{
-			this.script = script;
-		}
-
+				
 		private void ThrowUnableToExecuteException(string executionStage, SyntaxTreeNode node)
 		{
-			throw new ExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
+			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public void Run()
+		public ScriptVariable Execute(ScriptNode script, ScriptStack stack)
 		{
-			if (this.script == null)
+			if (script == null)
+				throw new ArgumentNullException("script");
+
+			if (stack == null)
+				throw new ArgumentNullException("stack");
+
+			var context = new ExecutionContext()
 			{
-				throw new InvalidOperationException("No script loaded for execution.");
+				Stack = stack,
+				ReturnValue = ScriptVariable.Null
+			};
+						
+			foreach (StatementNode statement in script.Statements)
+			{
+				this.ExecuteStatement(context, statement);
+
+				if (context.ShouldReturn)
+					break;
 			}
 
-			foreach (StatementNode statement in this.script.Statements)
-			{
-				this.ExecuteStatement(statement);
-			}
+			return context.ReturnValue;
 		}
 
-		public Variable CallFunction(ScriptFunction function, IList<Variable> args)
+		private ScriptVariable CallFunction(ExecutionContext context, ScriptFunction function, IList<ScriptVariable> args)
 		{
-			Variable functionReturnValue = Variable.Null;
+			ScriptVariable functionReturnValue = ScriptVariable.Null;
 				
 			//if (args != null && args.Count != func.Args.Count)
 			//	throw new ExecutionException("Invalid number of arguments specified when calling \"" + funcName + "\".");
 
-			this.Stack.Push();
+			context.Stack.Push();
 			
 			//if (args != null)
 			//{
@@ -63,122 +66,122 @@ namespace Snowsoft.SnowflakeScript.Execution
 			//		variable.Gets(args[i]);
 			//	}
 			//}
-						
-			this.shouldReturn = false;
-			this.returnValue = null;
+
+			context.ShouldReturn = false;
+			context.ReturnValue = null;
 
 			foreach (StatementNode statement in function.StatementBlock.Statements)
 			{
-				this.ExecuteStatement(statement);
+				this.ExecuteStatement(context, statement);
 
-				if (this.shouldReturn)
+				if (context.ShouldReturn)
 				{
-					functionReturnValue = this.returnValue;
+					functionReturnValue = context.ReturnValue;
 
-					this.returnValue = null;
-					this.shouldReturn = false;
+					context.ReturnValue = ScriptVariable.Null;
+					context.ShouldReturn = false;
 
 					break;
 				}
 			}
 
-			this.Stack.Pop();
+			context.Stack.Pop();
 				
 			return functionReturnValue;
 		}
 
-		private void ExecuteStatement(StatementNode node)
+		private void ExecuteStatement(ExecutionContext context, StatementNode node)
 		{
 			if (node is VariableDeclarationNode)
 			{
-				this.ExecuteVariableDeclaration((VariableDeclarationNode)node);
+				this.ExecuteVariableDeclaration(context, (VariableDeclarationNode)node);
 			}
 			else if (node is EchoNode)
 			{
-				this.ExecuteEcho((EchoNode)node);
+				this.ExecuteEcho(context, (EchoNode)node);
 			}
 			else if (node is ReturnNode)
 			{
-				this.ExecuteReturn((ReturnNode)node);
+				this.ExecuteReturn(context, (ReturnNode)node);
 			}
 			else if (node is ExpressionNode)
 			{
-				this.ExecuteExpression((ExpressionNode)node);
+				this.ExecuteExpression(context, (ExpressionNode)node);
 			}
 			else
 			{
-				throw new ExecutionException("Unable to handle node in script tree.");
+				throw new ScriptExecutionException("Unable to handle node in script tree.");
 			}
 		}
 
-		private void ExecuteVariableDeclaration(VariableDeclarationNode node)
+		private void ExecuteVariableDeclaration(ExecutionContext context, VariableDeclarationNode node)
 		{
-			Variable variable = null;
+			ScriptVariable variable = null;
 
 			if (node.ValueExpression != null)
 			{
-				variable = this.ExecuteExpression(node.ValueExpression);
+				variable = this.ExecuteExpression(context, node.ValueExpression);
 			}
 			else
 			{
-				variable = Variable.Null;
+				variable = ScriptVariable.Null;
 			}
 
-			this.Stack[node.VariableName] = variable;
+			context.Stack[node.VariableName] = variable;
 		}
 
-		private void ExecuteEcho(EchoNode node)
+		private void ExecuteEcho(ExecutionContext context, EchoNode node)
 		{
-			Console.Write(this.ExecuteExpression(node.Expression));
+			Console.Write(this.ExecuteExpression(context, node.Expression));
 		}
 
-		private void ExecuteReturn(ReturnNode node)
+		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{
-			this.shouldReturn = true;
-			this.returnValue = this.ExecuteExpression(node.Expression);
+			context.ShouldReturn = true;
+			context.ReturnValue = this.ExecuteExpression(context, node.Expression);
 		}
 
-		private Variable GetVariable(string variableName)
+		private ScriptVariable GetVariable(ExecutionContext context, string variableName)
 		{
-			Variable variable = this.Stack[variableName];
+			ScriptVariable variable = context.Stack[variableName];
 
 			if (variable == null)
-				throw new ExecutionException(string.Format("\"{0}\" is not defined.", variableName));
+				throw new ScriptExecutionException(string.Format("\"{0}\" is not defined.", variableName));
 
 			return variable;
 		}
 
-		private Variable ExecuteExpression(ExpressionNode node)
+		private ScriptVariable ExecuteExpression(ExecutionContext context, ExpressionNode node)
 		{
-			Variable result = null;
+			ScriptVariable result = null;
 
 			if (node is FunctionNode)
 			{
 				FunctionNode function = (FunctionNode)node;
-				result = new Variable(new ScriptFunction(function.StatementBlock));
+				result = new ScriptVariable(new ScriptFunction(function.StatementBlock));
 			}
 			else if (node is FunctionCallNode)
 			{
 				FunctionCallNode functionCall = (FunctionCallNode)node;
 
-				List<Variable> args = new List<Variable>();
+				List<ScriptVariable> args = new List<ScriptVariable>();
 				foreach (ExpressionNode expression in functionCall.Arguments)
 				{
-					args.Add(this.ExecuteExpression(expression));
+					args.Add(this.ExecuteExpression(context, expression));
 				}
 
-				Variable variable = this.GetVariable(functionCall.FunctionName);
+				ScriptVariable variable = this.GetVariable(context, functionCall.FunctionName);
 				
-				if (variable.Type != VariableType.Function)
-					throw new ExecutionException(string.Format("\"{0}\" is not a function.", functionCall.FunctionName));
-				
-				result = this.CallFunction((ScriptFunction)variable.Value, args);
+				if (variable.Type != ScriptVariableType.Function)
+					throw new ScriptExecutionException(string.Format("\"{0}\" is not a function.", functionCall.FunctionName));
+
+				result = this.CallFunction(context, (ScriptFunction)variable.Value, args);
 			}
 			else if (node is OperationNode)
 			{
 				OperationNode operation = (OperationNode)node;
-				result = this.ExecuteExpression(operation.LHS);
-				Variable rhs = this.ExecuteExpression(operation.RHS);
+				result = this.ExecuteExpression(context, operation.LHS);
+				ScriptVariable rhs = this.ExecuteExpression(context, operation.RHS);
 
 				switch (operation.Type)
 				{
@@ -195,30 +198,34 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
 
-				result = this.Stack[variableReferenceNode.VariableName];
+				result = context.Stack[variableReferenceNode.VariableName];
 
 				if (result == null)
 					throw new ScriptException(string.Format("Variable \"{0}\" is not defined.", variableReferenceNode.VariableName));
 			}
 			else if (node is NullValueNode)
 			{
-				result = Variable.Null;
+				result = ScriptVariable.Null;
+			}
+			else if (node is BooleanValueNode)
+			{
+				result = new ScriptVariable(((BooleanValueNode)node).Value);
 			}
 			else if (node is StringValueNode)
 			{
-				result = new Variable(((StringValueNode)node).Value);
+				result = new ScriptVariable(((StringValueNode)node).Value);
 			}
 			else if (node is CharValueNode)
 			{
-				result = new Variable(((CharValueNode)node).Value);
+				result = new ScriptVariable(((CharValueNode)node).Value);
 			}
 			else if (node is IntegerValueNode)
 			{
-				result = new Variable(((IntegerValueNode)node).Value);
+				result = new ScriptVariable(((IntegerValueNode)node).Value);
 			}
 			else if (node is FloatValueNode)
 			{
-				result = new Variable(((FloatValueNode)node).Value);
+				result = new ScriptVariable(((FloatValueNode)node).Value);
 			}
 
 			if (result == null)

@@ -5,11 +5,8 @@ using Snowsoft.SnowflakeScript.Lexing;
 
 namespace Snowflake.Tests
 {
-	/// <summary>
-	/// Contains tests which should cause ScriptParserException(s).
-	/// </summary>
 	[TestFixture]
-	public class ScriptParserErrorTests
+	public class ScriptLexerTests
 	{
 		private void ParseScript(string script)
 		{
@@ -18,31 +15,31 @@ namespace Snowflake.Tests
 		}
 
 		[Test, ExpectedException(typeof(LexerException))]
-		public void Char_WithNoEscapeCodeMoreThanOneChar()
+		public void More_Than_One_Char_No_Escape_Code_Is_Error()
 		{
 			this.ParseScript("'aa'");
 		}
 
 		[Test, ExpectedException(typeof(LexerException))]
-		public void Char_WithEscapeCodeMoreThanOneChar()
+		public void More_Than_One_Char_With_Escape_Code_Is_Error()
 		{
 			this.ParseScript("'\\aa'");
 		}
 
 		[Test, ExpectedException(typeof(LexerException))]
-		public void UnexpectedEndOfFile_UnclosedChar()
+		public void Unclosed_Char_Is_Error()
 		{
 			this.ParseScript("\'a");
 		}
 
 		[Test, ExpectedException(typeof(LexerException))]
-		public void UnexpectedEndOfFile_UnclosedString()
+		public void Unclosed_String_Is_Error()
 		{
 			this.ParseScript("\"aa");
 		}
 
 		[Test, ExpectedException(typeof(LexerException))]
-		public void UnexpectedEndOfFile_FloatEndsWithDecimal()
+		public void Float_Ending_With_Decimal_Is_Error()
 		{
 			this.ParseScript("123.");
 		}

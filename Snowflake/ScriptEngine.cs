@@ -9,66 +9,32 @@ namespace Snowsoft.SnowflakeScript
 {
 	public class ScriptEngine
 	{
-		IScriptLexer lexer;
-		IScriptParser parser;
-		IScriptExecutor executor;
-
-		ScriptNode script;
-		VariableStack stack;
+		ScriptLexer lexer;
+		ScriptParser parser;
+		ScriptExecutor executor;
+				
+		ScriptStack stack;
 
 		public ScriptEngine()
-			: this(new ScriptLexer(), new Parser(), new ScriptExecutor())
 		{
+			this.lexer = new ScriptLexer();
+			this.parser = new ScriptParser();
+			this.executor = new ScriptExecutor();
+
+			this.stack = new ScriptStack();
+		}
+		
+		public object Execute(string script)
+		{
+			var scriptNode = this.parser.Parse(this.lexer.Lex(script));
+			var result = this.executor.Execute(scriptNode, stack);
+			return result.Value;
 		}
 
-		public ScriptEngine(IScriptLexer lexer, IScriptParser parser, IScriptExecutor executor)
+		public object ExecuteFile(string fileName)
 		{
-			if (lexer == null)
-			{
-				throw new ArgumentNullException("lexer");
-			}
-
-			if (parser == null)
-			{
-				throw new ArgumentNullException("parser");
-			}
-
-			if (executor == null)
-			{
-				throw new ArgumentNullException("executor");
-			}
-
-			this.lexer = lexer;
-			this.parser = parser;
-			this.executor = executor;
-
-			this.stack = new VariableStack();
-		}
-
-		/// <summary>
-		/// Loads a script from a file.
-		/// </summary>
-		/// <param name="filename">The filename to read from.</param>
-		/// <returns>Script</returns>
-		public void LoadFromFile(string fileName)
-		{
-			string text = File.ReadAllText(fileName);
-			this.LoadFromString(text);
-		}
-
-		/// <summary>
-		/// Loads a script from a string.
-		/// </summary>
-		/// <param name="script">The script text.</param>
-		/// <returns>Script</returns>
-		public void LoadFromString(string script)
-		{
-			this.executor.SetScript(this.parser.Parse(this.lexer.Lex(script)));
-		}
-
-		public void Run()
-		{
-			this.executor.Run();
+			string script = File.ReadAllText(fileName);
+			return this.Execute(script);
 		}
 	}
 }

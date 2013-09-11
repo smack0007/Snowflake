@@ -10,3 +10,7 @@ var DoIt = func() {
 DoIt();
 DoIt();
 DoIt();
+
+var check = false;
+
+return 5;

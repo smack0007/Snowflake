@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ExecutionException : ScriptException
+	public class ScriptExecutionException : ScriptException
 	{
-		public ExecutionException(string message)
+		public ScriptExecutionException(string message)
 			: base(message)
 		{
 		}

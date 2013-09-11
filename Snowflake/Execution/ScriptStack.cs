@@ -6,11 +6,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 	/// <summary>
 	/// Represents a stack.
 	/// </summary>
-	public class VariableStack
+	public class ScriptStack
 	{		
-		List<Dictionary<string, Variable>> stack;
+		List<Dictionary<string, ScriptVariable>> stack;
 
-		public Variable this[string name]
+		public ScriptVariable this[string name]
 		{
 			get
 			{				
@@ -26,10 +26,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 		}
 
-		public VariableStack()
+		public ScriptStack()
 		{
-			this.stack = new List<Dictionary<string, Variable>>();
-			this.stack.Add(new Dictionary<string, Variable>());
+			this.stack = new List<Dictionary<string, ScriptVariable>>();
+			this.stack.Add(new Dictionary<string, ScriptVariable>());
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		/// </summary>
 		public void Push()
 		{
-			this.stack.Add(new Dictionary<string, Variable>());
+			this.stack.Add(new Dictionary<string, ScriptVariable>());
 		}
 
 		/// <summary>

@@ -4,12 +4,11 @@ StatementBlock: [{] { Statement } [}]
 
 Statement: ( VariableDeclaration | Echo | If | Return | Expression ) [;]
 
-VariableDeclaration: [var] Identifier | [var] Identifier [=] Expression
+VariableDeclaration: [var] Identifier ( [=] Expression )^
 
 Echo: [echo] Expression
 
-If: [if] [(] Expression [)] StatementBlock |
-    [if] [(] Expression [)] StatementBlock [else] StatementBlock
+If: [if] [(] Expression [)] StatementBlock ( [else] StatementBlock )^
 
 Return: [return] Expression
 
@@ -23,9 +22,11 @@ Identifier: [A-Za-z_][A-Za-z0-9_]*
 
 Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
 
-Value: Null | String | Char | Integer | Float 
+Value: Null | Boolean | String | Char | Integer | Float 
 
 Null: [null]
+
+Boolean: [true] | [false]
 
 String: ["] [chars]* ["]
 
@@ -36,9 +37,10 @@ Float: [1-9]*[.][1-9]*
 Legend:
 	*       0 or more
 	+       1 or more
+	^       Optional
 	|		Or
-	( )		Grouping
-	[ ]		Symbol or Keyword
-	{ }		Repetition
-	[ ]!	Symbol is repetition indicator
+	( )     Grouping
+	[ ]     Symbol or Keyword
+	{ }     Repetition
+	[ ]!    Symbol is repetition indicator
 

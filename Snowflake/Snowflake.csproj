@@ -66,11 +66,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Execution\ExecutionException.cs" />
+    <Compile Include="Execution\ScriptExecutionException.cs" />
     <Compile Include="Execution\ScriptExecutor.cs" />
-    <Compile Include="Execution\IScriptExecutor.cs" />
     <Compile Include="Execution\ScriptFunction.cs" />
-    <Compile Include="Lexing\IScriptLexer.cs" />
+    <Compile Include="Parsing\BooleanValueNode.cs" />
     <Compile Include="Parsing\CharValueNode.cs" />
     <Compile Include="Parsing\EchoNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
@@ -78,7 +77,6 @@
     <Compile Include="Parsing\FunctionCallNode.cs" />
     <Compile Include="Parsing\FunctionNode.cs" />
     <Compile Include="Parsing\IntegerValueNode.cs" />
-    <Compile Include="Parsing\IScriptParser.cs" />
     <Compile Include="Parsing\NullValueNode.cs" />
     <Compile Include="Parsing\OperationNode.cs" />
     <Compile Include="Parsing\OperationType.cs" />
@@ -92,7 +90,6 @@
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
     <Compile Include="ScriptEngine.cs" />
-    <Compile Include="Execution\FunctionCallException.cs" />
     <Compile Include="Lexing\Lexeme.cs" />
     <Compile Include="Lexing\LexemeType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,10 +97,9 @@
     <Compile Include="Lexing\LexerException.cs" />
     <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
-    <Compile Include="Execution\VariableException.cs" />
-    <Compile Include="Execution\Variable.cs" />
-    <Compile Include="Execution\VariableStack.cs" />
-    <Compile Include="Execution\VariableType.cs" />
+    <Compile Include="Execution\ScriptVariable.cs" />
+    <Compile Include="Execution\ScriptStack.cs" />
+    <Compile Include="Execution\ScriptVariableType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />
