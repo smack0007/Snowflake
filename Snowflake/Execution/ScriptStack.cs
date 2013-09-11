@@ -13,9 +13,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public ScriptVariable this[string name]
 		{
 			get
-			{				
-				if (this.stack[this.stack.Count - 1].ContainsKey(name))
-					return this.stack[this.stack.Count - 1][name];
+			{
+				for (int i = this.stack.Count - 1; i >= 0; i--)
+				{
+					if (this.stack[i].ContainsKey(name))
+						return this.stack[i][name];
+				}
 
 				return null;
 			}

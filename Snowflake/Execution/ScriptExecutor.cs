@@ -137,8 +137,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{
+			// It's important to store the result before setting any of the context values because
+			// the expression itself could change the context values.
+			var result = this.ExecuteExpression(context, node.Expression);
+
 			context.ShouldReturn = true;
-			context.ReturnValue = this.ExecuteExpression(context, node.Expression);
+			context.ReturnValue = result;
 		}
 
 		private ScriptVariable GetVariable(ExecutionContext context, string variableName)
