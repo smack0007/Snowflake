@@ -308,9 +308,13 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					else if (type == LexemeType.Numeric)
 					{
 						if (isFloat)
+						{
 							type = LexemeType.Float;
+						}
 						else
+						{
 							type = LexemeType.Integer;
+						}
 
 						lexemes.Add(new Lexeme(type, value, line, column));
 					}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Snowsoft.SnowflakeScript.Lexing;
+using System.Globalization;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
@@ -171,7 +172,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 					break;
 
 				case LexemeType.Char:
-					node = new CharValueNode() { Value = lexemes[pos].Value[0] };
+					node = new CharacterValueNode() { Value = lexemes[pos].Value[0] };
 					pos++;
 					break;
 
@@ -181,7 +182,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 					break;
 
 				case LexemeType.Float:
-					node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value) }; // TODO: Specify always use '.' for decimal place.
+					node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture) };
 					pos++;
 					break;
 			}

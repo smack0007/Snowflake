@@ -1,16 +1,2 @@
-﻿echo "Hello World!\n";
+﻿echo 3.14;
 
-var x = 5;
-echo x + "\n";
-
-var DoIt = func() {
-	echo "Test\n";
-};
-
-DoIt();
-DoIt();
-DoIt();
-
-var check = false;
-
-return 5;

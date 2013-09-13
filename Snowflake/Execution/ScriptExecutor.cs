@@ -12,7 +12,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			public ScriptStack Stack;
 			public bool ShouldReturn;
-			public ScriptVariable ReturnValue;
+			public ScriptObject ReturnValue;
 		}
 
 		public ScriptExecutor()
@@ -24,7 +24,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public ScriptVariable Execute(ScriptNode script, ScriptStack stack)
+		public ScriptObject Execute(ScriptNode script, ScriptStack stack)
 		{
 			if (script == null)
 				throw new ArgumentNullException("script");
@@ -35,7 +35,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			var context = new ExecutionContext()
 			{
 				Stack = stack,
-				ReturnValue = ScriptVariable.Null
+				ReturnValue = ScriptNull.Value
 			};
 						
 			foreach (StatementNode statement in script.Statements)
@@ -49,9 +49,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return context.ReturnValue;
 		}
 
-		private ScriptVariable CallFunction(ExecutionContext context, ScriptFunction function, IList<ScriptVariable> args)
+		private ScriptObject CallFunction(ExecutionContext context, ScriptFunction function, IList<ScriptObject> args)
 		{
-			ScriptVariable functionReturnValue = ScriptVariable.Null;
+			ScriptObject functionReturnValue = ScriptNull.Value;
 				
 			//if (args != null && args.Count != func.Args.Count)
 			//	throw new ExecutionException("Invalid number of arguments specified when calling \"" + funcName + "\".");
@@ -78,7 +78,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 				{
 					functionReturnValue = context.ReturnValue;
 
-					context.ReturnValue = ScriptVariable.Null;
+					context.ReturnValue = ScriptNull.Value;
 					context.ShouldReturn = false;
 
 					break;
@@ -116,18 +116,18 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		private void ExecuteVariableDeclaration(ExecutionContext context, VariableDeclarationNode node)
 		{
-			ScriptVariable variable = null;
+			ScriptObject value = null;
 
 			if (node.ValueExpression != null)
 			{
-				variable = this.ExecuteExpression(context, node.ValueExpression);
+				value = this.ExecuteExpression(context, node.ValueExpression);
 			}
 			else
 			{
-				variable = ScriptVariable.Null;
+				value = ScriptNull.Value;
 			}
 
-			context.Stack[node.VariableName] = variable;
+			context.Stack[node.VariableName] = new ScriptVariableReference(value);
 		}
 
 		private void ExecuteEcho(ExecutionContext context, EchoNode node)
@@ -145,9 +145,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 			context.ReturnValue = result;
 		}
 
-		private ScriptVariable GetVariable(ExecutionContext context, string variableName)
+		private ScriptVariableReference GetVariableRefernce(ExecutionContext context, string variableName)
 		{
-			ScriptVariable variable = context.Stack[variableName];
+			ScriptVariableReference variable = context.Stack[variableName];
 
 			if (variable == null)
 				throw new ScriptExecutionException(string.Format("\"{0}\" is not defined.", variableName));
@@ -155,37 +155,41 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return variable;
 		}
 
-		private ScriptVariable ExecuteExpression(ExecutionContext context, ExpressionNode node)
+		private ScriptObject ExecuteExpression(ExecutionContext context, ExpressionNode node)
 		{
-			ScriptVariable result = null;
+			ScriptObject result = null;
 
 			if (node is FunctionNode)
 			{
 				FunctionNode function = (FunctionNode)node;
-				result = new ScriptVariable(new ScriptFunction(function.StatementBlock));
+				result = new ScriptFunction(function.StatementBlock);
 			}
 			else if (node is FunctionCallNode)
 			{
 				FunctionCallNode functionCall = (FunctionCallNode)node;
 
-				List<ScriptVariable> args = new List<ScriptVariable>();
+				List<ScriptObject> args = new List<ScriptObject>();
 				foreach (ExpressionNode expression in functionCall.Arguments)
 				{
 					args.Add(this.ExecuteExpression(context, expression));
 				}
 
-				ScriptVariable variable = this.GetVariable(context, functionCall.FunctionName);
-				
-				if (variable.Type != ScriptVariableType.Function)
-					throw new ScriptExecutionException(string.Format("\"{0}\" is not a function.", functionCall.FunctionName));
+				var variable = this.GetVariableRefernce(context, functionCall.FunctionName);
 
-				result = this.CallFunction(context, (ScriptFunction)variable.Value, args);
+				if (variable.Value is ScriptFunction)
+				{
+					result = this.CallFunction(context, (ScriptFunction)variable.Value, args);
+				}
+				else
+				{
+					throw new ScriptExecutionException(string.Format("\"{0}\" is not a function.", functionCall.FunctionName));
+				}
 			}
 			else if (node is OperationNode)
 			{
 				OperationNode operation = (OperationNode)node;
 				result = this.ExecuteExpression(context, operation.LHS);
-				ScriptVariable rhs = this.ExecuteExpression(context, operation.RHS);
+				ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
 
 				switch (operation.Type)
 				{
@@ -205,31 +209,31 @@ namespace Snowsoft.SnowflakeScript.Execution
 				result = context.Stack[variableReferenceNode.VariableName];
 
 				if (result == null)
-					throw new ScriptException(string.Format("Variable \"{0}\" is not defined.", variableReferenceNode.VariableName));
+					throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", variableReferenceNode.VariableName));
 			}
 			else if (node is NullValueNode)
 			{
-				result = ScriptVariable.Null;
+				result = ScriptNull.Value;
 			}
 			else if (node is BooleanValueNode)
 			{
-				result = new ScriptVariable(((BooleanValueNode)node).Value);
+				result = new ScriptBoolean(((BooleanValueNode)node).Value);
 			}
 			else if (node is StringValueNode)
 			{
-				result = new ScriptVariable(((StringValueNode)node).Value);
+				result = new ScriptString(((StringValueNode)node).Value);
 			}
-			else if (node is CharValueNode)
+			else if (node is CharacterValueNode)
 			{
-				result = new ScriptVariable(((CharValueNode)node).Value);
+				result = new ScriptCharacter(((CharacterValueNode)node).Value);
 			}
 			else if (node is IntegerValueNode)
 			{
-				result = new ScriptVariable(((IntegerValueNode)node).Value);
+				result = new ScriptInteger(((IntegerValueNode)node).Value);
 			}
 			else if (node is FloatValueNode)
 			{
-				result = new ScriptVariable(((FloatValueNode)node).Value);
+				result = new ScriptFloat(((FloatValueNode)node).Value);
 			}
 
 			if (result == null)

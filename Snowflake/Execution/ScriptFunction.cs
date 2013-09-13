@@ -6,8 +6,13 @@ using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptFunction
+	public class ScriptFunction : ScriptObject
 	{
+		public override string TypeName
+		{
+			get { return "func"; }
+		}
+
 		internal StatementBlockNode StatementBlock
 		{
 			get;

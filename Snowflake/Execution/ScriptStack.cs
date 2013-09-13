@@ -8,9 +8,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 	/// </summary>
 	public class ScriptStack
 	{		
-		List<Dictionary<string, ScriptVariable>> stack;
+		List<Dictionary<string, ScriptVariableReference>> stack;
 
-		public ScriptVariable this[string name]
+		public ScriptVariableReference this[string name]
 		{
 			get
 			{
@@ -31,8 +31,8 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		public ScriptStack()
 		{
-			this.stack = new List<Dictionary<string, ScriptVariable>>();
-			this.stack.Add(new Dictionary<string, ScriptVariable>());
+			this.stack = new List<Dictionary<string, ScriptVariableReference>>();
+			this.stack.Add(new Dictionary<string, ScriptVariableReference>());
 		}
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		/// </summary>
 		public void Push()
 		{
-			this.stack.Add(new Dictionary<string, ScriptVariable>());
+			this.stack.Add(new Dictionary<string, ScriptVariableReference>());
 		}
 
 		/// <summary>

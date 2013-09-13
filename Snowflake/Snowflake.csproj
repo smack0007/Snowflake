@@ -66,11 +66,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\ScriptBoolean.cs" />
+    <Compile Include="Execution\ScriptCharacter.cs" />
     <Compile Include="Execution\ScriptExecutionException.cs" />
     <Compile Include="Execution\ScriptExecutor.cs" />
+    <Compile Include="Execution\ScriptFloat.cs" />
     <Compile Include="Execution\ScriptFunction.cs" />
+    <Compile Include="Execution\ScriptString.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
-    <Compile Include="Parsing\CharValueNode.cs" />
+    <Compile Include="Parsing\CharacterValueNode.cs" />
     <Compile Include="Parsing\EchoNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
     <Compile Include="Parsing\FloatValueNode.cs" />
@@ -97,9 +101,11 @@
     <Compile Include="Lexing\LexerException.cs" />
     <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
-    <Compile Include="Execution\ScriptVariable.cs" />
+    <Compile Include="Execution\ScriptInteger.cs" />
+    <Compile Include="Execution\ScriptNull.cs" />
+    <Compile Include="Execution\ScriptVariableReference.cs" />
     <Compile Include="Execution\ScriptStack.cs" />
-    <Compile Include="Execution\ScriptVariableType.cs" />
+    <Compile Include="Execution\ScriptObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />

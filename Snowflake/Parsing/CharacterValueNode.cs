@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class CharValueNode : ExpressionNode
+	public class CharacterValueNode : ExpressionNode
 	{
 		public char Value
 		{
@@ -10,7 +10,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public CharValueNode()
+		public CharacterValueNode()
 		{
 		}
 	}
