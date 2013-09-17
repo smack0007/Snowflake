@@ -7,17 +7,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 	{
 		public override string TypeName
 		{
-			get
-			{
-				if (this.Value != null)
-				{
-					return this.Value.TypeName;
-				}
-				else
-				{
-					return "null";
-				}
-			}
+			get { return "var"; }
 		}
 
 		public ScriptObject Value
@@ -34,9 +24,19 @@ namespace Snowsoft.SnowflakeScript.Execution
 			this.Value = value;
 		}
 
+		public override object GetValue()
+		{
+			return this.Value.GetValue();
+		}
+
 		public override void Gets(ScriptObject other)
 		{
-			this.Value = other;
+			this.Value = (other is ScriptVariableReference ? ((ScriptVariableReference)other).Value : other);
+		}
+
+		public override ScriptObject Add(ScriptObject other)
+		{
+			return this.Value.Add((other is ScriptVariableReference ? ((ScriptVariableReference)other).Value : other));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Snowsoft.SnowflakeScript;
+using Snowsoft.SnowflakeScript.Execution;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,69 @@ namespace Snowflake.Tests
 			ScriptEngine engine = new ScriptEngine();
 			Assert.AreEqual(expectedValue, engine.Execute(script));
 		}
+
+		private void AssertScriptIsExecutionException(string script)
+		{
+			ScriptEngine engine = new ScriptEngine();
+			Assert.Throws<ScriptExecutionException>(() =>
+			{
+				engine.Execute(script);
+			});
+		}
+				
+		#region Function Calls
+
+		[Test]
+		public void Function_Call_With_One_Arg()
+		{
+			AssertScriptReturnValue(42, @"
+var doubleIt = func(x) {
+	return x + x;
+};
+
+return doubleIt(21);");
+		}
+
+		[Test]
+		public void Function_Call_With_Two_Args()
+		{
+			AssertScriptReturnValue(42, @"
+var add = func(x, y) {
+	return x + y;
+};
+
+return add(21, 21);");
+		}
+		
+		#endregion
+
+		#region Return Values
+
+		[Test]
+		public void Script_Return_Value_Is_Null_When_No_Return_Value()
+		{
+			AssertScriptReturnValue<object>(null, "42 + 3;");
+		}
+
+		[Test]
+		public void Script_Return_Value_Is_Correct()
+		{
+			AssertScriptReturnValue(42, "return 42;");
+		}
+
+		[Test]
+		public void Script_Return_Value_Is_Correct_When_Returning_Function_Call()
+		{
+			AssertScriptReturnValue(42, @"var x = func() { return 42; }; return x();");
+		}
+
+		[Test]
+		public void Return_Value_Is_Correct_When_Call_Stack_Is_Multiple_Levels_Deep()
+		{
+			AssertScriptReturnValue(42, @"var x = func() { return 21; }; var y = func() { return x() + x(); }; return y();");
+		}
+
+		#endregion
 
 		#region String Adds
 
@@ -49,33 +113,27 @@ namespace Snowflake.Tests
 		}
 
 		#endregion
-
-		#region Return Values
+				
+		#region Variable Declarations
 
 		[Test]
-		public void Script_Return_Value_Is_Null_When_No_Return_Value()
+		public void Variable_Declared_Twice_Is_Error()
 		{
-			AssertScriptReturnValue<object>(null, "42 + 3;");
-		}
-		
-		[Test]
-		public void Script_Return_Value_Is_Correct()
-		{
-			AssertScriptReturnValue(42, "return 42;");
+			AssertScriptIsExecutionException("var x = 42; var x = 12;");
 		}
 
 		[Test]
-		public void Script_Return_Value_Is_Correct_When_Returning_Function_Call()
+		public void Variable_Declared_Inside_Function_With_Same_Name_As_Global()
 		{
-			AssertScriptReturnValue(42, @"var x = func() { return 42; }; return x();");
+			AssertScriptReturnValue(12, @"
+var x = 42;
+var doIt = func() {
+	var x = 12;
+	return x;
+};
+return doIt();");
 		}
 
-		[Test]
-		public void Return_Value_Is_Correct_When_Call_Stack_Is_Multiple_Levels_Deep()
-		{
-			AssertScriptReturnValue(42, @"var x = func() { return 21; }; var y = func() { return x() + x(); }; return y();");
-		}
-
-#endregion
+		#endregion
 	}
 }

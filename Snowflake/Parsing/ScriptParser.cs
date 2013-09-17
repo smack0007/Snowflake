@@ -228,21 +228,18 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{
-				//this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-				//node.Args.Add(lexemes[pos].Value);
+				this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+				node.Args.Add(lexemes[pos].Value);
 
-				//pos++;
-				//while (lexemes[pos].Type == LexemeType.Comma)
-				//{
-				//	pos++;
-				//	this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
+				pos++;
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{					
+					pos++;
+					this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+					node.Args.Add(lexemes[pos].Value);
 
-				//	pos++;
-				//	this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-				//	node.Args.Add(lexemes[pos].Value);
-
-				//	pos++;
-				//}
+					pos++;
+				}
 			}
 
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
@@ -262,9 +259,18 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
 
-			// TODO: Parse args.
-
 			pos++;
+			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
+			{
+				node.Args.Add(this.ParseExpression(lexemes, ref pos));
+								
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					node.Args.Add(this.ParseExpression(lexemes, ref pos));
+				}
+			}
+						
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 
 			pos++;

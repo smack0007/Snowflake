@@ -11,7 +11,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public IList<ExpressionNode> Arguments
+		public IList<ExpressionNode> Args
 		{
 			get;
 			set;
@@ -20,7 +20,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		public FunctionCallNode()
 			: base()
 		{
-			this.Arguments = new List<ExpressionNode>();
+			this.Args = new List<ExpressionNode>();
 		}
 	}
 }

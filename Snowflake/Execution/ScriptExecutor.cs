@@ -49,23 +49,22 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return context.ReturnValue;
 		}
 
-		private ScriptObject CallFunction(ExecutionContext context, ScriptFunction function, IList<ScriptObject> args)
+		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptFunction function, IList<ScriptObject> args)
 		{
 			ScriptObject functionReturnValue = ScriptNull.Value;
 				
-			//if (args != null && args.Count != func.Args.Count)
-			//	throw new ExecutionException("Invalid number of arguments specified when calling \"" + funcName + "\".");
+			if (args != null && args.Count != function.Args.Length)
+				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
 
 			context.Stack.Push();
-			
-			//if (args != null)
-			//{
-			//	for (int i = 0; i < args.Count; i++)
-			//	{
-			//		Variable variable = Stack[func.Args[i]];
-			//		variable.Gets(args[i]);
-			//	}
-			//}
+
+			if (args != null)
+			{
+				for (int i = 0; i < args.Count; i++)
+				{
+					context.Stack[function.Args[i]] = new ScriptVariableReference(args[i]);
+				}
+			}
 
 			context.ShouldReturn = false;
 			context.ReturnValue = null;
@@ -116,6 +115,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		private void ExecuteVariableDeclaration(ExecutionContext context, VariableDeclarationNode node)
 		{
+			if (context.Stack.IsDeclaredInFrame(node.VariableName))
+				throw new ScriptExecutionException(string.Format("Variable \"{0}\" is already declared.", node.VariableName));
+
 			ScriptObject value = null;
 
 			if (node.ValueExpression != null)
@@ -161,15 +163,15 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			if (node is FunctionNode)
 			{
-				FunctionNode function = (FunctionNode)node;
-				result = new ScriptFunction(function.StatementBlock);
+				FunctionNode functionNode = (FunctionNode)node;
+				result = new ScriptFunction(functionNode.StatementBlock, functionNode.Args.ToArray());
 			}
 			else if (node is FunctionCallNode)
 			{
 				FunctionCallNode functionCall = (FunctionCallNode)node;
 
 				List<ScriptObject> args = new List<ScriptObject>();
-				foreach (ExpressionNode expression in functionCall.Arguments)
+				foreach (ExpressionNode expression in functionCall.Args)
 				{
 					args.Add(this.ExecuteExpression(context, expression));
 				}
@@ -178,7 +180,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 				if (variable.Value is ScriptFunction)
 				{
-					result = this.CallFunction(context, (ScriptFunction)variable.Value, args);
+					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variable.Value, args);
 				}
 				else
 				{

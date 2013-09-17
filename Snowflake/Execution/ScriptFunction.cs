@@ -19,12 +19,22 @@ namespace Snowsoft.SnowflakeScript.Execution
 			set;
 		}
 
-		public ScriptFunction(StatementBlockNode statementBlock)
+		internal string[] Args
+		{
+			get;
+			set;
+		}
+
+		public ScriptFunction(StatementBlockNode statementBlock, string[] args)
 		{
 			if (statementBlock == null)
 				throw new ArgumentNullException("statementBlock");
 
+			if (args == null)
+				throw new ArgumentNullException("args");
+
 			this.StatementBlock = statementBlock;
+			this.Args = args;
 		}
 	}
 }

@@ -13,7 +13,6 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public ScriptInteger(int value)
 			: base(value)
 		{
-			this.Value = value;
 		}
 
 		public override string ToString()

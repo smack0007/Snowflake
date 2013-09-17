@@ -36,6 +36,16 @@ namespace Snowsoft.SnowflakeScript.Execution
 		}
 
 		/// <summary>
+		/// Returns true if a variable is already declared in the current frame of the stack.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public bool IsDeclaredInFrame(string name)
+		{
+			return this.stack[this.stack.Count - 1].ContainsKey(name);
+		}
+
+		/// <summary>
 		/// Pushes a new function onto the stack.
 		/// </summary>
 		public void Push()
