@@ -190,17 +190,22 @@ namespace Snowsoft.SnowflakeScript.Execution
 			else if (node is OperationNode)
 			{
 				OperationNode operation = (OperationNode)node;
-				result = this.ExecuteExpression(context, operation.LHS);
+				ScriptObject lhs = this.ExecuteExpression(context, operation.LHS);
 				ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
 
 				switch (operation.Type)
 				{
 					case OperationType.Gets:
-						result.Gets(rhs);
+						lhs.Gets(rhs);
+						result = lhs;
 						break;
 
 					case OperationType.Add:
-						result = result.Add(rhs);
+						result = lhs.Add(rhs);
+						break;
+
+					case OperationType.Subtract:
+						result = lhs.Subtract(rhs);
 						break;
 				}
 			}

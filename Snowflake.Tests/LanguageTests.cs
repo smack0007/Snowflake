@@ -61,7 +61,7 @@ return add(21, 21);");
 		}
 
 		[Test]
-		public void Script_Return_Value_Is_Correct()
+		public void Script_Return_Value_Is_Returned()
 		{
 			AssertScriptReturnValue(42, "return 42;");
 		}
@@ -69,18 +69,32 @@ return add(21, 21);");
 		[Test]
 		public void Script_Return_Value_Is_Correct_When_Returning_Function_Call()
 		{
-			AssertScriptReturnValue(42, @"var x = func() { return 42; }; return x();");
+			AssertScriptReturnValue(42, @"
+var x = func() {
+	return 42;
+};
+
+return x();");
 		}
 
 		[Test]
 		public void Return_Value_Is_Correct_When_Call_Stack_Is_Multiple_Levels_Deep()
 		{
-			AssertScriptReturnValue(42, @"var x = func() { return 21; }; var y = func() { return x() + x(); }; return y();");
+			AssertScriptReturnValue(42, @"
+var x = func() {
+	return 21;
+};
+
+var y = func() {
+	return x() + x();
+};
+
+return y();");
 		}
 
 		#endregion
 
-		#region String Adds
+		#region String Operations
 
 		[Test]
 		public void Add_String_And_String()
@@ -134,6 +148,38 @@ var doIt = func() {
 return doIt();");
 		}
 
+		[Test]
+		public void Variable_Declared_With_Initial_Value_Set_To_Other_Variable()
+		{
+			AssertScriptReturnValue(42, @"
+var x = 42;
+var y = x;
+x = 21;
+return y;");
+		}
+
+		#endregion
+
+		#region Varaible Operations
+
+		[Test]
+		public void Add_Int_Variable_And_Int_Variable()
+		{
+			AssertScriptReturnValue(12, @"
+var x = 4;
+var y = 8;
+return x + y;");
+		}
+
+		[Test]
+		public void Subtract_Int_Variable_And_Int_Variable()
+		{
+			AssertScriptReturnValue(4, @"
+var x = 8;
+var y = 4;
+return x - y;");
+		}
+		
 		#endregion
 	}
 }

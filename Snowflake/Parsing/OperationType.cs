@@ -6,6 +6,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 	{
 		Gets,
 
-		Add
+		Add,
+
+		Subtract
 	}
 }

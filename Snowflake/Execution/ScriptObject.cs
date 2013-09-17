@@ -11,6 +11,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ScriptExecutionException(string.Format("Type \"{0}\" does not support the {1} operation.", this.TypeName, operation));
 		}
 
+		protected void ThrowOperationNotSupportedBetweenTypesException(string operation, ScriptObject other)
+		{
+			throw new ScriptExecutionException(string.Format("{0} operation not supported for type {1} and {2}.", this.TypeName, other.TypeName));
+		}
+
 		public virtual object GetValue()
 		{
 			this.ThrowOperationNotSupportedException("GetValue");
@@ -25,6 +30,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public virtual ScriptObject Add(ScriptObject other)
 		{
 			this.ThrowOperationNotSupportedException("Add");
+			return null;
+		}
+
+		public virtual ScriptObject Subtract(ScriptObject other)
+		{
+			this.ThrowOperationNotSupportedException("Subtract");
 			return null;
 		}
 	}

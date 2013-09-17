@@ -21,7 +21,17 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (value == null)
 				throw new ArgumentNullException("value");
 
-			this.Value = value;
+			this.Value = Unbox(value);
+		}
+
+		private static ScriptObject Unbox(ScriptObject other)
+		{
+			if (other is ScriptVariableReference)
+			{
+				return ((ScriptVariableReference)other).Value;
+			}
+
+			return other;
 		}
 
 		public override object GetValue()
@@ -31,12 +41,17 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		public override void Gets(ScriptObject other)
 		{
-			this.Value = (other is ScriptVariableReference ? ((ScriptVariableReference)other).Value : other);
+			this.Value = Unbox(other);
 		}
 
 		public override ScriptObject Add(ScriptObject other)
 		{
-			return this.Value.Add((other is ScriptVariableReference ? ((ScriptVariableReference)other).Value : other));
+			return this.Value.Add(Unbox(other));
+		}
+
+		public override ScriptObject Subtract(ScriptObject other)
+		{
+			return this.Value.Subtract(Unbox(other));
 		}
 	}
 }

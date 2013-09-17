@@ -36,7 +36,25 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else
 			{
-				throw new ScriptExecutionException(string.Format("Add operation not supported for type {0} and {1}.", this.TypeName, other.TypeName));
+				this.ThrowOperationNotSupportedBetweenTypesException("Add", other);
+				return null;
+			}
+		}
+
+		public override ScriptObject Subtract(ScriptObject other)
+		{
+			if (other is ScriptInteger)
+			{
+				return new ScriptInteger(this.Value - ((ScriptInteger)other).Value);
+			}
+			else if (other is ScriptFloat)
+			{
+				return new ScriptFloat(this.Value - ((ScriptFloat)other).Value);
+			}
+			else
+			{
+				this.ThrowOperationNotSupportedBetweenTypesException("Subtract", other);
+				return null;
 			}
 		}
 	}

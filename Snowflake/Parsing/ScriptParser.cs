@@ -211,6 +211,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 						RHS = this.ParseExpression(lexemes, ref pos)
 					};
 					break;
+
+				case LexemeType.Minus:
+					pos++;
+					node = new OperationNode()
+					{
+						Type = OperationType.Subtract,
+						LHS = node,
+						RHS = this.ParseExpression(lexemes, ref pos)
+					};
+					break;
 			}
 
 			return node;
