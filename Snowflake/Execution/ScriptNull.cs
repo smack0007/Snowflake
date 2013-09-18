@@ -15,7 +15,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 		}
 
-		public override object GetValue()
+		public override object Unbox()
 		{
 			return null;
 		}

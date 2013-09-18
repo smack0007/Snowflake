@@ -16,9 +16,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ScriptExecutionException(string.Format("{0} operation not supported for type {1} and {2}.", this.TypeName, other.TypeName));
 		}
 
-		public virtual object GetValue()
+		public virtual object Unbox()
 		{
-			this.ThrowOperationNotSupportedException("GetValue");
+			this.ThrowOperationNotSupportedException("Unbox");
 			return null;
 		}
 
@@ -59,7 +59,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			this.Value = value;
 		}
 
-		public override object GetValue()
+		public override object Unbox()
 		{
 			return this.Value;
 		}

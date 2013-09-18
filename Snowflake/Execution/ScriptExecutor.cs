@@ -11,6 +11,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		class ExecutionContext
 		{
 			public ScriptStack Stack;
+			public ScriptObjectBoxer Boxer;
 			public bool ShouldReturn;
 			public ScriptObject ReturnValue;
 		}
@@ -24,7 +25,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public ScriptObject Execute(ScriptNode script, ScriptStack stack)
+		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptObjectBoxer boxer)
 		{
 			if (script == null)
 				throw new ArgumentNullException("script");
@@ -32,9 +33,13 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (stack == null)
 				throw new ArgumentNullException("stack");
 
+			if (boxer == null)
+				throw new ArgumentNullException("boxer");
+
 			var context = new ExecutionContext()
 			{
 				Stack = stack,
+				Boxer = boxer,
 				ReturnValue = ScriptNull.Value
 			};
 						
@@ -57,13 +62,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
 
 			context.Stack.Push();
-
-			if (args != null)
+						
+			for (int i = 0; i < args.Count; i++)
 			{
-				for (int i = 0; i < args.Count; i++)
-				{
-					context.Stack[function.Args[i]] = new ScriptVariableReference(args[i]);
-				}
+				context.Stack[function.Args[i]] = new ScriptVariableReference(args[i]);
 			}
 
 			context.ShouldReturn = false;
@@ -87,6 +89,15 @@ namespace Snowsoft.SnowflakeScript.Execution
 			context.Stack.Pop();
 				
 			return functionReturnValue;
+		}
+
+		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptClrFunction function, IList<ScriptObject> args)
+		{			
+			object[] parameters = args.Select(x => x.Unbox()).ToArray();
+			
+			object result = function.Function.DynamicInvoke(parameters);
+
+			return context.Boxer.Box(result);
 		}
 
 		private void ExecuteStatement(ExecutionContext context, StatementNode node)
@@ -181,6 +192,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 				if (variable.Value is ScriptFunction)
 				{
 					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variable.Value, args);
+				}
+				else if (variable.Value is ScriptClrFunction)
+				{
+					result = this.CallFunction(context, functionCall.FunctionName, (ScriptClrFunction)variable.Value, args);
 				}
 				else
 				{

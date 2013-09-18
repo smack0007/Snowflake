@@ -34,9 +34,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return other;
 		}
 
-		public override object GetValue()
+		public override object Unbox()
 		{
-			return this.Value.GetValue();
+			return this.Value.Unbox();
 		}
 
 		public override void Gets(ScriptObject other)
