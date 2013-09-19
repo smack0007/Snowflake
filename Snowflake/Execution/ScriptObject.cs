@@ -13,7 +13,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 		protected void ThrowOperationNotSupportedBetweenTypesException(string operation, ScriptObject other)
 		{
-			throw new ScriptExecutionException(string.Format("{0} operation not supported for type {1} and {2}.", this.TypeName, other.TypeName));
+			throw new ScriptExecutionException(string.Format("{0} operation not supported for type {1} and {2}.", operation, this.TypeName, other.TypeName));
 		}
 
 		public virtual object Unbox()

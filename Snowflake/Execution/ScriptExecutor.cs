@@ -11,7 +11,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		class ExecutionContext
 		{
 			public ScriptStack Stack;
-			public ScriptObjectBoxer Boxer;
+			public ScriptTypeBoxer Boxer;
 			public bool ShouldReturn;
 			public ScriptObject ReturnValue;
 		}
@@ -25,7 +25,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
 
-		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptObjectBoxer boxer)
+		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptTypeBoxer boxer)
 		{
 			if (script == null)
 				throw new ArgumentNullException("script");
@@ -208,20 +208,29 @@ namespace Snowsoft.SnowflakeScript.Execution
 				ScriptObject lhs = this.ExecuteExpression(context, operation.LHS);
 				ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
 
-				switch (operation.Type)
+				if (operation.Type == OperationType.Gets)
 				{
-					case OperationType.Gets:
-						lhs.Gets(rhs);
-						result = lhs;
-						break;
+					lhs.Gets(rhs);
+					result = lhs;
+				}
+				else
+				{
+					if (lhs is ScriptVariableReference)
+						lhs = ((ScriptVariableReference)lhs).Value;
 
-					case OperationType.Add:
-						result = lhs.Add(rhs);
-						break;
+					if (rhs is ScriptVariableReference)
+						rhs = ((ScriptVariableReference)rhs).Value;
 
-					case OperationType.Subtract:
-						result = lhs.Subtract(rhs);
-						break;
+					switch (operation.Type)
+					{
+						case OperationType.Add:
+							result = lhs.Add(rhs);
+							break;
+
+						case OperationType.Subtract:
+							result = lhs.Subtract(rhs);
+							break;
+					}
 				}
 			}
 			else if (node is VariableReferenceNode)

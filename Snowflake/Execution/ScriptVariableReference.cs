@@ -23,6 +23,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			this.Value = Unbox(value);
 		}
+				
+		public override object Unbox()
+		{
+			return this.Value.Unbox();
+		}
 
 		private static ScriptObject Unbox(ScriptObject other)
 		{
@@ -34,24 +39,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return other;
 		}
 
-		public override object Unbox()
-		{
-			return this.Value.Unbox();
-		}
-
 		public override void Gets(ScriptObject other)
 		{
 			this.Value = Unbox(other);
-		}
-
-		public override ScriptObject Add(ScriptObject other)
-		{
-			return this.Value.Add(Unbox(other));
-		}
-
-		public override ScriptObject Subtract(ScriptObject other)
-		{
-			return this.Value.Subtract(Unbox(other));
 		}
 	}
 }

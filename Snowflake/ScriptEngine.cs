@@ -12,7 +12,7 @@ namespace Snowsoft.SnowflakeScript
 		ScriptLexer lexer;
 		ScriptParser parser;
 		ScriptExecutor executor;
-		ScriptObjectBoxer boxer;
+		ScriptTypeBoxer boxer;
 
 		ScriptStack stack;
 
@@ -21,7 +21,7 @@ namespace Snowsoft.SnowflakeScript
 			this.lexer = new ScriptLexer();
 			this.parser = new ScriptParser();
 			this.executor = new ScriptExecutor();
-			this.boxer = new ScriptObjectBoxer();
+			this.boxer = new ScriptTypeBoxer();
 
 			this.stack = new ScriptStack();
 		}

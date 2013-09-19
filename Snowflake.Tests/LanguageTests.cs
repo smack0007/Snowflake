@@ -25,7 +25,7 @@ namespace Snowflake.Tests
 				engine.Execute(script);
 			});
 		}
-				
+
 		#region Function Calls
 
 		[Test]
@@ -169,6 +169,14 @@ return y;");
 var x = 4;
 var y = 8;
 return x + y;");
+		}
+
+		[Test]
+		public void Add_Int_And_Int_Variable()
+		{
+			AssertScriptReturnValue(8, @"
+var x = 4;
+return 4 + x;");
 		}
 
 		[Test]
