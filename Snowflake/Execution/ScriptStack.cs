@@ -10,6 +10,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 	{		
 		List<Dictionary<string, ScriptVariableReference>> stack;
 
+		public IDictionary<string, ScriptVariableReference> Globals
+		{
+			get { return this.stack[0]; }
+		}
+
 		public ScriptVariableReference this[string name]
 		{
 			get

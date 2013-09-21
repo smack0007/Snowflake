@@ -7,9 +7,12 @@ namespace SnowflakeDemo
 	{
 		static void Main(string[] args)
 		{
+			Random random = new Random();
+
 			ScriptEngine engine = new ScriptEngine();
-			engine.SetGlobalVariable("print", new Action<object>((x) => Console.WriteLine(x)));
-			engine.SetGlobalVariable("add", new Func<int, int, int>((x, y) => x + y));
+			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
+			engine.SetGlobalFunction<int>("GetNumber", () => random.Next());
+			engine.SetGlobalFunction<int, int, int>("add", (x, y) => x + y);
 			var result = engine.ExecuteFile("SnowflakeDemo.sfs");
 
 			//Console.WriteLine("Result is: {0} ({1})", result, result.GetType());
