@@ -282,7 +282,14 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (node is BooleanValueNode)
 			{
-				result = new ScriptBoolean(((BooleanValueNode)node).Value);
+				if (((BooleanValueNode)node).Value)
+				{
+					result = ScriptBoolean.True;
+				}
+				else
+				{
+					result = ScriptBoolean.False;
+				}
 			}
 			else if (node is StringValueNode)
 			{

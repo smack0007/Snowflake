@@ -5,15 +5,23 @@ namespace Snowsoft.SnowflakeScript.Execution
 	public class ScriptTypeBoxer
 	{
 		public ScriptObject Box(object value)
-		{
-			if (value == null)
-				return ScriptNull.Value;
-
+		{		
 			ScriptObject scriptObject = null;
 
-			if (value is bool)
+			if (value == null)
 			{
-				scriptObject = new ScriptBoolean((bool)value);
+				scriptObject = ScriptNull.Value;
+			}
+			else if (value is bool)
+			{
+				if ((bool)value)
+				{
+					scriptObject = ScriptBoolean.True;
+				}
+				else
+				{
+					scriptObject = ScriptBoolean.False;
+				}
 			}
 			else if (value is char)
 			{
