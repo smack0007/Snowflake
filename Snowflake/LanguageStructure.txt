@@ -2,7 +2,7 @@ Script: { Statement } EOF
 
 StatementBlock: [{] { Statement } [}]
 
-Statement: ( VariableDeclaration | Echo | If | Return | Expression ) [;]
+Statement: ( VariableDeclaration | If | Return | Expression ) [;]
 
 VariableDeclaration: [var] Identifier ( [=] Expression )^
 

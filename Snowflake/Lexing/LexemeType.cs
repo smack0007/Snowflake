@@ -63,12 +63,7 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		/// as
 		/// </summary>
 		As,
-		
-		/// <summary>
-		/// echo
-		/// </summary>
-		Echo,
-		
+				
 		/// <summary>
 		/// null
 		/// </summary>

@@ -106,10 +106,6 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				this.ExecuteVariableDeclaration(context, (VariableDeclarationNode)node);
 			}
-			else if (node is EchoNode)
-			{
-				this.ExecuteEcho(context, (EchoNode)node);
-			}
 			else if (node is ReturnNode)
 			{
 				this.ExecuteReturn(context, (ReturnNode)node);
@@ -142,12 +138,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			context.Stack[node.VariableName] = new ScriptVariableReference(value);
 		}
-
-		private void ExecuteEcho(ExecutionContext context, EchoNode node)
-		{
-			Console.Write(this.ExecuteExpression(context, node.Expression));
-		}
-
+		
 		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{
 			// It's important to store the result before setting any of the context values because

@@ -48,10 +48,6 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				node = this.ParseVariableDeclaration(lexemes, ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Echo)
-			{
-				node = this.ParseEcho(lexemes, ref pos);
-			}
 			else if (lexemes[pos].Type == LexemeType.Return)
 			{
 				node = this.ParseReturn(lexemes, ref pos);
@@ -105,19 +101,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			return node;
 		}
-
-		private EchoNode ParseEcho(IList<Lexeme> lexemes, ref int pos)
-		{
-			this.EnsureLexemeType(lexemes, LexemeType.Echo, pos);
-
-			EchoNode node = new EchoNode();
-
-			pos++;
-			node.Expression = this.ParseExpression(lexemes, ref pos);
-
-			return node;
-		}
-
+		
 		private ReturnNode ParseReturn(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Return, pos);

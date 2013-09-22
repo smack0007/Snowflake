@@ -77,7 +77,6 @@
     <Compile Include="Execution\ScriptString.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
     <Compile Include="Parsing\CharacterValueNode.cs" />
-    <Compile Include="Parsing\EchoNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
     <Compile Include="Parsing\FloatValueNode.cs" />
     <Compile Include="Parsing\FunctionCallNode.cs" />
