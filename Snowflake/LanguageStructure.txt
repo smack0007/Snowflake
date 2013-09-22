@@ -6,7 +6,7 @@ Statement: VariableDeclaration | If | Return | ( Expression [;] )
 
 VariableDeclaration: [var] Identifier ( [=] Expression )^ [;]
 
-If: [if] [(] Expression [)] StatementBlock ( [else] Statement )
+If: [if] [(] Expression [)] StatementBlock ( [else] StatementBlock )
 
 Return: [return] Expression [;]
 

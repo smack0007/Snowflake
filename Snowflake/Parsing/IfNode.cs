@@ -16,7 +16,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
-		public StatementNode ElseStatement
+		public StatementBlockNode ElseStatementBlock
 		{
 			get;
 			set;

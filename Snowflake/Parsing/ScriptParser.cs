@@ -128,7 +128,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			if (lexemes[pos].Type == LexemeType.Else)
 			{
 				pos++;
-				node.ElseStatement = this.ParseStatement(lexemes, ref pos);
+				node.ElseStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
 			}
 
 			return node;

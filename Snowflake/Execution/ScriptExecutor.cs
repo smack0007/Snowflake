@@ -176,9 +176,15 @@ namespace Snowsoft.SnowflakeScript.Execution
 						return;
 				}
 			}
-			else if (node.ElseStatement != null)
+			else if (node.ElseStatementBlock != null)
 			{
-				this.ExecuteStatement(context, node.ElseStatement);			
+				foreach (var statement in node.ElseStatementBlock.Statements)
+				{
+					this.ExecuteStatement(context, statement);
+
+					if (context.ShouldReturn)
+						return;
+				}	
 			}
 		}
 
