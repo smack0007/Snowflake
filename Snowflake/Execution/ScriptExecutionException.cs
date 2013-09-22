@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
@@ -9,6 +6,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 	{
 		public ScriptExecutionException(string message)
 			: base(message)
+		{
+		}
+
+		public ScriptExecutionException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 	}

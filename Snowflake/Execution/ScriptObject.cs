@@ -45,7 +45,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public T Value
 		{
 			get;
-			set;
+			private set;
 		}
 
 		protected ScriptObject()

@@ -26,6 +26,52 @@ namespace Snowflake.Tests
 			});
 		}
 
+		#region CLR Function Calls
+
+		[Test]
+		public void Too_Few_Arguments_To_Clr_Method_Is_Error()
+		{
+			int value = 0;
+
+			ScriptEngine engine = new ScriptEngine();
+			engine.SetGlobalFunction<int>("DoIt", (x) => { value += x; });
+
+			Assert.Throws<ScriptExecutionException>(() =>
+			{
+				engine.Execute(@"DoIt();");
+			});
+		}
+
+		[Test]
+		public void Too_Many_Arguments_To_Clr_Method_Is_Error()
+		{
+			int value = 0;
+
+			ScriptEngine engine = new ScriptEngine();
+			engine.SetGlobalFunction<int>("DoIt", (x) => { value += x; });
+
+			Assert.Throws<ScriptExecutionException>(() =>
+			{
+				engine.Execute(@"DoIt(12, 12);");
+			});
+		}
+
+		[Test]
+		public void Invalid_Arguments_To_Clr_Method_Is_Error()
+		{
+			int value = 0;
+
+			ScriptEngine engine = new ScriptEngine();
+			engine.SetGlobalFunction<int>("DoIt", (x) => { value += x; });
+
+			Assert.Throws<ScriptExecutionException>(() =>
+			{
+				engine.Execute(@"DoIt(""Hello World!"");");
+			});
+		}
+		
+		#endregion
+
 		#region Function Calls
 
 		[Test]
@@ -49,7 +95,29 @@ var add = func(x, y) {
 
 return add(21, 21);");
 		}
-		
+
+		[Test]
+		public void Too_Few_Arguments_To_Script_Function_Is_Error()
+		{
+			AssertScriptIsExecutionException(@"
+var doubleIt = func(x) {
+	return x + x;
+};
+
+return doubleIt();");
+		}
+
+		[Test]
+		public void Too_Many_Arguments_To_Script_Function_Is_Error()
+		{
+			AssertScriptIsExecutionException(@"
+var doubleIt = func(x) {
+	return x + x;
+};
+
+return doubleIt(21, 21);");
+		}
+
 		#endregion
 
 		#region Return Values

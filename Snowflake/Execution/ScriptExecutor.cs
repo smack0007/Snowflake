@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Snowsoft.SnowflakeScript.Parsing;
+using System.Reflection;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
@@ -94,8 +95,21 @@ namespace Snowsoft.SnowflakeScript.Execution
 		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptClrFunction function, IList<ScriptObject> args)
 		{			
 			object[] parameters = args.Select(x => x.Unbox()).ToArray();
-			
-			object result = function.Function.DynamicInvoke(parameters);
+
+			object result = null;
+
+			try
+			{
+				function.Function.DynamicInvoke(parameters);
+			}
+			catch (TargetParameterCountException ex)
+			{
+				throw new ScriptExecutionException(string.Format("Argument count for function \"{0}\" is wrong.", functionName), ex);
+			}
+			catch (ArgumentException ex)
+			{
+				throw new ScriptExecutionException(string.Format("Argument type for \"{0}\" is wrong.", ex.ParamName), ex);
+			}
 
 			return context.Boxer.Box(result);
 		}
