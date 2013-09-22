@@ -21,7 +21,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (value is Delegate)
 			{
-				scriptObject = new ScriptClrFunction((Delegate)value);
+				scriptObject = new ScriptClrMethod((Delegate)value);
 			}
 			else if (value is float)
 			{

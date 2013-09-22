@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptClrFunction : ScriptObject
+	public class ScriptClrMethod : ScriptObject
 	{
 		public override string TypeName
 		{
-			get { return "ClrFunc"; }
+			get { return "ClrMethod"; }
 		}
 
 		internal Delegate Function
@@ -18,7 +18,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			set;
 		}
 
-		public ScriptClrFunction(Delegate function)
+		public ScriptClrMethod(Delegate function)
 		{
 			this.Function = function;
 		}

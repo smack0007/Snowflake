@@ -2,15 +2,13 @@ Script: { Statement } EOF
 
 StatementBlock: [{] { Statement } [}]
 
-Statement: ( VariableDeclaration | If | Return | Expression ) [;]
+Statement: VariableDeclaration | If | Return | ( Expression [;] )
 
-VariableDeclaration: [var] Identifier ( [=] Expression )^
+VariableDeclaration: [var] Identifier ( [=] Expression )^ [;]
 
-Echo: [echo] Expression
+If: [if] [(] Expression [)] StatementBlock ( [else] Statement )
 
-If: [if] [(] Expression [)] StatementBlock ( [else] StatementBlock )^
-
-Return: [return] Expression
+Return: [return] Expression [;]
 
 Expression: Function | FunctionCall | Identifier | Identifier Operation Expression | Value | Value Operation Expression
 

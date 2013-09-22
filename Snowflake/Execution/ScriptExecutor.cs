@@ -43,7 +43,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 				Boxer = boxer,
 				ReturnValue = ScriptNull.Value
 			};
-						
+
 			foreach (StatementNode statement in script.Statements)
 			{
 				this.ExecuteStatement(context, statement);
@@ -51,7 +51,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 				if (context.ShouldReturn)
 					break;
 			}
-
+				
 			return context.ReturnValue;
 		}
 
@@ -92,7 +92,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return functionReturnValue;
 		}
 
-		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptClrFunction function, IList<ScriptObject> args)
+		private ScriptObject CallClrMethod(ExecutionContext context, string functionName, ScriptClrMethod function, IList<ScriptObject> args)
 		{			
 			object[] parameters = args.Select(x => x.Unbox()).ToArray();
 
@@ -113,12 +113,16 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			return context.Boxer.Box(result);
 		}
-
+				
 		private void ExecuteStatement(ExecutionContext context, StatementNode node)
 		{
 			if (node is VariableDeclarationNode)
 			{
 				this.ExecuteVariableDeclaration(context, (VariableDeclarationNode)node);
+			}
+			else if (node is IfNode)
+			{
+				this.ExecuteIf(context, (IfNode)node);
 			}
 			else if (node is ReturnNode)
 			{
@@ -152,7 +156,32 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			context.Stack[node.VariableName] = new ScriptVariableReference(value);
 		}
-		
+
+		private void ExecuteIf(ExecutionContext context, IfNode node)
+		{
+			var result = this.ExecuteExpression(context, node.EvaluateExpression).Unbox();
+
+			if (!(result is bool))
+			{
+				throw new ScriptExecutionException("Evaluate expression of if must result in a boolean value.");
+			}
+						
+			if ((bool)result)
+			{
+				foreach (var statement in node.BodyStatementBlock.Statements)
+				{
+					this.ExecuteStatement(context, statement);
+
+					if (context.ShouldReturn)
+						return;
+				}
+			}
+			else if (node.ElseStatement != null)
+			{
+				this.ExecuteStatement(context, node.ElseStatement);			
+			}
+		}
+
 		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{
 			// It's important to store the result before setting any of the context values because
@@ -180,7 +209,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (node is FunctionNode)
 			{
 				FunctionNode functionNode = (FunctionNode)node;
-				result = new ScriptFunction(functionNode.StatementBlock, functionNode.Args.ToArray());
+				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.ToArray());
 			}
 			else if (node is FunctionCallNode)
 			{
@@ -198,9 +227,9 @@ namespace Snowsoft.SnowflakeScript.Execution
 				{
 					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variable.Value, args);
 				}
-				else if (variable.Value is ScriptClrFunction)
+				else if (variable.Value is ScriptClrMethod)
 				{
-					result = this.CallFunction(context, functionCall.FunctionName, (ScriptClrFunction)variable.Value, args);
+					result = this.CallClrMethod(context, functionCall.FunctionName, (ScriptClrMethod)variable.Value, args);
 				}
 				else
 				{

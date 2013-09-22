@@ -120,6 +120,62 @@ return doubleIt(21, 21);");
 
 		#endregion
 
+		#region If
+
+		[Test]
+		public void If_Expression_Which_Evaluates_To_True_Is_Executed()
+		{
+			AssertScriptReturnValue(42, @"
+if (true) {
+	return 42;
+}
+
+return 0;
+");
+		}
+
+		[Test]
+		public void If_Expression_Which_Evaluates_To_False_Is_Not_Executed()
+		{
+			AssertScriptReturnValue(0, @"
+if (false) {
+	return 42;
+}
+
+return 0;
+");
+		}
+
+		[Test]
+		public void If_Expression_With_Variable_Which_Evaluates_To_True_Is_Executed()
+		{
+			AssertScriptReturnValue(42, @"
+var test = true;
+
+if (test) {
+	return 42;
+}
+
+return 0;
+");
+		}
+
+		[Test]
+		public void If_Expression_With_Variable_Which_Evaluates_To_False_Is_Not_Executed()
+		{
+			AssertScriptReturnValue(0, @"
+var test = false;
+
+if (test) {
+	return 42;
+}
+
+return 0;
+");
+		}
+
+		#endregion
+
 		#region Return Values
 
 		[Test]

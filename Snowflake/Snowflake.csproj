@@ -68,7 +68,7 @@
   <ItemGroup>
     <Compile Include="Execution\ScriptBoolean.cs" />
     <Compile Include="Execution\ScriptCharacter.cs" />
-    <Compile Include="Execution\ScriptClrFunction.cs" />
+    <Compile Include="Execution\ScriptClrMethod.cs" />
     <Compile Include="Execution\ScriptExecutionException.cs" />
     <Compile Include="Execution\ScriptExecutor.cs" />
     <Compile Include="Execution\ScriptFloat.cs" />
@@ -81,6 +81,7 @@
     <Compile Include="Parsing\FloatValueNode.cs" />
     <Compile Include="Parsing\FunctionCallNode.cs" />
     <Compile Include="Parsing\FunctionNode.cs" />
+    <Compile Include="Parsing\IfNode.cs" />
     <Compile Include="Parsing\IntegerValueNode.cs" />
     <Compile Include="Parsing\NullValueNode.cs" />
     <Compile Include="Parsing\OperationNode.cs" />

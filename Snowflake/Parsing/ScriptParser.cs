@@ -48,6 +48,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				node = this.ParseVariableDeclaration(lexemes, ref pos);
 			}
+			else if (lexemes[pos].Type == LexemeType.If)
+			{
+				node = this.ParseIf(lexemes, ref pos);
+			}
 			else if (lexemes[pos].Type == LexemeType.Return)
 			{
 				node = this.ParseReturn(lexemes, ref pos);
@@ -55,12 +59,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			else
 			{
 				node = this.ParseExpression(lexemes, ref pos);
+
+				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+				pos++;
 			}
-
-			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-
-			pos++;
-
+			
 			return node;
 		}
 
@@ -99,9 +102,38 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 			}
 
+			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+			pos++;
+
 			return node;
 		}
-		
+
+		private IfNode ParseIf(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.If, pos);
+
+			IfNode node = new IfNode();
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+			pos++;
+			node.EvaluateExpression = this.ParseExpression(lexemes, ref pos);
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+			pos++;
+			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.Else)
+			{
+				pos++;
+				node.ElseStatement = this.ParseStatement(lexemes, ref pos);
+			}
+
+			return node;
+		}
+
 		private ReturnNode ParseReturn(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Return, pos);
@@ -110,6 +142,9 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			pos++;
 			node.Expression = this.ParseExpression(lexemes, ref pos);
+
+			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+			pos++;
 
 			return node;
 		}
@@ -239,7 +274,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 
 			pos++;
-			node.StatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
 
 			return node;
 		}
