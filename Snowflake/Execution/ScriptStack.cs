@@ -6,7 +6,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 	/// <summary>
 	/// Represents a stack.
 	/// </summary>
-	public class ScriptStack
+	public sealed class ScriptStack
 	{		
 		List<Dictionary<string, ScriptVariableReference>> stack;
 

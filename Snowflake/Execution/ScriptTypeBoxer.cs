@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptTypeBoxer
+	public sealed class ScriptTypeBoxer
 	{
 		public ScriptObject Box(object value)
 		{		

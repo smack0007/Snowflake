@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptNull : ScriptObject
+	public sealed class ScriptNull : ScriptObject
 	{
 		public static readonly ScriptNull Value = new ScriptNull();
 

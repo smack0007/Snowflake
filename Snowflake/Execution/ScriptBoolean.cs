@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptBoolean : ScriptObject<bool>
+	public sealed class ScriptBoolean : ScriptObject<bool>
 	{
 		public static readonly ScriptBoolean True = new ScriptBoolean(true);
 
@@ -21,6 +21,40 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public override string ToString()
 		{
 			return this.Value ? "true" : "false";
+		}
+
+		public override ScriptObject LogicalAnd(ScriptObject other)
+		{
+			if (!(other is ScriptBoolean))
+			{
+				this.ThrowOperationNotSupportedBetweenTypesException("LogicalAnd", other);
+			}
+
+			if (this.Value && ((ScriptBoolean)other).Value)
+			{
+				return ScriptBoolean.True;
+			}
+			else
+			{
+				return ScriptBoolean.False;
+			}
+		}
+
+		public override ScriptObject LogicalOr(ScriptObject other)
+		{
+			if (!(other is ScriptBoolean))
+			{
+				this.ThrowOperationNotSupportedBetweenTypesException("LogicalOr", other);
+			}
+
+			if (this.Value || ((ScriptBoolean)other).Value)
+			{
+				return ScriptBoolean.True;
+			}
+			else
+			{
+				return ScriptBoolean.False;
+			}
 		}
 	}
 }

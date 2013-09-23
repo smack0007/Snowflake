@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptCharacter : ScriptObject<char>
+	public sealed class ScriptCharacter : ScriptObject<char>
 	{
 		public override string TypeName
 		{

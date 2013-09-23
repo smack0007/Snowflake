@@ -8,6 +8,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		Add,
 
-		Subtract
+		Subtract,
+
+		LogicalAnd,
+
+		LogicalOr
 	}
 }

@@ -208,6 +208,64 @@ return 0;
 
 		#endregion
 
+		#region Logical Operations
+
+		[Test]
+		public void True_And_True_Is_True()
+		{
+			AssertScriptReturnValue(true, "return true && true;");
+		}
+
+		[Test]
+		public void True_And_False_Is_False()
+		{
+			AssertScriptReturnValue(false, "return true && false;");
+		}
+
+		[Test]
+		public void False_And_True_Is_False()
+		{
+			AssertScriptReturnValue(false, "return false && true;");
+		}
+
+		[Test]
+		public void False_And_False_Is_False()
+		{
+			AssertScriptReturnValue(false, "return false && false;");
+		}
+
+		[Test]
+		public void True_Or_True_Is_True()
+		{
+			AssertScriptReturnValue(true, "return true || true;");
+		}
+
+		[Test]
+		public void True_Or_False_Is_True()
+		{
+			AssertScriptReturnValue(true, "return true || false;");
+		}
+
+		[Test]
+		public void False_Or_True_Is_True()
+		{
+			AssertScriptReturnValue(true, "return false || true;");
+		}
+
+		[Test]
+		public void False_Or_False_Is_False()
+		{
+			AssertScriptReturnValue(false, "return false || false;");
+		}
+
+		[Test]
+		public void Variable_True_And_Variable_True_Is_True()
+		{
+			AssertScriptReturnValue(true, "var x = true; var y = true; return x && y;");
+		}
+
+		#endregion
+
 		#region Return Values
 
 		[Test]

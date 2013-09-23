@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptVariableReference : ScriptObject
+	public sealed class ScriptVariableReference : ScriptObject
 	{
 		public override string TypeName
 		{

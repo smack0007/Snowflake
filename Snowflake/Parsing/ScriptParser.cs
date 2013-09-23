@@ -209,40 +209,52 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("Expression", lexemes, pos);
 						
-			switch (lexemes[pos].Type)
+			OperationType? operationType = this.ParseOperationType(lexemes, ref pos);
+
+			if (operationType != null)
 			{
-				case LexemeType.Gets:
-					pos++;
-					node = new OperationNode()
-					{
-						Type = OperationType.Gets,
-						LHS = node,
-						RHS = this.ParseExpression(lexemes, ref pos)
-					};
-					break;
-
-				case LexemeType.Plus:
-					pos++;
-					node = new OperationNode()
-					{
-						Type = OperationType.Add,
-						LHS = node,
-						RHS = this.ParseExpression(lexemes, ref pos)
-					};
-					break;
-
-				case LexemeType.Minus:
-					pos++;
-					node = new OperationNode()
-					{
-						Type = OperationType.Subtract,
-						LHS = node,
-						RHS = this.ParseExpression(lexemes, ref pos)
-					};
-					break;
+				node = new OperationNode()
+				{
+					Type = operationType.Value,
+					LHS = node,
+					RHS = this.ParseExpression(lexemes, ref pos)
+				};
 			}
 
 			return node;
+		}
+
+		private OperationType? ParseOperationType(IList<Lexeme> lexemes, ref int pos)
+		{
+			OperationType? operationType = null;
+
+			switch (lexemes[pos].Type)
+			{
+				case LexemeType.Gets:
+					operationType = OperationType.Gets;
+					break;
+
+				case LexemeType.Plus:
+					operationType = OperationType.Add;
+					break;
+
+				case LexemeType.Minus:
+					operationType = OperationType.Subtract;
+					break;
+
+				case LexemeType.LogicalAnd:
+					operationType = OperationType.LogicalAnd;
+					break;
+
+				case LexemeType.LogicalOr:
+					operationType = OperationType.LogicalOr;
+					break;
+			}
+
+			if (operationType != null)
+				pos++;
+
+			return operationType;
 		}
 
 		private FunctionNode ParseFunction(IList<Lexeme> lexemes, ref int pos)

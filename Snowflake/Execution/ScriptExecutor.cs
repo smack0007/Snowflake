@@ -270,6 +270,14 @@ namespace Snowsoft.SnowflakeScript.Execution
 						case OperationType.Subtract:
 							result = lhs.Subtract(rhs);
 							break;
+
+						case OperationType.LogicalAnd:
+							result = lhs.LogicalAnd(rhs);
+							break;
+
+						case OperationType.LogicalOr:
+							result = lhs.LogicalOr(rhs);
+							break;
 					}
 				}
 			}

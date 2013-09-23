@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptClrMethod : ScriptObject
+	public sealed class ScriptClrMethod : ScriptObject
 	{
 		public override string TypeName
 		{

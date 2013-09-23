@@ -38,6 +38,18 @@ namespace Snowsoft.SnowflakeScript.Execution
 			this.ThrowOperationNotSupportedException("Subtract");
 			return null;
 		}
+
+		public virtual ScriptObject LogicalAnd(ScriptObject other)
+		{
+			this.ThrowOperationNotSupportedException("LogicalAnd");
+			return null;
+		}
+
+		public virtual ScriptObject LogicalOr(ScriptObject other)
+		{
+			this.ThrowOperationNotSupportedException("LogicalAnd");
+			return null;
+		}
 	}
 
 	public abstract class ScriptObject<T> : ScriptObject

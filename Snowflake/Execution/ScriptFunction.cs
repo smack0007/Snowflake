@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public class ScriptFunction : ScriptObject
+	public sealed class ScriptFunction : ScriptObject
 	{
 		public override string TypeName
 		{
