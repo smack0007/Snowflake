@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class StatementBlockNode : SyntaxTreeNode
+	public class StatementBlockNode : SyntaxNode
 	{
-		public List<StatementNode> Statements
+		public SyntaxNodeCollection<StatementNode> Statements
 		{
 			get;
 			private set;
@@ -13,7 +13,23 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		public StatementBlockNode()
 		{
-			this.Statements = new List<StatementNode>();
+			this.Statements = new SyntaxNodeCollection<StatementNode>(this);
+		}
+
+		public override IEnumerable<T> Find<T>()
+		{
+			foreach (T node in base.Find<T>())
+			{
+				yield return node;
+			}
+
+			foreach (var statement in this.Statements)
+			{
+				foreach (T node in statement.Find<T>())
+				{
+					yield return node;
+				}
+			}
 		}
 	}
 }

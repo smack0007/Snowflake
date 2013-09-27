@@ -21,7 +21,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 		}
 				
-		private void ThrowUnableToExecuteException(string executionStage, SyntaxTreeNode node)
+		private void ThrowUnableToExecuteException(string executionStage, SyntaxNode node)
 		{
 			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
 		}
@@ -63,7 +63,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
 
 			context.Stack.Push();
-						
+
+			foreach (var pair in function.VariableReferences)
+			{
+				context.Stack[pair.Key] = pair.Value;
+			}
+
 			for (int i = 0; i < args.Count; i++)
 			{
 				context.Stack[function.Args[i]] = new ScriptVariableReference(args[i]);
@@ -215,7 +220,23 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (node is FunctionNode)
 			{
 				FunctionNode functionNode = (FunctionNode)node;
-				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.ToArray());
+
+				Dictionary<string, ScriptVariableReference> references = new Dictionary<string, ScriptVariableReference>();
+				
+				var capturedVariables = functionNode.BodyStatementBlock.FindChildren<VariableReferenceNode>()
+					.Where(x => x.FindParent<FunctionNode>() == functionNode && !functionNode.Args.Contains(x.VariableName));
+
+				foreach (var referenceNode in capturedVariables)
+				{
+					var variable = context.Stack[referenceNode.VariableName];
+
+					if (variable == null)
+						throw new ScriptExecutionException(string.Format("Variable \"{0}\" referenced in function does not exist.", referenceNode.VariableName));
+					
+					references.Add(referenceNode.VariableName, variable);
+				}
+
+				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.ToArray(), references);
 			}
 			else if (node is FunctionCallNode)
 			{

@@ -18,7 +18,7 @@ FunctionCall: Identifier [(] { Expression [,]! } [)]
 
 Identifier: [A-Za-z_][A-Za-z0-9_]*
 
-Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=]
+Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=] | [&&] | [||]
 
 Value: Null | Boolean | String | Char | Integer | Float 
 

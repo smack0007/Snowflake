@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class StatementNode : SyntaxTreeNode
+	public class StatementNode : SyntaxNode
 	{
 		public StatementNode()
 			: base()

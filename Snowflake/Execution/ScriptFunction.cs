@@ -13,19 +13,25 @@ namespace Snowsoft.SnowflakeScript.Execution
 			get { return "func"; }
 		}
 
-		internal StatementBlockNode StatementBlock
+		public StatementBlockNode StatementBlock
 		{
 			get;
-			set;
+			private set;
 		}
 
-		internal string[] Args
+		public string[] Args
 		{
 			get;
-			set;
+			private set;
 		}
 
-		public ScriptFunction(StatementBlockNode statementBlock, string[] args)
+		public Dictionary<string, ScriptVariableReference> VariableReferences
+		{
+			get;
+			private set;
+		}
+
+		public ScriptFunction(StatementBlockNode statementBlock, string[] args, Dictionary<string, ScriptVariableReference> variableReferences)
 		{
 			if (statementBlock == null)
 				throw new ArgumentNullException("statementBlock");
@@ -33,8 +39,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 			if (args == null)
 				throw new ArgumentNullException("args");
 
+			if (variableReferences == null)
+				throw new ArgumentNullException("variableReferences");
+
 			this.StatementBlock = statementBlock;
 			this.Args = args;
+			this.VariableReferences = variableReferences;
 		}
 	}
 }

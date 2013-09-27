@@ -92,7 +92,8 @@
     <Compile Include="Parsing\StatementNode.cs" />
     <Compile Include="Parsing\StringValueNode.cs" />
     <Compile Include="Parsing\ScriptNode.cs" />
-    <Compile Include="Parsing\SyntaxTreeNode.cs" />
+    <Compile Include="Parsing\SyntaxNodeCollection.cs" />
+    <Compile Include="Parsing\SyntaxNode.cs" />
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
     <Compile Include="ScriptEngine.cs" />

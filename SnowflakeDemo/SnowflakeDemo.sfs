@@ -1,3 +1,8 @@
-﻿print(add(1, 2));
-print(GetNumber());
+﻿var buildAdder = func(x) {
+	return func(y) {
+		return x + y;
+	};
+};
 
+var adder = buildAdder(5);
+print(adder(10));
