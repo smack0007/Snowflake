@@ -100,7 +100,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			try
 			{
-				function.Function.DynamicInvoke(parameters);
+				result = function.Function.DynamicInvoke(parameters);
 			}
 			catch (TargetParameterCountException ex)
 			{
