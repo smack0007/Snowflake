@@ -19,5 +19,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			return null;
 		}
+
+        public override ScriptBoolean EqualTo(ScriptObject other)
+        {
+            return other is ScriptNull ? ScriptBoolean.True : ScriptBoolean.False;
+        }
 	}
 }

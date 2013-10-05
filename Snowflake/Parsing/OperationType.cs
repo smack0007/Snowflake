@@ -4,6 +4,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public enum OperationType
 	{
+        Equals,
+
 		Gets,
 
 		Add,

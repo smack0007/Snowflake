@@ -175,6 +175,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 					pos++;
 					break;
 
+                case LexemeType.Undef:
+                    node = new UndefinedValueNode();
+                    pos++;
+                    break;
+
 				case LexemeType.True:
 					node = new BooleanValueNode() { Value = true };
 					pos++;
@@ -230,6 +235,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			switch (lexemes[pos].Type)
 			{
+                case LexemeType.EqualTo:
+                    operationType = OperationType.Equals;
+                    break;
+
 				case LexemeType.Gets:
 					operationType = OperationType.Gets;
 					break;

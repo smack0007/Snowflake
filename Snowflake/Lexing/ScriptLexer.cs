@@ -284,6 +284,10 @@ namespace Snowsoft.SnowflakeScript.Lexing
 								lexemes.Add(new Lexeme(LexemeType.As, null, line, column));
 								break;
 
+                            case "undef":
+                                lexemes.Add(new Lexeme(LexemeType.Undef, null, line, column));
+                                break;
+
 							case "null":
 								lexemes.Add(new Lexeme(LexemeType.Null, null, line, column));
 								break;

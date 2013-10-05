@@ -22,6 +22,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return null;
 		}
 
+        public virtual ScriptBoolean EqualTo(ScriptObject other)
+        {
+            this.ThrowOperationNotSupportedException("Equals");
+            return ScriptBoolean.False;
+        }
+
 		public virtual void Gets(ScriptObject other)
 		{
 			this.ThrowOperationNotSupportedException("Gets");
@@ -50,7 +56,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			this.ThrowOperationNotSupportedException("LogicalAnd");
 			return null;
 		}
-	}
+    }
 
 	public abstract class ScriptObject<T> : ScriptObject
 	{
@@ -75,6 +81,31 @@ namespace Snowsoft.SnowflakeScript.Execution
 		{
 			return this.Value;
 		}
+
+        public override ScriptBoolean EqualTo(ScriptObject other)
+        {
+            bool result = false;
+
+            if (other is ScriptObject<T>)
+            {
+                var otherVariable = (ScriptObject<T>)other;
+
+                if (this.Value != null)
+                {
+                    result = this.Value.Equals(otherVariable.Value);
+                }
+                else
+                {
+                    result = otherVariable.Value == null;
+                }
+            }
+            else
+            {
+                result = false;
+            }
+
+            return result ? ScriptBoolean.True : ScriptBoolean.False;
+        }
 
 		public override string ToString()
 		{

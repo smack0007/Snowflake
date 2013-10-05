@@ -20,7 +20,9 @@ Identifier: [A-Za-z_][A-Za-z0-9_]*
 
 Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=] | [&&] | [||]
 
-Value: Null | Boolean | String | Char | Integer | Float 
+Value: Undefined | Null | Boolean | String | Char | Integer | Float 
+
+Undefined: [undef]
 
 Null: [null]
 

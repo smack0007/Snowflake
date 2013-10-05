@@ -118,6 +118,15 @@ var doubleIt = func(var x) {
 return doubleIt(21, 21);");
 		}
 
+        [Test]
+        public void Function_With_No_Return_Statement_Returns_Undefined()
+        {
+            AssertScriptReturnValue(true, @"
+var doIt = func() { };
+
+return doIt() == undef;");
+        }
+
 		#endregion
 
 		#region If

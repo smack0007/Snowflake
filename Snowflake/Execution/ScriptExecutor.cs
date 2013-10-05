@@ -41,7 +41,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				Stack = stack,
 				Boxer = boxer,
-				ReturnValue = ScriptNull.Value
+				ReturnValue = ScriptUndefined.Value
 			};
 
 			foreach (StatementNode statement in script.Statements)
@@ -55,9 +55,19 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return context.ReturnValue;
 		}
 
+        private ScriptObject GetVariableValue(ExecutionContext context, string variableName)
+        {
+            ScriptVariableReference variable = context.Stack[variableName];
+
+            if (variable == null)
+                return ScriptUndefined.Value;
+
+            return variable.Value;
+        }
+
 		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptFunction function, IList<ScriptObject> args)
 		{
-			ScriptObject functionReturnValue = ScriptNull.Value;
+			ScriptObject functionReturnValue = ScriptUndefined.Value;
 				
 			if (args != null && args.Count != function.Args.Length)
 				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
@@ -203,16 +213,6 @@ namespace Snowsoft.SnowflakeScript.Execution
 			context.ReturnValue = result;
 		}
 
-		private ScriptVariableReference GetVariableRefernce(ExecutionContext context, string variableName)
-		{
-			ScriptVariableReference variable = context.Stack[variableName];
-
-			if (variable == null)
-				throw new ScriptExecutionException(string.Format("\"{0}\" is not defined.", variableName));
-
-			return variable;
-		}
-
 		private ScriptObject ExecuteExpression(ExecutionContext context, ExpressionNode node)
 		{
 			ScriptObject result = null;
@@ -234,8 +234,8 @@ namespace Snowsoft.SnowflakeScript.Execution
 				{
 					var variable = context.Stack[referenceNode.VariableName];
 
-					if (variable == null)
-						throw new ScriptExecutionException(string.Format("Variable \"{0}\" referenced in function does not exist.", referenceNode.VariableName));
+                    if (variable == null)
+                        variable = new ScriptVariableReference(ScriptUndefined.Value);
 					
 					references.Add(referenceNode.VariableName, variable);
 				}
@@ -252,15 +252,15 @@ namespace Snowsoft.SnowflakeScript.Execution
 					args.Add(this.ExecuteExpression(context, expression));
 				}
 
-				var variable = this.GetVariableRefernce(context, functionCall.FunctionName);
+				var variableValue = this.GetVariableValue(context, functionCall.FunctionName);
 
-				if (variable.Value is ScriptFunction)
+				if (variableValue is ScriptFunction)
 				{
-					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variable.Value, args);
+					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variableValue, args);
 				}
-				else if (variable.Value is ScriptClrMethod)
+				else if (variableValue is ScriptClrMethod)
 				{
-					result = this.CallClrMethod(context, functionCall.FunctionName, (ScriptClrMethod)variable.Value, args);
+					result = this.CallClrMethod(context, functionCall.FunctionName, (ScriptClrMethod)variableValue, args);
 				}
 				else
 				{
@@ -288,6 +288,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 					switch (operation.Type)
 					{
+                        case OperationType.Equals:
+                            result = lhs.EqualTo(rhs);
+                            break;
+
 						case OperationType.Add:
 							result = lhs.Add(rhs);
 							break;
@@ -309,13 +313,17 @@ namespace Snowsoft.SnowflakeScript.Execution
 			else if (node is VariableReferenceNode)
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
+				
+                result = context.Stack[variableReferenceNode.VariableName];
 
-				result = context.Stack[variableReferenceNode.VariableName];
-
-				if (result == null)
-					throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", variableReferenceNode.VariableName));
+                if (result == null)
+                    result = new ScriptVariableReference(ScriptUndefined.Value);
 			}
-			else if (node is NullValueNode)
+            else if (node is UndefinedValueNode)
+            {
+                result = ScriptUndefined.Value;
+            }
+            else if (node is NullValueNode)
 			{
 				result = ScriptNull.Value;
 			}

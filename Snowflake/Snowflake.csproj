@@ -75,6 +75,7 @@
     <Compile Include="Execution\ScriptFunction.cs" />
     <Compile Include="Execution\ScriptTypeBoxer.cs" />
     <Compile Include="Execution\ScriptString.cs" />
+    <Compile Include="Execution\ScriptUndefined.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
     <Compile Include="Parsing\CharacterValueNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Parsing\ScriptNode.cs" />
     <Compile Include="Parsing\SyntaxNodeCollection.cs" />
     <Compile Include="Parsing\SyntaxNode.cs" />
+    <Compile Include="Parsing\UndefinedValueNode.cs" />
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
     <Compile Include="ScriptEngine.cs" />
