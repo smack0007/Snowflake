@@ -78,7 +78,7 @@ namespace Snowflake.Tests
 		public void Function_Call_With_One_Arg()
 		{
 			AssertScriptReturnValue(42, @"
-var doubleIt = func(x) {
+var doubleIt = func(var x) {
 	return x + x;
 };
 
@@ -89,7 +89,7 @@ return doubleIt(21);");
 		public void Function_Call_With_Two_Args()
 		{
 			AssertScriptReturnValue(42, @"
-var add = func(x, y) {
+var add = func(var x, var y) {
 	return x + y;
 };
 
@@ -100,7 +100,7 @@ return add(21, 21);");
 		public void Too_Few_Arguments_To_Script_Function_Is_Error()
 		{
 			AssertScriptIsExecutionException(@"
-var doubleIt = func(x) {
+var doubleIt = func(var x) {
 	return x + x;
 };
 
@@ -111,7 +111,7 @@ return doubleIt();");
 		public void Too_Many_Arguments_To_Script_Function_Is_Error()
 		{
 			AssertScriptIsExecutionException(@"
-var doubleIt = func(x) {
+var doubleIt = func(var x) {
 	return x + x;
 };
 
@@ -361,6 +361,17 @@ var doIt = func() {
 };
 return doIt();");
 		}
+
+        [Test]
+        public void Function_Arg_With_Same_Name_As_Global()
+        {
+            AssertScriptReturnValue(12, @"
+var x = 42;
+var doIt = func(var x) {
+	return x;
+};
+return doIt(12);");
+        }
 
 		[Test]
 		public void Variable_Declared_With_Initial_Value_Set_To_Other_Variable()

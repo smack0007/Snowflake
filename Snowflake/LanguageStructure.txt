@@ -12,7 +12,7 @@ Return: [return] Expression [;]
 
 Expression: Function | FunctionCall | Identifier | Identifier Operation Expression | Value | Value Operation Expression
 
-Function: [func] [(] { Variable [,]! } [)] StatementBlock
+Function: [func] [(] { [var] Identifier [,]! } [)] StatementBlock
 
 FunctionCall: Identifier [(] { Expression [,]! } [)]
 

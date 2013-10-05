@@ -269,16 +269,22 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{
+                this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
+                pos++;
+
 				this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-				node.Args.Add(lexemes[pos].Value);
+                node.Args.Add(new VariableDeclarationNode() { VariableName = lexemes[pos].Value });
 
 				pos++;
 				while (lexemes[pos].Type == LexemeType.Comma)
-				{					
-					pos++;
+				{
+                    pos++;
+                    
+                    this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
+                    pos++;
+					
 					this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-					node.Args.Add(lexemes[pos].Value);
-
+					node.Args.Add(new VariableDeclarationNode() { VariableName = lexemes[pos].Value });
 					pos++;
 				}
 			}

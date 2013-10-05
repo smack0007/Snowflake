@@ -223,8 +223,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 				Dictionary<string, ScriptVariableReference> references = new Dictionary<string, ScriptVariableReference>();
 				
-				var capturedVariables = functionNode.BodyStatementBlock.FindChildren<VariableReferenceNode>()
-					.Where(x => x.FindParent<FunctionNode>() == functionNode && !functionNode.Args.Contains(x.VariableName));
+				var capturedVariables = functionNode.BodyStatementBlock
+                    .FindChildren<VariableReferenceNode>()
+					.Where(
+                        x => x.FindParent<FunctionNode>() == functionNode && 
+                        functionNode.Args.SingleOrDefault(y => y.VariableName == x.VariableName) == null &&
+                        functionNode.FindChildren<VariableDeclarationNode>().SingleOrDefault(y => y.VariableName == x.VariableName) == null);
 
 				foreach (var referenceNode in capturedVariables)
 				{
@@ -236,7 +240,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 					references.Add(referenceNode.VariableName, variable);
 				}
 
-				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.ToArray(), references);
+				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.Select(x => x.VariableName).ToArray(), references);
 			}
 			else if (node is FunctionCallNode)
 			{

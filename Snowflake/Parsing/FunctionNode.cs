@@ -7,7 +7,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 	{
 		StatementBlockNode bodyStatementBlock;
 
-		public List<string> Args
+		public SyntaxNodeCollection<VariableDeclarationNode> Args
 		{
 			get;
 			private set;
@@ -22,7 +22,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		public FunctionNode()
 			: base()
 		{
-			this.Args = new List<string>();
+            this.Args = new SyntaxNodeCollection<VariableDeclarationNode>(this);
 		}
 
 		public override IEnumerable<T> Find<T>()
@@ -31,6 +31,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				yield return node;
 			}
+
+            foreach (T node in this.Args.Find<T>())
+            {
+                yield return node;
+            }
 
 			if (this.BodyStatementBlock != null)
 			{

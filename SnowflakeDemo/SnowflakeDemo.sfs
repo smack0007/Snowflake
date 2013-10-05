@@ -1,5 +1,5 @@
-﻿var buildAdder = func(x) {
-	return func(y) {
+﻿var buildAdder = func(var x) {
+	return func(var y) {
 		return x + y;
 	};
 };
