@@ -2,7 +2,7 @@
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public sealed class ScriptBoolean : ScriptObject<bool>
+	public sealed class ScriptBoolean : ScriptValue<bool>
 	{
 		public static readonly ScriptBoolean True = new ScriptBoolean(true);
 

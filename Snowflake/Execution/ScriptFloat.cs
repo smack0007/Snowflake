@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Snowsoft.SnowflakeScript.Execution
 {
-	public sealed class ScriptFloat : ScriptObject<float>
+	public sealed class ScriptFloat : ScriptValue<float>
 	{
 		public override string TypeName
 		{
