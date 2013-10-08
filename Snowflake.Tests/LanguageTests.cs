@@ -95,18 +95,7 @@ var add = func(var x, var y) {
 
 return add(21, 21);");
 		}
-
-		[Test]
-		public void Too_Few_Arguments_To_Script_Function_Is_Error()
-		{
-			AssertScriptIsExecutionException(@"
-var doubleIt = func(var x) {
-	return x + x;
-};
-
-return doubleIt();");
-		}
-
+				
 		[Test]
 		public void Too_Many_Arguments_To_Script_Function_Is_Error()
 		{
@@ -126,6 +115,17 @@ var doIt = func() { };
 
 return doIt() == undef;");
         }
+
+		[Test]
+		public void Default_Value_For_Function_Argument_Taken_When_Not_Provided()
+		{
+			AssertScriptReturnValue(42, @"
+var doubleIt = func(var x = 21) {
+	return x + x;
+};
+
+return doubleIt();");
+		}
 
 		#endregion
 

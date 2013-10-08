@@ -47,6 +47,9 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			if (lexemes[pos].Type == LexemeType.Var)
 			{
 				node = this.ParseVariableDeclaration(lexemes, ref pos);
+
+				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+				pos++;
 			}
 			else if (lexemes[pos].Type == LexemeType.If)
 			{
@@ -101,9 +104,6 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				pos++;
 				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 			}
-
-			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-			pos++;
 
 			return node;
 		}
@@ -282,23 +282,12 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{
-                this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
-                pos++;
-
-				this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-                node.Args.Add(new VariableDeclarationNode() { VariableName = lexemes[pos].Value });
-
-				pos++;
+				node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos));
+												
 				while (lexemes[pos].Type == LexemeType.Comma)
 				{
                     pos++;
-                    
-                    this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
-                    pos++;
-					
-					this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-					node.Args.Add(new VariableDeclarationNode() { VariableName = lexemes[pos].Value });
-					pos++;
+					node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos));
 				}
 			}
 

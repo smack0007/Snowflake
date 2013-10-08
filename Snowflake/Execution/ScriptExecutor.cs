@@ -65,11 +65,24 @@ namespace Snowsoft.SnowflakeScript.Execution
             return variable.Value;
         }
 
-		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptFunction function, IList<ScriptObject> args)
+		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptFunction function, List<ScriptObject> args)
 		{
 			ScriptObject functionReturnValue = ScriptUndefined.Value;
-				
-			if (args != null && args.Count != function.Args.Length)
+
+			if (args.Count < function.Args.Length)
+			{
+				for (int i = args.Count; i < function.Args.Length; i++)
+				{
+					ScriptObject value = ScriptNull.Value;
+					
+					if (function.Args[i].DefaultValueExpression != null)
+						value = this.ExecuteExpression(context, function.Args[i].DefaultValueExpression);
+					
+					args.Add(value);
+				}
+			}
+
+			if (args.Count != function.Args.Length)
 				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
 
 			context.Stack.Push();
@@ -81,7 +94,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			for (int i = 0; i < args.Count; i++)
 			{
-				context.Stack[function.Args[i]] = new ScriptVariableReference(args[i]);
+				context.Stack[function.Args[i].Name] = new ScriptVariableReference(args[i]);
 			}
 
 			context.ShouldReturn = false;
@@ -240,7 +253,15 @@ namespace Snowsoft.SnowflakeScript.Execution
 					references.Add(referenceNode.VariableName, variable);
 				}
 
-				result = new ScriptFunction(functionNode.BodyStatementBlock, functionNode.Args.Select(x => x.VariableName).ToArray(), references);
+				var args = functionNode.Args
+					.Select(x => new ScriptFunction.Argument()
+					{
+						Name = x.VariableName,
+						DefaultValueExpression = x.ValueExpression
+					})
+					.ToArray();
+
+				result = new ScriptFunction(functionNode.BodyStatementBlock, args, references);
 			}
 			else if (node is FunctionCallNode)
 			{

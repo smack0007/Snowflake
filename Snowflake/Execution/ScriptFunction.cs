@@ -8,6 +8,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public sealed class ScriptFunction : ScriptObject
 	{
+		public sealed class Argument
+		{
+			public string Name { get; set; }
+			public ExpressionNode DefaultValueExpression { get; set; }
+		}
+
 		public override string TypeName
 		{
 			get { return "func"; }
@@ -19,7 +25,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			private set;
 		}
 
-		public string[] Args
+		public Argument[] Args
 		{
 			get;
 			private set;
@@ -31,7 +37,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			private set;
 		}
 
-		public ScriptFunction(StatementBlockNode statementBlock, string[] args, Dictionary<string, ScriptVariableReference> variableReferences)
+		public ScriptFunction(StatementBlockNode statementBlock, Argument[] args, Dictionary<string, ScriptVariableReference> variableReferences)
 		{
 			if (statementBlock == null)
 				throw new ArgumentNullException("statementBlock");
