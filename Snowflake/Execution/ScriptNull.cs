@@ -22,7 +22,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
         public override ScriptBoolean EqualTo(ScriptObject other)
         {
-            return other is ScriptNull ? ScriptBoolean.True : ScriptBoolean.False;
+			return ReferenceEquals(other, this) ? ScriptBoolean.True : ScriptBoolean.False;
         }
 	}
 }

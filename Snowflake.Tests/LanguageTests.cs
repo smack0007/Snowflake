@@ -392,6 +392,35 @@ x = 21;
 return y;");
 		}
 
+		[Test]
+		public void Undeclarded_Variable_Is_Undefined()
+		{
+			AssertScriptReturnValue(true, @"return x == undef;");
+		}
+
+		[Test]
+		public void Variable_Declared_Inside_Function_Is_Undefined_Outside_Function()
+		{
+			AssertScriptReturnValue(true, @"
+var doIt = func() {
+	var x = 5;
+	return x;
+};
+
+return x == undef;");
+		}
+
+		[Test]
+		public void Variable_Declared_As_Function_Arg_Is_Undefined_Outside_Function()
+		{
+			AssertScriptReturnValue(true, @"
+var doIt = func(var x) {
+	return x;
+};
+
+return x == undef;");
+		}
+
 		#endregion
 
 		#region Varaible Operations

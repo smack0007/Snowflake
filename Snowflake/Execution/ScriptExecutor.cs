@@ -23,7 +23,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 				
 		private void ThrowUnableToExecuteException(string executionStage, SyntaxNode node)
 		{
-			throw new ScriptExecutionException("Unable to execute node type " + node.GetType().Name + " at " + executionStage + ".");
+			throw new ScriptExecutionException(string.Format("Unable to execute node type {0} at {1}.", node.GetType().Name, executionStage));
 		}
 
 		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptTypeBoxer boxer)
