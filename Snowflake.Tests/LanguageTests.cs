@@ -220,6 +220,18 @@ return 0;
 		#region Logical Operations
 
 		[Test]
+		public void True_Equal_To_True()
+		{
+			AssertScriptReturnValue(true, "return true == true;");
+		}
+
+		[Test]
+		public void True_Not_Equal_To_False()
+		{
+			AssertScriptReturnValue(true, "return true != false;");
+		}
+
+		[Test]
 		public void True_And_True_Is_True()
 		{
 			AssertScriptReturnValue(true, "return true && true;");

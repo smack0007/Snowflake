@@ -239,6 +239,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
                     operationType = OperationType.Equals;
                     break;
 
+				case LexemeType.NotEqualTo:
+					operationType = OperationType.NotEquals;
+					break;
+
 				case LexemeType.Gets:
 					operationType = OperationType.Gets;
 					break;

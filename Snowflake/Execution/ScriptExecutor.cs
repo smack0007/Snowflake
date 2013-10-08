@@ -292,6 +292,10 @@ namespace Snowsoft.SnowflakeScript.Execution
                             result = lhs.EqualTo(rhs);
                             break;
 
+						case OperationType.NotEquals:
+							result = lhs.EqualTo(rhs).Inverse();
+							break;
+
 						case OperationType.Add:
 							result = lhs.Add(rhs);
 							break;

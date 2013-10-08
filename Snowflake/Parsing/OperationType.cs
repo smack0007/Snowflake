@@ -6,6 +6,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 	{
         Equals,
 
+		NotEquals,
+
 		Gets,
 
 		Add,

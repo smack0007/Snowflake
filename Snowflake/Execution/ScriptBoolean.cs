@@ -56,5 +56,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 				return ScriptBoolean.False;
 			}
 		}
+
+		public ScriptBoolean Inverse()
+		{
+			return ReferenceEquals(this, ScriptBoolean.True) ? ScriptBoolean.False : ScriptBoolean.True;
+		}
 	}
 }
