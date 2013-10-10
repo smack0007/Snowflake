@@ -43,10 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LanguageTests.cs" />
+    <Compile Include="ClrFunctionCallTests.cs" />
+    <Compile Include="FunctionCallTests.cs" />
+    <Compile Include="IfTests.cs" />
+    <Compile Include="LanguageTestFixture.cs" />
     <Compile Include="Execution\ScriptBooleanTests.cs" />
-    <Compile Include="ScriptLexerTests.cs" />
+    <Compile Include="LogicalOperationsTests.cs" />
+    <Compile Include="ReturnValueTests.cs" />
+    <Compile Include="Lexing\ScriptLexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringOperationsTests.cs" />
+    <Compile Include="VariableDeclarationTests.cs" />
+    <Compile Include="VariableOperationsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Snowflake\Snowflake.csproj">

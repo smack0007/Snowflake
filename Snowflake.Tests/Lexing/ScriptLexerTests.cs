@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Snowsoft.SnowflakeScript;
 using Snowsoft.SnowflakeScript.Lexing;
 
-namespace Snowflake.Tests
+namespace Snowflake.Tests.Lexing
 {
 	[TestFixture]
 	public class ScriptLexerTests
