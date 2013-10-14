@@ -1,46 +1,41 @@
-Script: { Statement } EOF
+Script = <Statement>* EOF ;
 
-StatementBlock: [{] { Statement } [}]
+StatementBlock = "{" <Statement>* "}" ;
 
-Statement: VariableDeclaration | If | Return | ( Expression [;] )
+Statement = <VariableDeclaration> |
+			<If> | 
+			<Return> |
+			<Expression> ";" ;
 
-VariableDeclaration: [var] Identifier ( [=] Expression )^ [;]
+VariableDeclaration = "var" <Identifier> { "=" <Expression> } ";" ;
 
-If: [if] [(] Expression [)] StatementBlock ( [else] StatementBlock )
+If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 
-Return: [return] Expression [;]
+Return = "return" <Expression> ";" ;
 
-Expression: Function | FunctionCall | Identifier | Identifier Operation Expression | Value | Value Operation Expression
+Expression = <Function> | <FunctionCall> | <Identifier> | <Identifier> <Operation> <Expression> | <Value> | <Value> <Operation> <Expression> ;
 
-Function: [func] [(] { [var] Identifier [,]! } [)] StatementBlock
+Function = "func" "(" { <Expression> ("," <Expression>)* } ")" <StatementBlock> ;
 
-FunctionCall: Identifier [(] { Expression [,]! } [)]
+FunctionCall = <Identifier> "(" { <Expression> ("," <Expression>)* } ")" ;
 
-Identifier: [A-Za-z_][A-Za-z0-9_]*
+Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 
-Operation: [=] | [+] | [+=] | [-] | [-=] | [*] | [*=] | [/] | [/=] | [==] | [!=] | [&&] | [||]
+Operation = "=" | "+" | "+=" | "-" | "-=" | "*" | "*=" | "/" | "/=" | "==" | "!=" | "&&" | "||" ;
 
-Value: Undefined | Null | Boolean | String | Char | Integer | Float 
+Value = <Undefined> | <Null> | <Boolean> | <String> | <Char> | <Integer> | <Float> ;
 
-Undefined: [undef]
+Undefined = "undef" ;
 
-Null: [null]
+Null = "null" ;
 
-Boolean: [true] | [false]
+Boolean = "true" | "false" ;
 
-String: ["] [chars]* ["]
+String = "\"" <chars>* "\"" ;
 
-Integer: [1-9]*
+Integer = [1-9]* ;
 
-Float: [1-9]*[.][1-9]*
+Float = [1-9]*[.][1-9]* ;
 
-Legend:
-	*       0 or more
-	+       1 or more
-	^       Optional
-	|		Or
-	( )     Grouping
-	[ ]     Symbol or Keyword
-	{ }     Repetition
-	[ ]!    Symbol is repetition indicator
+
 
