@@ -349,6 +349,14 @@ namespace Snowsoft.SnowflakeScript.Execution
 						result = lhs.Subtract(rhs);
 						break;
 
+					case OperationType.Multiply:
+						result = lhs.Multiply(rhs);
+						break;
+
+					case OperationType.Divide:
+						result = lhs.Divide(rhs);
+						break;
+
 					case OperationType.LogicalAnd:
 						result = lhs.LogicalAnd(rhs);
 						break;

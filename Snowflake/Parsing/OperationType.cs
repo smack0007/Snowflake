@@ -8,11 +8,13 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		NotEquals,
 
-		Gets,
-
 		Add,
 
 		Subtract,
+
+		Multiply,
+
+		Divide,
 
 		LogicalAnd,
 

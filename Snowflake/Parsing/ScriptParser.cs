@@ -301,16 +301,20 @@ namespace Snowsoft.SnowflakeScript.Parsing
 					operationType = OperationType.NotEquals;
 					break;
 
-				case LexemeType.Gets:
-					operationType = OperationType.Gets;
-					break;
-
 				case LexemeType.Plus:
 					operationType = OperationType.Add;
 					break;
 
 				case LexemeType.Minus:
 					operationType = OperationType.Subtract;
+					break;
+
+				case LexemeType.Multiply:
+					operationType = OperationType.Multiply;
+					break;
+
+				case LexemeType.Divide:
+					operationType = OperationType.Divide;
 					break;
 
 				case LexemeType.LogicalAnd:
