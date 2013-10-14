@@ -8,13 +8,7 @@ namespace Snowflake.Tests
 {
 	[TestFixture]
 	public class ReturnValueTests : LanguageTestFixture
-	{
-		[Test]
-		public void Script_Return_Value_Is_Null_When_No_Return_Value()
-		{
-			AssertScriptReturnValue<object>(null, "42 + 3;");
-		}
-
+	{		
 		[Test]
 		public void Script_Return_Value_Is_Returned()
 		{

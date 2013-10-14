@@ -3,11 +3,17 @@ Script = <Statement>* EOF ;
 StatementBlock = "{" <Statement>* "}" ;
 
 Statement = <VariableDeclaration> |
-			<If> | 
+            <Assignment> |
+			<FunctionCall> |
+			<If> |
 			<Return> |
 			<Expression> ";" ;
 
 VariableDeclaration = "var" <Identifier> { "=" <Expression> } ";" ;
+
+Assignment = <Identifier> <AssignmentOperation> <Expression> ";" ;
+
+AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
 If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 

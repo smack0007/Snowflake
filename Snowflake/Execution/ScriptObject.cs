@@ -45,6 +45,18 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return null;
 		}
 
+		public virtual ScriptObject Multiply(ScriptObject other)
+		{
+			this.ThrowOperationNotSupportedException("Multiply");
+			return null;
+		}
+
+		public virtual ScriptObject Divide(ScriptObject other)
+		{
+			this.ThrowOperationNotSupportedException("Divide");
+			return null;
+		}
+
 		public virtual ScriptObject LogicalAnd(ScriptObject other)
 		{
 			this.ThrowOperationNotSupportedException("LogicalAnd");

@@ -57,5 +57,39 @@ namespace Snowsoft.SnowflakeScript.Execution
 				return null;
 			}
 		}
+
+		public override ScriptObject Multiply(ScriptObject other)
+		{
+			if (other is ScriptFloat)
+			{
+				return new ScriptFloat(this.Value * ((ScriptFloat)other).Value);
+			}
+			else if (other is ScriptInteger)
+			{
+				return new ScriptFloat(this.Value * ((ScriptInteger)other).Value);
+			}
+			else
+			{
+				this.ThrowOperationNotSupportedBetweenTypesException("Multiply", other);
+				return null;
+			}
+		}
+
+		public override ScriptObject Divide(ScriptObject other)
+		{
+			if (other is ScriptFloat)
+			{
+				return new ScriptFloat(this.Value / ((ScriptFloat)other).Value);
+			}
+			else if (other is ScriptInteger)
+			{
+				return new ScriptFloat(this.Value / ((ScriptInteger)other).Value);
+			}
+			else
+			{
+				this.ThrowOperationNotSupportedBetweenTypesException("Divide", other);
+				return null;
+			}
+		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿var buildAdder = func(var x) {
+﻿(func(var x) { return x; })(5);
+
+var buildAdder = func(var x) {
 	return func(var y) {
 		return x + y;
 	};

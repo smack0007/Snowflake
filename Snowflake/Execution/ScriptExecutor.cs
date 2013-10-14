@@ -148,6 +148,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				this.ExecuteVariableDeclaration(context, (VariableDeclarationNode)node);
 			}
+			else if (node is AssignmentNode)
+			{
+				this.ExecuteAssignment(context, (AssignmentNode)node);
+			}
 			else if (node is IfNode)
 			{
 				this.ExecuteIf(context, (IfNode)node);
@@ -162,7 +166,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else
 			{
-				throw new ScriptExecutionException("Unable to handle node in script tree.");
+				this.ThrowUnableToExecuteException("Statement", node);
 			}
 		}
 
@@ -183,6 +187,33 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 
 			context.Stack[node.VariableName] = new ScriptVariableReference(value);
+		}
+
+		private void ExecuteAssignment(ExecutionContext context, AssignmentNode node)
+		{
+			var variable = context.Stack[node.VariableName];
+			var value = this.ExecuteExpression(context, node.ValueExpression);
+
+			switch (node.Operation)
+			{
+				case AssignmentOperation.AddGets:
+					value = variable.Value.Add(value);
+					break;
+
+				case AssignmentOperation.SubtractGets:
+					value = variable.Value.Subtract(value);
+					break;
+
+				case AssignmentOperation.MultiplyGets:
+					value = variable.Value.Multiply(value);
+					break;
+
+				case AssignmentOperation.DivideGets:
+					value = variable.Value.Divide(value);
+					break;
+			}
+
+			variable.Gets(value);
 		}
 
 		private void ExecuteIf(ExecutionContext context, IfNode node)
@@ -294,45 +325,37 @@ namespace Snowsoft.SnowflakeScript.Execution
 				ScriptObject lhs = this.ExecuteExpression(context, operation.LHS);
 				ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
 
-				if (operation.Type == OperationType.Gets)
+				if (lhs is ScriptVariableReference)
+					lhs = ((ScriptVariableReference)lhs).Value;
+
+				if (rhs is ScriptVariableReference)
+					rhs = ((ScriptVariableReference)rhs).Value;
+
+				switch (operation.Type)
 				{
-					lhs.Gets(rhs);
-					result = lhs;
-				}
-				else
-				{
-					if (lhs is ScriptVariableReference)
-						lhs = ((ScriptVariableReference)lhs).Value;
+                    case OperationType.Equals:
+                        result = lhs.EqualTo(rhs);
+                        break;
 
-					if (rhs is ScriptVariableReference)
-						rhs = ((ScriptVariableReference)rhs).Value;
+					case OperationType.NotEquals:
+						result = lhs.EqualTo(rhs).Inverse();
+						break;
 
-					switch (operation.Type)
-					{
-                        case OperationType.Equals:
-                            result = lhs.EqualTo(rhs);
-                            break;
+					case OperationType.Add:
+						result = lhs.Add(rhs);
+						break;
 
-						case OperationType.NotEquals:
-							result = lhs.EqualTo(rhs).Inverse();
-							break;
+					case OperationType.Subtract:
+						result = lhs.Subtract(rhs);
+						break;
 
-						case OperationType.Add:
-							result = lhs.Add(rhs);
-							break;
+					case OperationType.LogicalAnd:
+						result = lhs.LogicalAnd(rhs);
+						break;
 
-						case OperationType.Subtract:
-							result = lhs.Subtract(rhs);
-							break;
-
-						case OperationType.LogicalAnd:
-							result = lhs.LogicalAnd(rhs);
-							break;
-
-						case OperationType.LogicalOr:
-							result = lhs.LogicalOr(rhs);
-							break;
-					}
+					case OperationType.LogicalOr:
+						result = lhs.LogicalOr(rhs);
+						break;
 				}
 			}
 			else if (node is VariableReferenceNode)

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssignmentTests.cs" />
     <Compile Include="ClrFunctionCallTests.cs" />
     <Compile Include="FunctionCallTests.cs" />
     <Compile Include="IfTests.cs" />

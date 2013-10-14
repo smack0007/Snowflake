@@ -77,6 +77,8 @@
     <Compile Include="Execution\ScriptString.cs" />
     <Compile Include="Execution\ScriptUndefined.cs" />
     <Compile Include="Execution\ScriptValue.cs" />
+    <Compile Include="Parsing\AssignmentNode.cs" />
+    <Compile Include="Parsing\AssignmentOperation.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
     <Compile Include="Parsing\CharacterValueNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />

@@ -10,20 +10,28 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		private void EnsureLexemeType(IList<Lexeme> lexemes, LexemeType expected, int pos)
 		{
 			if (lexemes[pos].Type != expected)
-				throw new SyntaxException(expected + " was expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column + ".");
+				throw new SyntaxException(string.Format("{0} was expected at line {1} column {2}.", expected, lexemes[pos].Line, lexemes[pos].Column));
 		}
 
 		private void EnsureNotLexemeType(IList<Lexeme> lexemes, LexemeType unexpected, int pos)
 		{
 			if (lexemes[pos].Type == unexpected)
-				throw new SyntaxException(unexpected + " was not expected at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column + ".");
+				throw new SyntaxException(string.Format("{0} was not expected at line {1} column {2}.", unexpected, lexemes[pos].Line, lexemes[pos].Column));
 		}
 
 		private void ThrowUnableToParseException(string parseType, IList<Lexeme> lexemes, int pos)
 		{
-			throw new SyntaxException("Unable to parse lexeme type \"" + lexemes[pos].Type + "\" as \"" + parseType + "\" at Line " + lexemes[pos].Line + " Column " + lexemes[pos].Column + ".");
+			throw new SyntaxException(string.Format("Unable to parse lexeme type \"{0}\" as \"{1}\" at line {2} column {3}.", lexemes[pos].Type, parseType, lexemes[pos].Line, lexemes[pos].Column));
 		}
-				
+
+		private bool IsAssignmentOperator(LexemeType type)
+		{
+			if (type == LexemeType.Gets || type == LexemeType.PlusGets || type == LexemeType.MinusGets || type == LexemeType.MultiplyGets || type == LexemeType.DivideGets)
+				return true;
+
+			return false;
+		}
+
 		public ScriptNode Parse(IList<Lexeme> lexemes)
 		{
 			if (lexemes == null)
@@ -51,6 +59,20 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 				pos++;
 			}
+			else if (lexemes[pos].Type == LexemeType.Identifier)
+			{
+				if (this.IsAssignmentOperator(lexemes[pos + 1].Type))
+				{
+					node = this.ParseAssignment(lexemes, ref pos);
+				}
+				else
+				{
+					node = this.ParseFunctionCall(lexemes, ref pos);
+				}
+
+				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+				pos++;
+			}
 			else if (lexemes[pos].Type == LexemeType.If)
 			{
 				node = this.ParseIf(lexemes, ref pos);
@@ -61,10 +83,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			}
 			else
 			{
-				node = this.ParseExpression(lexemes, ref pos);
-
-				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-				pos++;
+				this.ThrowUnableToParseException("Statement", lexemes, pos);
 			}
 			
 			return node;
@@ -104,6 +123,45 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				pos++;
 				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 			}
+
+			return node;
+		}
+
+		private AssignmentNode ParseAssignment(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+
+			AssignmentNode node = new AssignmentNode() { VariableName = lexemes[pos].Value };
+
+			pos++;
+			switch (lexemes[pos].Type)
+			{
+				case LexemeType.Gets:
+					node.Operation = AssignmentOperation.Gets;
+					break;
+
+				case LexemeType.PlusGets:
+					node.Operation = AssignmentOperation.AddGets;
+					break;
+
+				case LexemeType.MinusGets:
+					node.Operation = AssignmentOperation.SubtractGets;
+					break;
+
+				case LexemeType.MultiplyGets:
+					node.Operation = AssignmentOperation.MultiplyGets;
+					break;
+
+				case LexemeType.DivideGets:
+					node.Operation = AssignmentOperation.DivideGets;
+					break;
+
+				default:
+					throw new SyntaxException(string.Format("An assignment operation was expected at line {0} column {1}.", lexemes[pos].Line, lexemes[pos].Column));
+			}
+
+			pos++;
+			node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 
 			return node;
 		}
