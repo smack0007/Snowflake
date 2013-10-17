@@ -163,12 +163,12 @@ namespace Snowsoft.SnowflakeScript.Lexing
 					}
 					else if (text[i] == '&' && i + 1 < text.Length && text[i + 1] == '&') // And
 					{
-						lexemes.Add(new Lexeme(LexemeType.LogicalAnd, null, curLine, curColumn));
+						lexemes.Add(new Lexeme(LexemeType.ConditionalAnd, null, curLine, curColumn));
 						i++;
 					}
 					else if (text[i] == '|' && i + 1 < text.Length && text[i + 1] == '|') // Or
 					{
-						lexemes.Add(new Lexeme(LexemeType.LogicalOr, null, curLine, curColumn));
+						lexemes.Add(new Lexeme(LexemeType.ConditionalOr, null, curLine, curColumn));
 						i++;
 					}
 					else if (char.IsLetter(text[i]) || text[i] == '_') // Identifier

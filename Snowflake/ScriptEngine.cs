@@ -205,9 +205,10 @@ namespace Snowsoft.SnowflakeScript
 
 		public object Execute(string script)
 		{
-			var scriptNode = this.parser.Parse(this.lexer.Lex(script));
-			var scriptObject = this.executor.Execute(scriptNode, this.stack, this.boxer);
-			return scriptObject.Unbox();
+			var lexemes = this.lexer.Lex(script);
+			var syntaxTree = this.parser.Parse(lexemes);
+			var result = this.executor.Execute(syntaxTree, this.stack, this.boxer);
+			return result.Unbox();
 		}
 
 		public object ExecuteFile(string fileName)

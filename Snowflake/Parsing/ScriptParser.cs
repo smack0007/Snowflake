@@ -209,127 +209,204 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		private ExpressionNode ParseExpression(IList<Lexeme> lexemes, ref int pos)
 		{
+			return this.ParseConditionalOrExpression(lexemes, ref pos);
+		}
+
+		private ExpressionNode ParseConditionalOrExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode lhs = this.ParseConditionalAndExpression(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.ConditionalOr)
+			{
+				pos++;
+
+				OperationNode node = new OperationNode()
+				{
+					Type = OperationType.ConditionalOr,
+					LHS = lhs,
+					RHS = this.ParseConditionalAndExpression(lexemes, ref pos)
+				};
+
+				return node;
+			}
+			else
+			{
+				return lhs;
+			}
+		}
+
+		private ExpressionNode ParseConditionalAndExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode lhs = this.ParseEqualityExpression(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.ConditionalAnd)
+			{
+				pos++;
+
+				OperationNode node = new OperationNode()
+				{
+					Type = OperationType.ConditionalAnd,
+					LHS = lhs,
+					RHS = this.ParseEqualityExpression(lexemes, ref pos)
+				};
+
+				return node;
+			}
+			else
+			{
+				return lhs;
+			}
+		}
+
+		private ExpressionNode ParseEqualityExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode lhs = this.ParseAdditiveExpression(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.EqualTo || lexemes[pos].Type == LexemeType.NotEqualTo)
+			{
+				OperationType opType = lexemes[pos].Type == LexemeType.EqualTo ? OperationType.Equals : OperationType.NotEquals;
+				pos++;
+
+				OperationNode node = new OperationNode()
+				{
+					Type = opType,
+					LHS = lhs,
+					RHS = this.ParseAdditiveExpression(lexemes, ref pos)
+				};
+
+				return node;
+			}
+			else
+			{
+				return lhs;
+			}
+		}
+
+		private ExpressionNode ParseAdditiveExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode lhs = this.ParseMultiplicativeExpression(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.Plus || lexemes[pos].Type == LexemeType.Minus)
+			{
+				OperationType opType = lexemes[pos].Type == LexemeType.Plus ? OperationType.Add : OperationType.Subtract;
+				pos++;
+
+				OperationNode node = new OperationNode()
+				{
+					Type = opType,
+					LHS = lhs,
+					RHS = this.ParseMultiplicativeExpression(lexemes, ref pos)
+				};
+
+				return node;
+			}
+			else
+			{
+				return lhs;
+			}
+		}
+
+		private ExpressionNode ParseMultiplicativeExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode lhs = this.ParsePrimaryExpression(lexemes, ref pos);
+
+			if (lexemes[pos].Type == LexemeType.Multiply || lexemes[pos].Type == LexemeType.Divide)
+			{
+				OperationType opType = lexemes[pos].Type == LexemeType.Multiply ? OperationType.Multiply : OperationType.Divide;
+				pos++;
+
+				OperationNode node = new OperationNode()
+				{
+					Type = opType,
+					LHS = lhs,
+					RHS = this.ParsePrimaryExpression(lexemes, ref pos)
+				};
+
+				return node;
+			}
+			else
+			{
+				return lhs;
+			}
+		}
+
+		private ExpressionNode ParsePrimaryExpression(IList<Lexeme> lexemes, ref int pos)
+		{
 			ExpressionNode node = null;
 
-			switch (lexemes[pos].Type)
+			if (lexemes[pos].Type == LexemeType.OpenParen)
 			{
-				case LexemeType.Func:
-					node = this.ParseFunction(lexemes, ref pos);
-					break;
+				pos++;
+				node = this.ParseExpression(lexemes, ref pos);
 
-				case LexemeType.Identifier:
-					if (pos + 1 < lexemes.Count && lexemes[pos + 1].Type == LexemeType.OpenParen)
-					{
-						node = this.ParseFunctionCall(lexemes, ref pos);
-					}
-					else
-					{
-						node = this.ParseVariableReference(lexemes, ref pos);
-					}
-					break;
+				this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+				pos++;
+			}
+			else
+			{
+				switch (lexemes[pos].Type)
+				{
+					case LexemeType.Func:
+						node = this.ParseFunction(lexemes, ref pos);
+						break;
 
-				case LexemeType.Null:
-					node = new NullValueNode();
-					pos++;
-					break;
+					case LexemeType.Identifier:
+						if (pos + 1 < lexemes.Count && lexemes[pos + 1].Type == LexemeType.OpenParen)
+						{
+							node = this.ParseFunctionCall(lexemes, ref pos);
+						}
+						else
+						{
+							node = this.ParseVariableReference(lexemes, ref pos);
+						}
+						break;
 
-                case LexemeType.Undef:
-                    node = new UndefinedValueNode();
-                    pos++;
-                    break;
+					case LexemeType.Null:
+						node = new NullValueNode();
+						pos++;
+						break;
 
-				case LexemeType.True:
-					node = new BooleanValueNode() { Value = true };
-					pos++;
-					break;
+					case LexemeType.Undef:
+						node = new UndefinedValueNode();
+						pos++;
+						break;
 
-				case LexemeType.False:
-					node = new BooleanValueNode() { Value = false };
-					pos++;
-					break;
+					case LexemeType.True:
+						node = new BooleanValueNode() { Value = true };
+						pos++;
+						break;
 
-				case LexemeType.String:
-					node = new StringValueNode() { Value = lexemes[pos].Value };
-					pos++;
-					break;
+					case LexemeType.False:
+						node = new BooleanValueNode() { Value = false };
+						pos++;
+						break;
 
-				case LexemeType.Char:
-					node = new CharacterValueNode() { Value = lexemes[pos].Value[0] };
-					pos++;
-					break;
+					case LexemeType.String:
+						node = new StringValueNode() { Value = lexemes[pos].Value };
+						pos++;
+						break;
 
-				case LexemeType.Integer:
-					node = new IntegerValueNode() { Value = int.Parse(lexemes[pos].Value) };
-					pos++;
-					break;
+					case LexemeType.Char:
+						node = new CharacterValueNode() { Value = lexemes[pos].Value[0] };
+						pos++;
+						break;
 
-				case LexemeType.Float:
-					node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture) };
-					pos++;
-					break;
+					case LexemeType.Integer:
+						node = new IntegerValueNode() { Value = int.Parse(lexemes[pos].Value) };
+						pos++;
+						break;
+
+					case LexemeType.Float:
+						node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture) };
+						pos++;
+						break;
+				}
 			}
 
 			if (node == null)
-				this.ThrowUnableToParseException("Expression", lexemes, pos);
-						
-			OperationType? operationType = this.ParseOperationType(lexemes, ref pos);
-
-			if (operationType != null)
-			{
-				node = new OperationNode()
-				{
-					Type = operationType.Value,
-					LHS = node,
-					RHS = this.ParseExpression(lexemes, ref pos)
-				};
-			}
+				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
 			return node;
-		}
-
-		private OperationType? ParseOperationType(IList<Lexeme> lexemes, ref int pos)
-		{
-			OperationType? operationType = null;
-
-			switch (lexemes[pos].Type)
-			{
-                case LexemeType.EqualTo:
-                    operationType = OperationType.Equals;
-                    break;
-
-				case LexemeType.NotEqualTo:
-					operationType = OperationType.NotEquals;
-					break;
-
-				case LexemeType.Plus:
-					operationType = OperationType.Add;
-					break;
-
-				case LexemeType.Minus:
-					operationType = OperationType.Subtract;
-					break;
-
-				case LexemeType.Multiply:
-					operationType = OperationType.Multiply;
-					break;
-
-				case LexemeType.Divide:
-					operationType = OperationType.Divide;
-					break;
-
-				case LexemeType.LogicalAnd:
-					operationType = OperationType.LogicalAnd;
-					break;
-
-				case LexemeType.LogicalOr:
-					operationType = OperationType.LogicalOr;
-					break;
-			}
-
-			if (operationType != null)
-				pos++;
-
-			return operationType;
 		}
 
 		private FunctionNode ParseFunction(IList<Lexeme> lexemes, ref int pos)

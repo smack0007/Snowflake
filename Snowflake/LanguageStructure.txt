@@ -19,15 +19,25 @@ If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 
 Return = "return" <Expression> ";" ;
 
-Expression = <Function> | <FunctionCall> | <Identifier> | <Identifier> <Operation> <Expression> | <Value> | <Value> <Operation> <Expression> ;
+Expression = <ConditionalOrExpression> ;
+
+ConditionalOrExpression = <ConditionalAndExpression> ( "||" <ConditionalAndExpression> )* ;
+
+ConditionalAndExpression = <EqualityExpression> ( "||" <EqualityExpression> )* ;
+
+EqualityExpression = <AdditiveExpression> ( ( "==" | "!=" ) <AdditiveExpression> )* ;
+
+AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )*
+
+MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )*
+
+PrimaryExpression = "(" <Expression> ")" | <Function> | <FunctionCall> | <Identifier> | <Value>
 
 Function = "func" "(" { <Expression> ("," <Expression>)* } ")" <StatementBlock> ;
 
 FunctionCall = <Identifier> "(" { <Expression> ("," <Expression>)* } ")" ;
 
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
-
-Operation = "=" | "+" | "+=" | "-" | "-=" | "*" | "*=" | "/" | "/=" | "==" | "!=" | "&&" | "||" ;
 
 Value = <Undefined> | <Null> | <Boolean> | <String> | <Char> | <Integer> | <Float> ;
 

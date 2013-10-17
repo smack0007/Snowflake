@@ -321,50 +321,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			else if (node is OperationNode)
 			{
-				OperationNode operation = (OperationNode)node;
-				ScriptObject lhs = this.ExecuteExpression(context, operation.LHS);
-				ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
-
-				if (lhs is ScriptVariableReference)
-					lhs = ((ScriptVariableReference)lhs).Value;
-
-				if (rhs is ScriptVariableReference)
-					rhs = ((ScriptVariableReference)rhs).Value;
-
-				switch (operation.Type)
-				{
-                    case OperationType.Equals:
-                        result = lhs.EqualTo(rhs);
-                        break;
-
-					case OperationType.NotEquals:
-						result = lhs.EqualTo(rhs).Inverse();
-						break;
-
-					case OperationType.Add:
-						result = lhs.Add(rhs);
-						break;
-
-					case OperationType.Subtract:
-						result = lhs.Subtract(rhs);
-						break;
-
-					case OperationType.Multiply:
-						result = lhs.Multiply(rhs);
-						break;
-
-					case OperationType.Divide:
-						result = lhs.Divide(rhs);
-						break;
-
-					case OperationType.LogicalAnd:
-						result = lhs.LogicalAnd(rhs);
-						break;
-
-					case OperationType.LogicalOr:
-						result = lhs.LogicalOr(rhs);
-						break;
-				}
+				result = this.ExecuteOperation(context, (OperationNode)node);
 			}
 			else if (node is VariableReferenceNode)
 			{
@@ -413,6 +370,58 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			if (result == null)
 				this.ThrowUnableToExecuteException("Expression", node);
+
+			return result;
+		}
+
+		private ScriptObject ExecuteOperation(ExecutionContext context, OperationNode node)
+		{
+			OperationNode operation = (OperationNode)node;
+			ScriptObject lhs = this.ExecuteExpression(context, operation.LHS);
+			ScriptObject rhs = this.ExecuteExpression(context, operation.RHS);
+
+			if (lhs is ScriptVariableReference)
+				lhs = ((ScriptVariableReference)lhs).Value;
+
+			if (rhs is ScriptVariableReference)
+				rhs = ((ScriptVariableReference)rhs).Value;
+
+			ScriptObject result = null;
+
+			switch (operation.Type)
+			{
+				case OperationType.Equals:
+					result = lhs.EqualTo(rhs);
+					break;
+
+				case OperationType.NotEquals:
+					result = lhs.EqualTo(rhs).Inverse();
+					break;
+
+				case OperationType.Add:
+					result = lhs.Add(rhs);
+					break;
+
+				case OperationType.Subtract:
+					result = lhs.Subtract(rhs);
+					break;
+
+				case OperationType.Multiply:
+					result = lhs.Multiply(rhs);
+					break;
+
+				case OperationType.Divide:
+					result = lhs.Divide(rhs);
+					break;
+
+				case OperationType.ConditionalOr:
+					result = lhs.LogicalOr(rhs);
+					break;
+
+				case OperationType.ConditionalAnd:
+					result = lhs.LogicalAnd(rhs);
+					break;
+			}
 
 			return result;
 		}

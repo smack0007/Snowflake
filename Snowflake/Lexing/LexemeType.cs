@@ -212,12 +212,12 @@ namespace Snowsoft.SnowflakeScript.Lexing
 		/// <summary>
 		/// &&
 		/// </summary>
-		LogicalAnd,
+		ConditionalAnd,
 		
 		/// <summary>
 		/// ||
 		/// </summary>
-		LogicalOr,
+		ConditionalOr,
 				
 		/// <summary>
 		/// Used to indicate the end of a list of Lexemes.

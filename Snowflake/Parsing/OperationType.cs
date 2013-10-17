@@ -16,8 +16,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		Divide,
 
-		LogicalAnd,
+		ConditionalOr,
 
-		LogicalOr
+		ConditionalAnd
 	}
 }
