@@ -59,17 +59,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 				pos++;
 			}
-			else if (lexemes[pos].Type == LexemeType.Identifier)
+			else if (lexemes[pos].Type == LexemeType.Identifier && pos < lexemes.Count - 1 && this.IsAssignmentOperator(lexemes[pos + 1].Type))
 			{
-				if (this.IsAssignmentOperator(lexemes[pos + 1].Type))
-				{
-					node = this.ParseAssignment(lexemes, ref pos);
-				}
-				else
-				{
-					node = this.ParseFunctionCall(lexemes, ref pos);
-				}
-
+				node = this.ParseAssignment(lexemes, ref pos);
+				
 				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 				pos++;
 			}
@@ -83,7 +76,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			}
 			else
 			{
-				this.ThrowUnableToParseException("Statement", lexemes, pos);
+				node = this.ParseExpression(lexemes, ref pos);
+
+				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+				pos++;
 			}
 			
 			return node;
@@ -351,14 +347,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 						break;
 
 					case LexemeType.Identifier:
-						if (pos + 1 < lexemes.Count && lexemes[pos + 1].Type == LexemeType.OpenParen)
-						{
-							node = this.ParseFunctionCall(lexemes, ref pos);
-						}
-						else
-						{
-							node = this.ParseVariableReference(lexemes, ref pos);
-						}
+						node = this.ParseVariableReference(lexemes, ref pos);
 						break;
 
 					case LexemeType.Null:
@@ -406,6 +395,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
+            if (lexemes[pos].Type == LexemeType.OpenParen)
+            {
+                node = this.ParseFunctionCall(node, lexemes, ref pos);
+            }
+
 			return node;
 		}
 
@@ -438,15 +432,12 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			return node;
 		}
 
-		private FunctionCallNode ParseFunctionCall(IList<Lexeme> lexemes, ref int pos)
+		private FunctionCallNode ParseFunctionCall(ExpressionNode functionExpression, IList<Lexeme> lexemes, ref int pos)
 		{
-			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-
-			FunctionCallNode node = new FunctionCallNode() { FunctionName = lexemes[pos].Value };
-
-			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
 
+			FunctionCallNode node = new FunctionCallNode() { FunctionExpression = functionExpression };
+            
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{

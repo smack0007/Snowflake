@@ -1,4 +1,5 @@
-﻿(func(var x) { return x; })(5);
+﻿var temp = (func(var x) { return x; })(5);
+print(temp);
 
 var buildAdder = func(var x) {
 	return func(var y) {

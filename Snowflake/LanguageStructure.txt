@@ -35,7 +35,7 @@ PrimaryExpression = "(" <Expression> ")" | <Function> | <FunctionCall> | <Identi
 
 Function = "func" "(" { <Expression> ("," <Expression>)* } ")" <StatementBlock> ;
 
-FunctionCall = <Identifier> "(" { <Expression> ("," <Expression>)* } ")" ;
+FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 

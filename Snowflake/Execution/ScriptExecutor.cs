@@ -304,19 +304,22 @@ namespace Snowsoft.SnowflakeScript.Execution
 					args.Add(this.ExecuteExpression(context, expression));
 				}
 
-				var variableValue = this.GetVariableValue(context, functionCall.FunctionName);
+                ScriptObject function = this.ExecuteExpression(context, functionCall.FunctionExpression);
 
-				if (variableValue is ScriptFunction)
+                if (function is ScriptVariableReference)
+                    function = ((ScriptVariableReference)function).Value;
+
+                if (function is ScriptFunction)
 				{
-					result = this.CallFunction(context, functionCall.FunctionName, (ScriptFunction)variableValue, args);
+                    result = this.CallFunction(context, string.Empty, (ScriptFunction)function, args);
 				}
-				else if (variableValue is ScriptClrMethod)
+                else if (function is ScriptClrMethod)
 				{
-					result = this.CallClrMethod(context, functionCall.FunctionName, (ScriptClrMethod)variableValue, args);
+                    result = this.CallClrMethod(context, string.Empty, (ScriptClrMethod)function, args);
 				}
 				else
 				{
-					throw new ScriptExecutionException(string.Format("\"{0}\" is not a function.", functionCall.FunctionName));
+					throw new ScriptExecutionException("Expression is not a function.");
 				}
 			}
 			else if (node is OperationNode)

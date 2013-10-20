@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class FunctionCallNode : ExpressionNode
-	{
-		public string FunctionName
-		{
-			get;
-			set;
-		}
+	{		
+        public ExpressionNode FunctionExpression
+        {
+            get;
+            set;
+        }
 
 		public SyntaxNodeCollection<ExpressionNode> Args
 		{
