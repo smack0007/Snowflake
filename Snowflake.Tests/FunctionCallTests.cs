@@ -61,5 +61,34 @@ var doubleIt = func(var x = 21) {
 
 return doubleIt();");
 		}
+
+        [Test]
+        public void Anonymous_Function_Can_Be_Directly_Invoked()
+        {
+            AssertScriptReturnValue(42, @"
+return func(var x) {
+	return x + x;   
+}(21);");
+        }
+
+        [Test]
+        public void Anonymous_Function_Returned_From_Anonymous_Function_Can_Be_Directly_Invoked()
+        {
+            AssertScriptReturnValue(5, @"
+return func(var x) {
+	return func(var y) {
+        return x + y;   
+    };
+}(3)(2);");
+        }
+
+        [Test]
+        public void Anonymous_Function_Wrapped_In_Parens_Can_Be_Directly_Invoked()
+        {
+            AssertScriptReturnValue(42, @"
+return (func(var x) {
+	return x + x;   
+})(21);");
+        }
 	}
 }

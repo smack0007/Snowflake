@@ -395,7 +395,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
-            if (lexemes[pos].Type == LexemeType.OpenParen)
+            while (lexemes[pos].Type == LexemeType.OpenParen)
             {
                 node = this.ParseFunctionCall(node, lexemes, ref pos);
             }

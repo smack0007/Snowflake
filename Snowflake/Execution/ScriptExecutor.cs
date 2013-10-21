@@ -65,7 +65,7 @@ namespace Snowsoft.SnowflakeScript.Execution
             return variable.Value;
         }
 
-		private ScriptObject CallFunction(ExecutionContext context, string functionName, ScriptFunction function, List<ScriptObject> args)
+		private ScriptObject CallFunction(ExecutionContext context, ScriptFunction function, List<ScriptObject> args)
 		{
 			ScriptObject functionReturnValue = ScriptUndefined.Value;
 
@@ -83,7 +83,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 
 			if (args.Count != function.Args.Length)
-				throw new ScriptExecutionException(string.Format("Invalid number of arguments specified when calling \"{0}\".", functionName));
+				throw new ScriptExecutionException("Invalid number of arguments specified when calling function.");
 
 			context.Stack.Push();
 
@@ -120,7 +120,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			return functionReturnValue;
 		}
 
-		private ScriptObject CallClrMethod(ExecutionContext context, string functionName, ScriptClrMethod function, IList<ScriptObject> args)
+		private ScriptObject CallClrMethod(ExecutionContext context, ScriptClrMethod function, IList<ScriptObject> args)
 		{			
 			object[] parameters = args.Select(x => x.Unbox()).ToArray();
 
@@ -132,7 +132,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			catch (TargetParameterCountException ex)
 			{
-				throw new ScriptExecutionException(string.Format("Argument count for function \"{0}\" is wrong.", functionName), ex);
+				throw new ScriptExecutionException("Argument count for CLR method is wrong.", ex);
 			}
 			catch (ArgumentException ex)
 			{
@@ -311,11 +311,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 
                 if (function is ScriptFunction)
 				{
-                    result = this.CallFunction(context, string.Empty, (ScriptFunction)function, args);
+                    result = this.CallFunction(context, (ScriptFunction)function, args);
 				}
                 else if (function is ScriptClrMethod)
 				{
-                    result = this.CallClrMethod(context, string.Empty, (ScriptClrMethod)function, args);
+                    result = this.CallClrMethod(context, (ScriptClrMethod)function, args);
 				}
 				else
 				{
