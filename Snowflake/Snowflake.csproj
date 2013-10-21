@@ -101,6 +101,7 @@
     <Compile Include="Parsing\UndefinedValueNode.cs" />
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
+    <Compile Include="Parsing\WhileNode.cs" />
     <Compile Include="ScriptEngine.cs" />
     <Compile Include="Lexing\Lexeme.cs" />
     <Compile Include="Lexing\LexemeType.cs" />

@@ -163,6 +163,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				this.ExecuteIf(context, (IfNode)node);
 			}
+            else if (node is WhileNode)
+            {
+                this.ExecuteWhile(context, (WhileNode)node);
+            }
 			else if (node is ReturnNode)
 			{
 				this.ExecuteReturn(context, (ReturnNode)node);
@@ -253,6 +257,35 @@ namespace Snowsoft.SnowflakeScript.Execution
 				}	
 			}
 		}
+
+        private void ExecuteWhile(ExecutionContext context, WhileNode node)
+        {
+            bool shouldContinue = true;
+            while (shouldContinue)
+            {
+                var result = this.ExecuteExpression(context, node.EvaluateExpression).Unbox();
+
+                if (!(result is bool))
+                {
+                    throw new ScriptExecutionException("Evaluate expression of while must result in a boolean value.");
+                }
+
+                if ((bool)result)
+                {
+                    foreach (var statement in node.BodyStatementBlock.Statements)
+                    {
+                        this.ExecuteStatement(context, statement);
+
+                        if (context.ShouldReturn)
+                            return;
+                    }
+                }
+                else
+                {
+                    shouldContinue = false;
+                }
+            }
+        }
 
 		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{

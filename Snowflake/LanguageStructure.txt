@@ -6,6 +6,7 @@ Statement = <VariableDeclaration> |
             <Assignment> |
 			<FunctionCall> |
 			<If> |
+			<While> |
 			<Return> |
 			<Expression> ";" ;
 
@@ -16,6 +17,8 @@ Assignment = <Identifier> <AssignmentOperation> <Expression> ";" ;
 AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
 If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
+
+While = "while" "(" <Expression> ")" <StatementBlock> ;
 
 Return = "return" <Expression> ";" ;
 

@@ -79,6 +79,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				node = this.ParseIf(lexemes, ref pos);
 			}
+            else if (lexemes[pos].Type == LexemeType.While)
+            {
+                node = this.ParseWhile(lexemes, ref pos);
+            }
 			else if (lexemes[pos].Type == LexemeType.Return)
 			{
 				node = this.ParseReturn(lexemes, ref pos);
@@ -199,6 +203,26 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			return node;
 		}
+
+        private WhileNode ParseWhile(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.While, pos);
+
+            WhileNode node = Construct<WhileNode>(lexemes, pos);
+
+            pos++;
+            this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+            pos++;
+            node.EvaluateExpression = this.ParseExpression(lexemes, ref pos);
+
+            this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+            pos++;
+            node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+            
+            return node;
+        }
 
 		private ReturnNode ParseReturn(IList<Lexeme> lexemes, ref int pos)
 		{
