@@ -1,6 +1,9 @@
 ﻿var temp = (func(var x) { return x; })(5);
 print(temp);
 
+var x = 5;
+x / 5;
+
 var buildAdder = func(var x) {
 	return func(var y) {
 		return x + y;

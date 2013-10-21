@@ -20,10 +20,17 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public ScriptExecutor()
 		{
 		}
-				
+		        
 		private void ThrowUnableToExecuteException(string executionStage, SyntaxNode node)
 		{
-			throw new ScriptExecutionException(string.Format("Unable to execute node type {0} at {1}.", node.GetType().Name, executionStage));
+            string message = string.Format(
+                "Unable to execute node type {0} as {1}.",
+                node.GetType().Name,
+                executionStage,
+                node.Line,
+                node.Column);
+
+            throw new ScriptExecutionException(message, node.Line, node.Column);
 		}
 
 		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptTypeBoxer boxer)
@@ -136,7 +143,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 			}
 			catch (ArgumentException ex)
 			{
-				throw new ScriptExecutionException(string.Format("Argument type for \"{0}\" is wrong.", ex.ParamName), ex);
+                throw new ScriptExecutionException(string.Format("Argument type for \"{0}\" is wrong.", ex.ParamName), ex);
 			}
 
 			return context.Boxer.Box(result);

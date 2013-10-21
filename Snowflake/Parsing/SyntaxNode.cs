@@ -12,6 +12,18 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			set;
 		}
 
+        public int Line
+        {
+            get;
+            set;
+        }
+
+        public int Column
+        {
+            get;
+            set;
+        }
+
 		protected T SetParent<T>(T oldValue, T newValue)
 			where T : SyntaxNode
 		{

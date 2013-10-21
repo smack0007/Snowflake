@@ -7,6 +7,12 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class ScriptParser
 	{
+        private static T Construct<T>(IList<Lexeme> lexemes, int pos)
+            where T : SyntaxNode, new()
+        {
+            return new T() { Line = lexemes[pos].Line, Column = lexemes[pos].Column };
+        }
+
 		private void EnsureLexemeType(IList<Lexeme> lexemes, LexemeType expected, int pos)
 		{
 			if (lexemes[pos].Type != expected)
@@ -89,7 +95,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{			
 			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
 
-			StatementBlockNode node = new StatementBlockNode();
+			StatementBlockNode node = Construct<StatementBlockNode>(lexemes, pos);
 
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseBrace &&
@@ -108,10 +114,12 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
 
+            VariableDeclarationNode node = Construct<VariableDeclarationNode>(lexemes, pos);
+
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+            node.VariableName = lexemes[pos].Value;
 
-			VariableDeclarationNode node = new VariableDeclarationNode() { VariableName = lexemes[pos].Value };
 			pos++;
 
 			if (pos < lexemes.Count && lexemes[pos].Type == LexemeType.Gets)
@@ -127,7 +135,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
 
-			AssignmentNode node = new AssignmentNode() { VariableName = lexemes[pos].Value };
+			AssignmentNode node = Construct<AssignmentNode>(lexemes, pos);
+            node.VariableName = lexemes[pos].Value;
 
 			pos++;
 			switch (lexemes[pos].Type)
@@ -166,7 +175,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.If, pos);
 
-			IfNode node = new IfNode();
+			IfNode node = Construct<IfNode>(lexemes, pos);
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
@@ -192,7 +201,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Return, pos);
 
-			ReturnNode node = new ReturnNode();
+			ReturnNode node = Construct<ReturnNode>(lexemes, pos);
 
 			pos++;
 			node.Expression = this.ParseExpression(lexemes, ref pos);
@@ -216,12 +225,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				pos++;
 
-				OperationNode node = new OperationNode()
-				{
-					Type = OperationType.ConditionalOr,
-					LHS = lhs,
-					RHS = this.ParseConditionalAndExpression(lexemes, ref pos)
-				};
+				OperationNode node = Construct<OperationNode>(lexemes, pos);
+                node.Type = OperationType.ConditionalOr;
+                node.LHS = lhs;
+                node.RHS = this.ParseConditionalAndExpression(lexemes, ref pos);
 
 				return node;
 			}
@@ -239,13 +246,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			{
 				pos++;
 
-				OperationNode node = new OperationNode()
-				{
-					Type = OperationType.ConditionalAnd,
-					LHS = lhs,
-					RHS = this.ParseEqualityExpression(lexemes, ref pos)
-				};
-
+                OperationNode node = Construct<OperationNode>(lexemes, pos);
+                node.Type = OperationType.ConditionalAnd;
+                node.LHS = lhs;
+                node.RHS = this.ParseEqualityExpression(lexemes, ref pos);
+                
 				return node;
 			}
 			else
@@ -263,13 +268,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				OperationType opType = lexemes[pos].Type == LexemeType.EqualTo ? OperationType.Equals : OperationType.NotEquals;
 				pos++;
 
-				OperationNode node = new OperationNode()
-				{
-					Type = opType,
-					LHS = lhs,
-					RHS = this.ParseAdditiveExpression(lexemes, ref pos)
-				};
-
+                OperationNode node = Construct<OperationNode>(lexemes, pos);
+                node.Type = opType;
+                node.LHS = lhs;
+                node.RHS = this.ParseAdditiveExpression(lexemes, ref pos);
+                
 				return node;
 			}
 			else
@@ -287,13 +290,11 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				OperationType opType = lexemes[pos].Type == LexemeType.Plus ? OperationType.Add : OperationType.Subtract;
 				pos++;
 
-				OperationNode node = new OperationNode()
-				{
-					Type = opType,
-					LHS = lhs,
-					RHS = this.ParseMultiplicativeExpression(lexemes, ref pos)
-				};
-
+                OperationNode node = Construct<OperationNode>(lexemes, pos);
+                node.Type = opType;
+                node.LHS = lhs;
+                node.RHS = this.ParseMultiplicativeExpression(lexemes, ref pos);
+                
 				return node;
 			}
 			else
@@ -311,12 +312,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				OperationType opType = lexemes[pos].Type == LexemeType.Multiply ? OperationType.Multiply : OperationType.Divide;
 				pos++;
 
-				OperationNode node = new OperationNode()
-				{
-					Type = opType,
-					LHS = lhs,
-					RHS = this.ParsePrimaryExpression(lexemes, ref pos)
-				};
+                OperationNode node = Construct<OperationNode>(lexemes, pos);
+                node.Type = opType;
+                node.LHS = lhs;
+                node.RHS = this.ParsePrimaryExpression(lexemes, ref pos);
 
 				return node;
 			}
@@ -351,43 +350,49 @@ namespace Snowsoft.SnowflakeScript.Parsing
 						break;
 
 					case LexemeType.Null:
-						node = new NullValueNode();
+						node = Construct<NullValueNode>(lexemes, pos);
 						pos++;
 						break;
 
 					case LexemeType.Undef:
-						node = new UndefinedValueNode();
+                        node = Construct<UndefinedValueNode>(lexemes, pos);
 						pos++;
 						break;
 
 					case LexemeType.True:
-						node = new BooleanValueNode() { Value = true };
+                    case LexemeType.False:
+                        var boolNode = Construct<BooleanValueNode>(lexemes, pos);
+                        boolNode.Value = lexemes[pos].Type == LexemeType.True;
+                        node = boolNode;
 						pos++;
-						break;
-
-					case LexemeType.False:
-						node = new BooleanValueNode() { Value = false };
-						pos++;
-						break;
+                        break;
 
 					case LexemeType.String:
-						node = new StringValueNode() { Value = lexemes[pos].Value };
+						var stringNode = Construct<StringValueNode>(lexemes, pos);
+                        stringNode.Value = lexemes[pos].Value;
+                        node = stringNode;
 						pos++;
 						break;
 
 					case LexemeType.Char:
-						node = new CharacterValueNode() { Value = lexemes[pos].Value[0] };
+                        var charNode = Construct<CharacterValueNode>(lexemes, pos);
+                        charNode.Value = lexemes[pos].Value[0];
+                        node = charNode;
 						pos++;
 						break;
 
 					case LexemeType.Integer:
-						node = new IntegerValueNode() { Value = int.Parse(lexemes[pos].Value) };
+                        var intNode = Construct<IntegerValueNode>(lexemes, pos);
+                        intNode.Value = int.Parse(lexemes[pos].Value);
+                        node = intNode;
 						pos++;
 						break;
 
 					case LexemeType.Float:
-						node = new FloatValueNode() { Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture) };
-						pos++;
+                        var floatNode = Construct<FloatValueNode>(lexemes, pos);
+						floatNode.Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture);
+                        node = floatNode;
+                        pos++;
 						break;
 				}
 			}
@@ -407,7 +412,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
 
-			FunctionNode node = new FunctionNode();
+			FunctionNode node = Construct<FunctionNode>(lexemes, pos);
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
@@ -436,7 +441,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
 
-			FunctionCallNode node = new FunctionCallNode() { FunctionExpression = functionExpression };
+			FunctionCallNode node = Construct<FunctionCallNode>(lexemes, pos);
+            node.FunctionExpression = functionExpression;
             
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
@@ -460,7 +466,8 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
 
-			VariableReferenceNode node = new VariableReferenceNode() { VariableName = lexemes[pos].Value };
+			VariableReferenceNode node = Construct<VariableReferenceNode>(lexemes, pos);
+            node.VariableName = lexemes[pos].Value;
 
 			pos++;
 			return node;
