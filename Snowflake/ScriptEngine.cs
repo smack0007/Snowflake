@@ -203,18 +203,23 @@ namespace Snowsoft.SnowflakeScript
 
 		#endregion
 
-		public object Execute(string script)
-		{
-			var lexemes = this.lexer.Lex(script);
-			var syntaxTree = this.parser.Parse(lexemes);
-			var result = this.executor.Execute(syntaxTree, this.stack, this.boxer);
-			return result.Unbox();
-		}
+        public object Execute(string script)
+        {
+            return this.Execute(string.Empty, script);
+        }
 
 		public object ExecuteFile(string fileName)
 		{
 			string script = File.ReadAllText(fileName);
-			return this.Execute(script);
+			return this.Execute(fileName, script);
 		}
+
+        private object Execute(string id, string script)
+        {
+            var lexemes = this.lexer.Lex(script);
+            var syntaxTree = this.parser.Parse(id, lexemes);
+            var result = this.executor.Execute(syntaxTree, this.stack, this.boxer);
+            return result.Unbox();
+        }
 	}
 }

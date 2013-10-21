@@ -11,6 +11,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 	{
 		class ExecutionContext
 		{
+            public ScriptNode Script;
 			public ScriptStack Stack;
 			public ScriptTypeBoxer Boxer;
 			public bool ShouldReturn;
@@ -26,11 +27,9 @@ namespace Snowsoft.SnowflakeScript.Execution
             string message = string.Format(
                 "Unable to execute node type {0} as {1}.",
                 node.GetType().Name,
-                executionStage,
-                node.Line,
-                node.Column);
+                executionStage);
 
-            throw new ScriptExecutionException(message, node.Line, node.Column);
+            throw new ScriptExecutionException(message, node.Script.ID, node.Line, node.Column);
 		}
 
 		public ScriptObject Execute(ScriptNode script, ScriptStack stack, ScriptTypeBoxer boxer)
@@ -46,6 +45,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			var context = new ExecutionContext()
 			{
+                Script = script,
 				Stack = stack,
 				Boxer = boxer,
 				ReturnValue = ScriptUndefined.Value

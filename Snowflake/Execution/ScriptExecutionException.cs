@@ -4,6 +4,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 {
 	public class ScriptExecutionException : ScriptException
 	{
+        public string ScriptID
+        {
+            get;
+            private set;
+        }
+
         public int Line
         {
             get;
@@ -21,9 +27,10 @@ namespace Snowsoft.SnowflakeScript.Execution
         {
         }
 
-		public ScriptExecutionException(string message, int line, int column)
+		public ScriptExecutionException(string message, string scriptId, int line, int column)
 			: base(message)
 		{
+            this.ScriptID = scriptId;
             this.Line = line;
             this.Column = column;
 		}

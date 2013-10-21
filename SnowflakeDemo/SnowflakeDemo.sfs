@@ -11,4 +11,5 @@ var buildAdder = func(var x) {
 };
 
 var adder = buildAdder(5);
-print(adder(10));
+print("Hello World!");
+
