@@ -270,64 +270,11 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			if (node is FunctionNode)
 			{
-				FunctionNode functionNode = (FunctionNode)node;
-
-				Dictionary<string, ScriptVariableReference> references = new Dictionary<string, ScriptVariableReference>();
-				
-				var capturedVariables = functionNode.BodyStatementBlock
-                    .FindChildren<VariableReferenceNode>()
-					.Where(
-                        x => x.FindParent<FunctionNode>() == functionNode && 
-                        functionNode.Args.SingleOrDefault(y => y.VariableName == x.VariableName) == null &&
-                        functionNode.FindChildren<VariableDeclarationNode>().SingleOrDefault(y => y.VariableName == x.VariableName) == null);
-
-				foreach (var referenceNode in capturedVariables)
-				{
-					var variable = context.Stack[referenceNode.VariableName];
-
-                    if (variable == null)
-                        variable = new ScriptVariableReference(ScriptUndefined.Value);
-					
-					references.Add(referenceNode.VariableName, variable);
-				}
-
-				var args = functionNode.Args
-					.Select(x => new ScriptFunction.Argument()
-					{
-						Name = x.VariableName,
-						DefaultValueExpression = x.ValueExpression
-					})
-					.ToArray();
-
-				result = new ScriptFunction(functionNode.BodyStatementBlock, args, references);
+                result = this.ExecuteFunction(context, (FunctionNode)node);
 			}
 			else if (node is FunctionCallNode)
 			{
-				FunctionCallNode functionCall = (FunctionCallNode)node;
-
-				List<ScriptObject> args = new List<ScriptObject>();
-				foreach (ExpressionNode expression in functionCall.Args)
-				{
-					args.Add(this.ExecuteExpression(context, expression));
-				}
-
-                ScriptObject function = this.ExecuteExpression(context, functionCall.FunctionExpression);
-
-                if (function is ScriptVariableReference)
-                    function = ((ScriptVariableReference)function).Value;
-
-                if (function is ScriptFunction)
-				{
-                    result = this.CallFunction(context, (ScriptFunction)function, args);
-				}
-                else if (function is ScriptClrMethod)
-				{
-                    result = this.CallClrMethod(context, (ScriptClrMethod)function, args);
-				}
-				else
-				{
-					throw new ScriptExecutionException("Expression is not a function.");
-				}
+                result = this.ExecuteFunctionCall(context, (FunctionCallNode)node);
 			}
 			else if (node is OperationNode)
 			{
@@ -383,6 +330,69 @@ namespace Snowsoft.SnowflakeScript.Execution
 
 			return result;
 		}
+
+        private ScriptObject ExecuteFunction(ExecutionContext context, FunctionNode node)
+        {
+            Dictionary<string, ScriptVariableReference> references = new Dictionary<string, ScriptVariableReference>();
+
+            var capturedVariables = node.BodyStatementBlock
+                .FindChildren<VariableReferenceNode>()
+                .Where(
+                    x => x.FindParent<FunctionNode>() == node &&
+                    node.Args.SingleOrDefault(y => y.VariableName == x.VariableName) == null &&
+                    node.FindChildren<VariableDeclarationNode>().SingleOrDefault(y => y.VariableName == x.VariableName) == null);
+
+            foreach (var referenceNode in capturedVariables)
+            {
+                var variable = context.Stack[referenceNode.VariableName];
+
+                if (variable == null)
+                    variable = new ScriptVariableReference(ScriptUndefined.Value);
+
+                references.Add(referenceNode.VariableName, variable);
+            }
+
+            var args = node.Args
+                .Select(x => new ScriptFunction.Argument()
+                {
+                    Name = x.VariableName,
+                    DefaultValueExpression = x.ValueExpression
+                })
+                .ToArray();
+
+            return new ScriptFunction(node.BodyStatementBlock, args, references);
+        }
+
+        private ScriptObject ExecuteFunctionCall(ExecutionContext context, FunctionCallNode node)
+        {
+            List<ScriptObject> args = new List<ScriptObject>();
+            foreach (ExpressionNode expression in node.Args)
+            {
+                args.Add(this.ExecuteExpression(context, expression));
+            }
+
+            ScriptObject function = this.ExecuteExpression(context, node.FunctionExpression);
+
+            if (function is ScriptVariableReference)
+                function = ((ScriptVariableReference)function).Value;
+
+            ScriptObject result = null;
+
+            if (function is ScriptFunction)
+            {
+                result = this.CallFunction(context, (ScriptFunction)function, args);
+            }
+            else if (function is ScriptClrMethod)
+            {
+                result = this.CallClrMethod(context, (ScriptClrMethod)function, args);
+            }
+            else
+            {
+                throw new ScriptExecutionException("Expression is not a function.");
+            }
+
+            return result;
+        }
 
 		private ScriptObject ExecuteOperation(ExecutionContext context, OperationNode node)
 		{

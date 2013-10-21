@@ -6,6 +6,17 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public abstract class SyntaxNode
 	{
+        public ScriptNode Script
+        {
+            get
+            {
+                if (this is ScriptNode)
+                    return (ScriptNode)this;
+
+                return this.FindParent<ScriptNode>();
+            }
+        }
+
 		public SyntaxNode Parent
 		{
 			get;
@@ -36,14 +47,15 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			return newValue;
 		}
 
-		public SyntaxNode FindParent<T>()
+		public T FindParent<T>()
 			where T : SyntaxNode
 		{
 			var parent = this.Parent;
+
 			while (parent != null && !(parent is T))
 				parent = parent.Parent;
 
-			return parent;
+			return parent as T;
 		}
 
 		public IEnumerable<T> FindChildren<T>()
