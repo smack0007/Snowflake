@@ -2,23 +2,24 @@ Script = <Statement>* EOF ;
 
 StatementBlock = "{" <Statement>* "}" ;
 
-Statement = <VariableDeclaration> |
-            <Assignment> |
-			<FunctionCall> |
+Statement = <VariableDeclaration> ";" |
+            <Assignment> ";" |
 			<If> |
 			<While> |
 			<Return> |
 			<Expression> ";" ;
 
-VariableDeclaration = "var" <Identifier> { "=" <Expression> } ";" ;
+VariableDeclaration = "var" <Identifier> { "=" <Expression> } ;
 
-Assignment = <Identifier> <AssignmentOperation> <Expression> ";" ;
+Assignment = <Identifier> <AssignmentOperation> <Expression> ;
 
 AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
 If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 
 While = "while" "(" <Expression> ")" <StatementBlock> ;
+
+For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <Assignment>  ")" <StatementBlock>
 
 Return = "return" <Expression> ";" ;
 

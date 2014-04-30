@@ -83,6 +83,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
             {
                 node = this.ParseWhile(lexemes, ref pos);
             }
+			else if (lexemes[pos].Type == LexemeType.For)
+			{
+				node = this.ParseFor(lexemes, ref pos);
+			}
 			else if (lexemes[pos].Type == LexemeType.Return)
 			{
 				node = this.ParseReturn(lexemes, ref pos);
@@ -223,6 +227,43 @@ namespace Snowsoft.SnowflakeScript.Parsing
             
             return node;
         }
+
+		private ForNode ParseFor(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.For, pos);
+
+			ForNode node = Construct<ForNode>(lexemes, pos);
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+			pos++;
+			if (lexemes[pos].Type == LexemeType.Var)
+			{
+				node.InitializeStatement = this.ParseVariableDeclaration(lexemes, ref pos);
+			}
+			else
+			{
+				node.InitializeStatement = this.ParseAssignment(lexemes, ref pos);
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+
+			pos++;
+			node.EvaluateExpression = this.ParseExpression(lexemes, ref pos);
+
+			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+
+			pos++;
+			node.IncrementStatement = this.ParseAssignment(lexemes, ref pos);
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+			pos++;
+			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+
+			return node;
+		}
 
 		private ReturnNode ParseReturn(IList<Lexeme> lexemes, ref int pos)
 		{

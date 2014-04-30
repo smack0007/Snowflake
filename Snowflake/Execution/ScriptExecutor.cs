@@ -167,6 +167,10 @@ namespace Snowsoft.SnowflakeScript.Execution
             {
                 this.ExecuteWhile(context, (WhileNode)node);
             }
+			else if (node is ForNode)
+			{
+				this.ExecuteFor(context, (ForNode)node);
+			}
 			else if (node is ReturnNode)
 			{
 				this.ExecuteReturn(context, (ReturnNode)node);
@@ -286,6 +290,42 @@ namespace Snowsoft.SnowflakeScript.Execution
                 }
             }
         }
+
+		private void ExecuteFor(ExecutionContext context, ForNode node)
+		{
+			this.ExecuteStatement(context, node.InitializeStatement);
+
+			bool shouldContinue = true;
+			while (shouldContinue)
+			{
+				var result = this.ExecuteExpression(context, node.EvaluateExpression).Unbox();
+
+				if (!(result is bool))
+				{
+					throw new ScriptExecutionException("Evaluate expression of for must result in a boolean value.");
+				}
+
+				if ((bool)result)
+				{
+					foreach (var statement in node.BodyStatementBlock.Statements)
+					{
+						this.ExecuteStatement(context, statement);
+
+						if (context.ShouldReturn)
+							return;
+					}
+				}
+				else
+				{
+					shouldContinue = false;
+				}
+
+				if (shouldContinue)
+				{
+					this.ExecuteAssignment(context, node.IncrementStatement);
+				}
+			}
+		}
 
 		private void ExecuteReturn(ExecutionContext context, ReturnNode node)
 		{
