@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="AssignmentTests.cs" />
     <Compile Include="ClrFunctionCallTests.cs" />
+    <Compile Include="ForTests.cs" />
     <Compile Include="FunctionCallTests.cs" />
     <Compile Include="IfTests.cs" />
     <Compile Include="IntegerOperationTests.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="StringOperationsTests.cs" />
     <Compile Include="VariableDeclarationTests.cs" />
     <Compile Include="VariableOperationsTests.cs" />
+    <Compile Include="WhileTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Snowflake\Snowflake.csproj">
