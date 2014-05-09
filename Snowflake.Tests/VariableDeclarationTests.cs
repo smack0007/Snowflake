@@ -32,7 +32,7 @@ return doIt();");
 		{
 			AssertScriptReturnValue(12, @"
 var x = 42;
-var doIt = func(var x) {
+var doIt = func(x) {
 	return x;
 };
 return doIt(12);");
@@ -70,7 +70,7 @@ return x == undef;");
 		public void Variable_Declared_As_Function_Arg_Is_Undefined_Outside_Function()
 		{
 			AssertScriptReturnValue(true, @"
-var doIt = func(var x) {
+var doIt = func(x) {
 	return x;
 };
 

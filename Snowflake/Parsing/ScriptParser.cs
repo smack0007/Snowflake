@@ -63,7 +63,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			if (lexemes[pos].Type == LexemeType.Var)
 			{
-				node = this.ParseVariableDeclaration(lexemes, ref pos);
+				node = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
 
 				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 				pos++;
@@ -121,13 +121,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			return node;
 		}
 
-		private VariableDeclarationNode ParseVariableDeclaration(IList<Lexeme> lexemes, ref int pos)
+		private VariableDeclarationNode ParseVariableDeclaration(IList<Lexeme> lexemes, ref int pos, bool varKeyword)
 		{
-			this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
+			if (varKeyword)
+			{
+				this.EnsureLexemeType(lexemes, LexemeType.Var, pos);
+				pos++;
+			}
 
             VariableDeclarationNode node = Construct<VariableDeclarationNode>(lexemes, pos);
 
-			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
             node.VariableName = lexemes[pos].Value;
 
@@ -240,7 +243,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			if (lexemes[pos].Type == LexemeType.Var)
 			{
-				node.InitializeStatement = this.ParseVariableDeclaration(lexemes, ref pos);
+				node.InitializeStatement = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
 			}
 			else
 			{
@@ -410,7 +413,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				switch (lexemes[pos].Type)
 				{
 					case LexemeType.Func:
-						node = this.ParseFunction(lexemes, ref pos);
+						node = this.ParseAnonymousFunction(lexemes, ref pos);
 						break;
 
 					case LexemeType.Identifier:
@@ -476,7 +479,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			return node;
 		}
 
-		private FunctionNode ParseFunction(IList<Lexeme> lexemes, ref int pos)
+		private FunctionNode ParseAnonymousFunction(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
 
@@ -488,12 +491,12 @@ namespace Snowsoft.SnowflakeScript.Parsing
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
 			{
-				node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos));
+				node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
 												
 				while (lexemes[pos].Type == LexemeType.Comma)
 				{
                     pos++;
-					node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos));
+					node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
 				}
 			}
 

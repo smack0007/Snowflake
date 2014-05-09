@@ -3,13 +3,18 @@ Script = <Statement>* EOF ;
 StatementBlock = "{" <Statement>* "}" ;
 
 Statement = <VariableDeclaration> ";" |
-            <Assignment> ";" |
+            <FunctionDeclaration> ";" |
+			<Assignment> ";" |
 			<If> |
 			<While> |
 			<Return> |
 			<Expression> ";" ;
 
 VariableDeclaration = "var" <Identifier> { "=" <Expression> } ;
+
+FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock>
+
+FunctionParameters = <Identifier> ( "," <Identifier> )+
 
 Assignment = <Identifier> <AssignmentOperation> <Expression> ;
 
@@ -27,7 +32,7 @@ Expression = <ConditionalOrExpression> ;
 
 ConditionalOrExpression = <ConditionalAndExpression> ( "||" <ConditionalAndExpression> )* ;
 
-ConditionalAndExpression = <EqualityExpression> ( "||" <EqualityExpression> )* ;
+ConditionalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
 
 EqualityExpression = <AdditiveExpression> ( ( "==" | "!=" ) <AdditiveExpression> )* ;
 
@@ -35,9 +40,9 @@ AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeE
 
 MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )*
 
-PrimaryExpression = "(" <Expression> ")" | <Function> | <FunctionCall> | <Identifier> | <Value>
+PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <Identifier> | <Value>
 
-Function = "func" "(" { <Expression> ("," <Expression>)* } ")" <StatementBlock> ;
+AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
