@@ -1,14 +1,14 @@
-﻿var temp = (func(var x) { return x; })(5);
+﻿var temp = (func(x) { return x; })(5);
 print(temp);
 
 var x = 5;
 x / 5;
 
-var buildAdder = func(var x) {
-	return func(var y) {
+func buildAdder(x) {
+	return func(y) {
 		return x + y;
 	};
-};
+}
 
 var adder = buildAdder(5);
 

@@ -68,6 +68,10 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 				pos++;
 			}
+			else if (lexemes[pos].Type == LexemeType.Func)
+			{
+				node = this.ParseFunctionDeclaration(lexemes, ref pos);
+			}
 			else if (lexemes[pos].Type == LexemeType.Identifier && pos < lexemes.Count - 1 && this.IsAssignmentOperator(lexemes[pos + 1].Type))
 			{
 				node = this.ParseAssignment(lexemes, ref pos);
@@ -141,6 +145,39 @@ namespace Snowsoft.SnowflakeScript.Parsing
 				pos++;
 				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 			}
+
+			return node;
+		}
+
+		private FunctionNode ParseFunctionDeclaration(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
+
+			FunctionNode node = Construct<FunctionNode>(lexemes, pos);
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+			node.Name = lexemes[pos].Value;
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+			pos++;
+			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
+			{
+				node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
+
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
+				}
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+			pos++;
+			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
 
 			return node;
 		}

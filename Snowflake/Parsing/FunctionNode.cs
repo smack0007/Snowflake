@@ -7,6 +7,17 @@ namespace Snowsoft.SnowflakeScript.Parsing
 	{
 		StatementBlockNode bodyStatementBlock;
 
+		public string Name
+		{
+			get;
+			set;
+		}
+
+		public bool IsAnonymous
+		{
+			get { return string.IsNullOrEmpty(this.Name); }
+		}
+
 		public SyntaxNodeCollection<VariableDeclarationNode> Args
 		{
 			get;

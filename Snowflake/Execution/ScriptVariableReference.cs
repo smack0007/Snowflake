@@ -16,6 +16,12 @@ namespace Snowsoft.SnowflakeScript.Execution
 			set;
 		}
 
+		public bool IsConst
+		{
+			get;
+			set;
+		}
+
 		public ScriptVariableReference(ScriptObject value)
 		{
 			if (value == null)

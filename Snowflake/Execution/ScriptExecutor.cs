@@ -155,6 +155,10 @@ namespace Snowsoft.SnowflakeScript.Execution
 			{
 				this.ExecuteVariableDeclaration(context, (VariableDeclarationNode)node);
 			}
+			else if (node is FunctionNode && !((FunctionNode)node).IsAnonymous)
+			{
+				this.ExecuteFunctionDeclaration(context, (FunctionNode)node);
+			}
 			else if (node is AssignmentNode)
 			{
 				this.ExecuteAssignment(context, (AssignmentNode)node);
@@ -188,7 +192,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		private void ExecuteVariableDeclaration(ExecutionContext context, VariableDeclarationNode node)
 		{
 			if (context.Stack.IsDeclaredInFrame(node.VariableName))
-				throw new ScriptExecutionException(string.Format("Variable \"{0}\" is already declared.", node.VariableName));
+				throw new ScriptExecutionException(string.Format("Variable name \"{0}\" conflicts with an already declared name.", node.VariableName));
 
 			ScriptObject value = null;
 
@@ -204,9 +208,23 @@ namespace Snowsoft.SnowflakeScript.Execution
 			context.Stack[node.VariableName] = new ScriptVariableReference(value);
 		}
 
+		private void ExecuteFunctionDeclaration(ExecutionContext context, FunctionNode node)
+		{
+			if (context.Stack.IsDeclaredInFrame(node.Name))
+				throw new ScriptExecutionException(string.Format("Function name \"{0}\" conflicts with an already declared name.", node.Name));
+
+			ScriptObject value = this.ExecuteFunction(context, node);
+
+			context.Stack[node.Name] = new ScriptVariableReference(value) { IsConst = true };
+		}
+
 		private void ExecuteAssignment(ExecutionContext context, AssignmentNode node)
 		{
 			var variable = context.Stack[node.VariableName];
+			
+			if (variable.IsConst)
+				throw new ScriptExecutionException(string.Format("Name \"{0}\" cannot be reassigned as it is const.", node.VariableName));
+
 			var value = this.ExecuteExpression(context, node.ValueExpression);
 
 			switch (node.Operation)

@@ -3,7 +3,7 @@ Script = <Statement>* EOF ;
 StatementBlock = "{" <Statement>* "}" ;
 
 Statement = <VariableDeclaration> ";" |
-            <FunctionDeclaration> ";" |
+            <FunctionDeclaration> |
 			<Assignment> ";" |
 			<If> |
 			<While> |
