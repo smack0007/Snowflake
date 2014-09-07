@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Snowsoft.SnowflakeScript.CodeGeneration;
 
 namespace Snowflake.Tests
 {
@@ -12,7 +13,7 @@ namespace Snowflake.Tests
 		[Test]
 		public void Declared_Function_Cannot_Be_Overwritten_By_Varaible()
 		{
-			AssertScriptIsExecutionException(@"
+			AssertScriptIsException<CodeGenerationException>(@"
 func foo() {
 	return 42;
 }
@@ -23,7 +24,7 @@ var foo = 12;");
 		[Test]
 		public void Function_Declaration_Cannnot_Overwrite_Variable()
 		{
-			AssertScriptIsExecutionException(@"
+			AssertScriptIsException<CodeGenerationException>(@"
 var foo = 12;
 
 func foo() {

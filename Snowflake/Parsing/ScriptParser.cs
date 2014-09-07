@@ -157,7 +157,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-			node.Name = lexemes[pos].Value;
+			node.FunctionName = lexemes[pos].Value;
 
 			pos++;
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);

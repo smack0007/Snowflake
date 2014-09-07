@@ -5,7 +5,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
 {
 	public class ScriptNode : SyntaxNode
 	{
-        public string ID
+        public string Id
         {
             get;
             private set;
@@ -22,7 +22,7 @@ namespace Snowsoft.SnowflakeScript.Parsing
             if (id == null)
                 throw new ArgumentNullException("id");
 
-            this.ID = id;
+            this.Id = id;
 			this.Statements = new SyntaxNodeCollection<StatementNode>(this);
 		}
 

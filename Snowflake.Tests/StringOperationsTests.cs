@@ -24,7 +24,8 @@ namespace Snowflake.Tests
 		[Test]
 		public void Add_String_And_Bool()
 		{
-			AssertScriptReturnValue("Hellotrue", "return \"Hello\" + true;");
+			string trueString = true.ToString();
+			AssertScriptReturnValue("Hello" + trueString, "return \"Hello\" + true;");
 		}
 
 		[Test]
@@ -36,7 +37,8 @@ namespace Snowflake.Tests
 		[Test]
 		public void Add_String_And_Float()
 		{
-			AssertScriptReturnValue("Hello1.1", "return \"Hello\" + 1.1;");
+			string floatString = (1.1f).ToString();
+			AssertScriptReturnValue("Hello" + floatString, "return \"Hello\" + 1.1;");
 		}
 	}
 }

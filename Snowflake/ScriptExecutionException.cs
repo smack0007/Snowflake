@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Snowsoft.SnowflakeScript.Execution
+namespace Snowsoft.SnowflakeScript
 {
 	public class ScriptExecutionException : ScriptException
 	{
-        public string ScriptID
+        public string ScriptId
         {
             get;
             private set;
@@ -22,6 +24,12 @@ namespace Snowsoft.SnowflakeScript.Execution
             private set;
         }
 
+		public IList<ScriptStackFrame> Stack
+		{
+			get;
+			private set;
+		}
+
         public ScriptExecutionException(string message)
             : base(message)
         {
@@ -30,7 +38,7 @@ namespace Snowsoft.SnowflakeScript.Execution
 		public ScriptExecutionException(string message, string scriptId, int line, int column)
 			: base(message)
 		{
-            this.ScriptID = scriptId;
+            this.ScriptId = scriptId;
             this.Line = line;
             this.Column = column;
 		}
@@ -38,6 +46,13 @@ namespace Snowsoft.SnowflakeScript.Execution
         public ScriptExecutionException(string message, Exception innerException)
 			: base(message, innerException)
 		{
+		}
+
+		public ScriptExecutionException(string message, Exception innerException, string scriptId, Stack<ScriptStackFrame> stack)
+			: base(message, innerException)
+		{
+			this.ScriptId = scriptId;
+			this.Stack = stack.ToList();
 		}
 	}
 }

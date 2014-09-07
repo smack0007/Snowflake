@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowsoft.SnowflakeScript.Parsing
 {
-	public class StatementBlockNode : SyntaxNode
+	public class StatementBlockNode : SyntaxNode, IEnumerable<StatementNode>
 	{
 		public SyntaxNodeCollection<StatementNode> Statements
 		{
@@ -30,6 +30,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 					yield return node;
 				}
 			}
+		}
+
+		public IEnumerator<StatementNode> GetEnumerator()
+		{
+			return this.Statements.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return this.Statements.GetEnumerator();
 		}
 	}
 }

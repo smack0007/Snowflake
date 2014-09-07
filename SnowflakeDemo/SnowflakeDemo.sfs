@@ -1,8 +1,10 @@
-﻿var temp = (func(x) { return x; })(5);
+﻿var a = 1;
+a += 1;
+
+var temp = (func(x) { return x; })(5);
 print(temp);
 
 var x = 5;
-x / 5;
 
 func buildAdder(x) {
 	return func(y) {
@@ -11,6 +13,16 @@ func buildAdder(x) {
 }
 
 var adder = buildAdder(5);
+
+var sub = func(x, y) {
+	return x - y;
+};
+
+if (x == 5) {
+	print("x == 5");
+} else {
+	print("x != 5");
+}
 
 while (x != 8) {
 	print("Hello World!");
@@ -22,4 +34,3 @@ for (var y = 0; y != 10; y += 1) {
 }
 
 print("x = " + x);
-print("y = " + y);

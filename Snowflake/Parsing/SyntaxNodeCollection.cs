@@ -11,6 +11,16 @@ namespace Snowsoft.SnowflakeScript.Parsing
 		SyntaxNode parent;
 		List<T> items;
 
+		public int Count
+		{
+			get { return this.items.Count; }
+		}
+
+		public T this[int index]
+		{
+			get { return this.items[index]; }
+		}
+
 		public SyntaxNodeCollection(SyntaxNode parent)
 		{
 			if (parent == null)

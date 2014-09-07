@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Snowsoft.SnowflakeScript.CodeGeneration;
 
 namespace Snowflake.Tests
 {
@@ -12,7 +13,7 @@ namespace Snowflake.Tests
 		[Test]
 		public void Variable_Declared_Twice_Is_Error()
 		{
-			AssertScriptIsExecutionException("var x = 42; var x = 12;");
+			AssertScriptIsException<CodeGenerationException>("var x = 42; var x = 12;");
 		}
 
 		[Test]

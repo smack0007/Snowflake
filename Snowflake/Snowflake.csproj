@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Snowsoft.SnowflakeScript</RootNamespace>
     <AssemblyName>Snowsoft.SnowflakeScript</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -23,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -32,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -45,6 +48,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -55,10 +59,29 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.7.4080704-beta\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.7.4080704-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Desktop">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.7.4080704-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Desktop">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.7.4080704-beta\lib\net45\Microsoft.CodeAnalysis.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.1.20-beta\lib\portable-net45+win8\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\packages\Microsoft.Bcl.Metadata.1.0.12-alpha\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,17 +89,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Execution\ScriptBoolean.cs" />
-    <Compile Include="Execution\ScriptCharacter.cs" />
-    <Compile Include="Execution\ScriptClrMethod.cs" />
-    <Compile Include="Execution\ScriptExecutionException.cs" />
-    <Compile Include="Execution\ScriptExecutor.cs" />
-    <Compile Include="Execution\ScriptFloat.cs" />
-    <Compile Include="Execution\ScriptFunction.cs" />
-    <Compile Include="Execution\ScriptTypeBoxer.cs" />
-    <Compile Include="Execution\ScriptString.cs" />
-    <Compile Include="Execution\ScriptUndefined.cs" />
-    <Compile Include="Execution\ScriptValue.cs" />
+    <Compile Include="CodeGeneration\CodeCompilationException.cs" />
+    <Compile Include="CodeGeneration\CodeCompiler.cs" />
+    <Compile Include="CodeGeneration\CodeGenerationException.cs" />
+    <Compile Include="CodeGeneration\VariableMap.cs" />
+    <Compile Include="ScriptExecutionException.cs" />
+    <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="Parsing\AssignmentNode.cs" />
     <Compile Include="Parsing\AssignmentOperation.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
@@ -103,6 +121,7 @@
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
     <Compile Include="Parsing\WhileNode.cs" />
+    <Compile Include="Script.cs" />
     <Compile Include="ScriptEngine.cs" />
     <Compile Include="Lexing\Lexeme.cs" />
     <Compile Include="Lexing\LexemeType.cs" />
@@ -111,14 +130,14 @@
     <Compile Include="Lexing\LexerException.cs" />
     <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
-    <Compile Include="Execution\ScriptInteger.cs" />
-    <Compile Include="Execution\ScriptNull.cs" />
-    <Compile Include="Execution\ScriptVariableReference.cs" />
-    <Compile Include="Execution\ScriptStack.cs" />
-    <Compile Include="Execution\ScriptObject.cs" />
+    <Compile Include="ScriptStackFrame.cs" />
+    <Compile Include="ScriptUndefined.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
