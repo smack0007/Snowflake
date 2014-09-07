@@ -25,6 +25,18 @@ namespace Snowsoft.SnowflakeScript
 
 		protected internal abstract object Execute();
 
+		protected dynamic Invoke(dynamic func, params dynamic[] args)
+		{
+			if (func is ScriptFunction)
+			{
+				return ((ScriptFunction)func).Invoke(args);
+			}
+			else
+			{
+				return func.DynamicInvoke(args);
+			}
+		}
+
 		protected dynamic GetGlobalVariable(string name)
 		{
 			return this.Engine.GetGlobalVariableIntern(name);

@@ -130,6 +130,7 @@
     <Compile Include="Lexing\LexerException.cs" />
     <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
+    <Compile Include="ScriptFunction.cs" />
     <Compile Include="ScriptStackFrame.cs" />
     <Compile Include="ScriptUndefined.cs" />
   </ItemGroup>

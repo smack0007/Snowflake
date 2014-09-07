@@ -416,16 +416,16 @@ namespace Snowsoft.SnowflakeScript.CodeGeneration
 
 		private static void GenerateFunction(FunctionNode node, DataContext data)
 		{
-			Append(data, "new Func<");
+			Append(data, "new ScriptFunction(new Func<");
 
-			Append(data, string.Join(", ", Enumerable.Repeat("dynamic", node.Args.Count() + 1)));
+			Append(data, string.Join(", ", Enumerable.Repeat("dynamic", node.Args.Count + 1)));
 					
 			Append(data, ">((");
 
 			data.VariableMap.PushFrame();
 
 			Append(data, string.Join(", ", node.Args.Select(x => data.VariableMap.DeclarVariable(x.VariableName, x.Line, x.Column))));
-
+						
 			Append(data, ") => {{ ");
 			
 			EndLine(data);
@@ -461,20 +461,37 @@ namespace Snowsoft.SnowflakeScript.CodeGeneration
 
 			StartLine(data, " }})");
 
+			if (node.Args.Count != 0)
+			{
+				foreach (var arg in node.Args)
+				{
+					Append(data, ", ");
+
+					if (arg.ValueExpression != null)
+					{
+						GenerateExpression(arg.ValueExpression, data);
+					}
+					else
+					{
+						Append(data, "null");
+					}
+				}
+			}
+
+			Append(data, ")");
+
 			data.VariableMap.PopFrame();
 		}
 
 		private static void GenerateFunctionCall(FunctionCallNode node, DataContext data)
 		{
-			GenerateExpression(node.FunctionExpression, data);
+			Append(data, "Invoke(");
 
-			Append(data, "(");
+			GenerateExpression(node.FunctionExpression, data);
 
 			for (int i = 0; i < node.Args.Count; i++)
 			{
-				if (i != 0)
-					Append(data, ", ");
-
+				Append(data, ", ");
 				GenerateExpression(node.Args[i], data);
 			}
 
