@@ -93,6 +93,7 @@
     <Compile Include="CodeGeneration\CodeCompiler.cs" />
     <Compile Include="CodeGeneration\CodeGenerationException.cs" />
     <Compile Include="CodeGeneration\VariableMap.cs" />
+    <Compile Include="Parsing\NegateOperationNode.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="Parsing\AssignmentNode.cs" />

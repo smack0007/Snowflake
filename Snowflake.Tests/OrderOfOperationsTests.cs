@@ -20,5 +20,35 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue(3, "return (2 + 4) / 2;");
 		}
+		
+		[Test]
+		public void Add_Integers()
+		{
+			AssertScriptReturnValue(6, "return 1 + 2 + 3;");
+		}
+
+		[Test]
+		public void Add_And_Subtract_Integers()
+		{
+			AssertScriptReturnValue(1, "return 2 - 4 + 3;");
+		}
+
+		[Test]
+		public void Add_Strings()
+		{
+			AssertScriptReturnValue("Hello World again!", "return \"Hello\" + \" World \" + \"again!\";");
+		}
+
+		[Test]
+		public void Negate_Operator_With_Integer()
+		{
+			AssertScriptReturnValue(0, "return 1 + -1;");
+		}
+
+		[Test]
+		public void Negate_Operator_With_Expression_In_Parens()
+		{
+			AssertScriptReturnValue(-42, "return -(21 + 21);");
+		}
 	}
 }

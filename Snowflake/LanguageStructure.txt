@@ -12,9 +12,9 @@ Statement = <VariableDeclaration> ";" |
 
 VariableDeclaration = "var" <Identifier> { "=" <Expression> } ;
 
-FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock>
+FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
 
-FunctionParameters = <Identifier> ( "," <Identifier> )+
+FunctionParameters = <Identifier> ( "," <Identifier> )+ ;
 
 Assignment = <Identifier> <AssignmentOperation> <Expression> ;
 
@@ -24,7 +24,7 @@ If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 
 While = "while" "(" <Expression> ")" <StatementBlock> ;
 
-For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <Assignment>  ")" <StatementBlock>
+For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <Assignment>  ")" <StatementBlock> ;
 
 Return = "return" <Expression> ";" ;
 
@@ -36,11 +36,11 @@ ConditionalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
 
 EqualityExpression = <AdditiveExpression> ( ( "==" | "!=" ) <AdditiveExpression> )* ;
 
-AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )*
+AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )* ;
 
-MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )*
+MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )* ;
 
-PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <Identifier> | <Value>
+PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <Identifier> | <Value> ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 

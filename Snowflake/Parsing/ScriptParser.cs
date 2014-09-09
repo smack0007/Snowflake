@@ -327,110 +327,100 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 		private ExpressionNode ParseConditionalOrExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode lhs = this.ParseConditionalAndExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseConditionalAndExpression(lexemes, ref pos);
 
-			if (lexemes[pos].Type == LexemeType.ConditionalOr)
+			while (lexemes[pos].Type == LexemeType.ConditionalOr)
 			{
 				pos++;
 
-				OperationNode node = Construct<OperationNode>(lexemes, pos);
-                node.Type = OperationType.ConditionalOr;
-                node.LHS = lhs;
-                node.RHS = this.ParseConditionalAndExpression(lexemes, ref pos);
+				OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                opNode.Type = OperationType.ConditionalOr;
+                opNode.LHS = node;
+                opNode.RHS = this.ParseConditionalAndExpression(lexemes, ref pos);
 
-				return node;
+				node = opNode;
 			}
-			else
-			{
-				return lhs;
-			}
+			
+			return node;
 		}
 
 		private ExpressionNode ParseConditionalAndExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode lhs = this.ParseEqualityExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseEqualityExpression(lexemes, ref pos);
 
-			if (lexemes[pos].Type == LexemeType.ConditionalAnd)
+			while (lexemes[pos].Type == LexemeType.ConditionalAnd)
 			{
 				pos++;
 
-                OperationNode node = Construct<OperationNode>(lexemes, pos);
-                node.Type = OperationType.ConditionalAnd;
-                node.LHS = lhs;
-                node.RHS = this.ParseEqualityExpression(lexemes, ref pos);
+                OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                opNode.Type = OperationType.ConditionalAnd;
+                opNode.LHS = node;
+                opNode.RHS = this.ParseEqualityExpression(lexemes, ref pos);
                 
-				return node;
+				node = opNode;
 			}
-			else
-			{
-				return lhs;
-			}
+			
+			return node;
 		}
 
 		private ExpressionNode ParseEqualityExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode lhs = this.ParseAdditiveExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseAdditiveExpression(lexemes, ref pos);
 
-			if (lexemes[pos].Type == LexemeType.EqualTo || lexemes[pos].Type == LexemeType.NotEqualTo)
+			while (lexemes[pos].Type == LexemeType.EqualTo || lexemes[pos].Type == LexemeType.NotEqualTo)
 			{
 				OperationType opType = lexemes[pos].Type == LexemeType.EqualTo ? OperationType.Equals : OperationType.NotEquals;
 				pos++;
 
-                OperationNode node = Construct<OperationNode>(lexemes, pos);
-                node.Type = opType;
-                node.LHS = lhs;
-                node.RHS = this.ParseAdditiveExpression(lexemes, ref pos);
+                OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                opNode.Type = opType;
+                opNode.LHS = node;
+                opNode.RHS = this.ParseAdditiveExpression(lexemes, ref pos);
                 
-				return node;
+				node = opNode;
 			}
-			else
-			{
-				return lhs;
-			}
+			
+			return node;
 		}
 
 		private ExpressionNode ParseAdditiveExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode lhs = this.ParseMultiplicativeExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseMultiplicativeExpression(lexemes, ref pos);
 
-			if (lexemes[pos].Type == LexemeType.Plus || lexemes[pos].Type == LexemeType.Minus)
+			while (lexemes[pos].Type == LexemeType.Plus || lexemes[pos].Type == LexemeType.Minus)
 			{
 				OperationType opType = lexemes[pos].Type == LexemeType.Plus ? OperationType.Add : OperationType.Subtract;
 				pos++;
 
-                OperationNode node = Construct<OperationNode>(lexemes, pos);
-                node.Type = opType;
-                node.LHS = lhs;
-                node.RHS = this.ParseMultiplicativeExpression(lexemes, ref pos);
+                OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                opNode.Type = opType;
+                opNode.LHS = node;
+                opNode.RHS = this.ParseMultiplicativeExpression(lexemes, ref pos);
                 
-				return node;
+				node = opNode;
 			}
-			else
-			{
-				return lhs;
-			}
+			
+			return node;
 		}
 
 		private ExpressionNode ParseMultiplicativeExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode lhs = this.ParsePrimaryExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParsePrimaryExpression(lexemes, ref pos);
 
 			if (lexemes[pos].Type == LexemeType.Multiply || lexemes[pos].Type == LexemeType.Divide)
 			{
 				OperationType opType = lexemes[pos].Type == LexemeType.Multiply ? OperationType.Multiply : OperationType.Divide;
 				pos++;
 
-                OperationNode node = Construct<OperationNode>(lexemes, pos);
-                node.Type = opType;
-                node.LHS = lhs;
-                node.RHS = this.ParsePrimaryExpression(lexemes, ref pos);
+                OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                opNode.Type = opType;
+                opNode.LHS = node;
+                opNode.RHS = this.ParsePrimaryExpression(lexemes, ref pos);
 
-				return node;
+				node = opNode;
 			}
-			else
-			{
-				return lhs;
-			}
+			
+			return node;
 		}
 
 		private ExpressionNode ParsePrimaryExpression(IList<Lexeme> lexemes, ref int pos)
@@ -444,6 +434,15 @@ namespace Snowsoft.SnowflakeScript.Parsing
 
 				this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 				pos++;
+			}
+			else if (lexemes[pos].Type == LexemeType.Minus)
+			{
+				NegateOperationNode negateOp = Construct<NegateOperationNode>(lexemes, pos);
+				
+				pos++;
+				negateOp.ValueExpression = this.ParseExpression(lexemes, ref pos);
+				
+				node = negateOp;
 			}
 			else
 			{

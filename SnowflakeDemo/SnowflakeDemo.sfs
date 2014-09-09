@@ -1,36 +1,11 @@
-﻿var a = 1;
-a += 1;
-
-var temp = (func(x) { return x; })(5);
-print(temp);
-
-var x = 5;
-
-func buildAdder(x) {
+﻿func buildMultiplier(x) {
 	return func(y) {
-		return x + y;
+		return x * y;
 	};
 }
 
-var adder = buildAdder(5);
+var x5 = buildMultiplier(5);
 
-var sub = func(x, y) {
-	return x - y;
-};
-
-if (x == 5) {
-	print("x == 5");
-} else {
-	print("x != 5");
+for (var i = 0; i != 10; i += 1) {
+	print("5 * " + i + " = " + x5(i));
 }
-
-while (x != 8) {
-	print("Hello World!");
-	x += 1;
-}
-
-for (var y = 0; y != 10; y += 1) {
-	print(y);
-}
-
-print("x = " + x);

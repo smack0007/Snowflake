@@ -372,6 +372,12 @@ namespace Snowsoft.SnowflakeScript.CodeGeneration
 			{
 				GenerateOperation((OperationNode)node, data);
 			}
+			else if (node is NegateOperationNode)
+			{
+				Append(data, "(-");
+				GenerateExpression(((NegateOperationNode)node).ValueExpression, data);
+				Append(data, ")");
+			}
 			else if (node is VariableReferenceNode)
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
@@ -411,6 +417,10 @@ namespace Snowsoft.SnowflakeScript.CodeGeneration
 			else if (node is FloatValueNode)
 			{
 				Append(data, ((FloatValueNode)node).Value.ToString(CultureInfo.InvariantCulture));
+			}
+			else
+			{
+				ThrowUnableToGenerateException("Expression", node);
 			}
 		}
 
