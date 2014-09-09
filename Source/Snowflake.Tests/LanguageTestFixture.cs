@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Snowflake;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Snowflake.Tests
 		{
 			ScriptEngine engine = new ScriptEngine();
 			Console.WriteLine(engine.GenerateCode(script));
-			Assert.AreEqual(expectedValue, engine.Execute(script));
+			Assert.Equal(expectedValue, engine.Execute(script));
 		}
 
 		public void AssertScriptIsException<T>(string script)

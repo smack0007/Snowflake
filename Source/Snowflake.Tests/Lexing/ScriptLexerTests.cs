@@ -1,11 +1,10 @@
 ﻿using System;
-using NUnit.Framework;
 using Snowflake;
 using Snowflake.Lexing;
+using Xunit;
 
 namespace Snowflake.Tests.Lexing
 {
-	[TestFixture]
 	public class ScriptLexerTests
 	{
 		private void ParseScript(string script)
@@ -14,34 +13,49 @@ namespace Snowflake.Tests.Lexing
 			parser.Lex(script);
 		}
 
-		[Test, ExpectedException(typeof(LexerException))]
+		[Fact]
 		public void More_Than_One_Char_No_Escape_Code_Is_Error()
 		{
-			this.ParseScript("'aa'");
+			Assert.Throws<LexerException>(() =>
+			{
+				this.ParseScript("'aa'");
+			});
 		}
 
-		[Test, ExpectedException(typeof(LexerException))]
+		[Fact]
 		public void More_Than_One_Char_With_Escape_Code_Is_Error()
 		{
-			this.ParseScript("'\\aa'");
+			Assert.Throws<LexerException>(() =>
+			{
+				this.ParseScript("'\\aa'");
+			});
 		}
 
-		[Test, ExpectedException(typeof(LexerException))]
+		[Fact]
 		public void Unclosed_Char_Is_Error()
 		{
-			this.ParseScript("\'a");
+			Assert.Throws<LexerException>(() =>
+			{
+				this.ParseScript("\'a");
+			});
 		}
 
-		[Test, ExpectedException(typeof(LexerException))]
+		[Fact]
 		public void Unclosed_String_Is_Error()
 		{
-			this.ParseScript("\"aa");
+			Assert.Throws<LexerException>(() =>
+			{
+				this.ParseScript("\"aa");
+			});
 		}
 
-		[Test, ExpectedException(typeof(LexerException))]
+		[Fact]
 		public void Float_Ending_With_Decimal_Is_Error()
 		{
-			this.ParseScript("123.");
+			Assert.Throws<LexerException>(() =>
+			{
+				this.ParseScript("123.");
+			});
 		}
 	}
 }

@@ -127,14 +127,28 @@ namespace Snowflake.Lexing
 					}
 					else if (text[i] == '-') // Minus or MinusGets
 					{
-						if (i + 1 < text.Length && text[i + 1] != '=')
+						if (i + 1 < text.Length && !char.IsWhiteSpace(text[i + 1]))
 						{
-							lexemes.Add(new Lexeme(LexemeType.Minus, null, curLine, curColumn));
+							if (text[i + 1] == '=')
+							{
+								lexemes.Add(new Lexeme(LexemeType.MinusGets, null, curLine, curColumn));
+								i++;
+							}
+							else if (char.IsDigit(text[i + 1]))
+							{
+								type = LexemeType.Numeric;
+								value += '-';
+								value += text[i + 1];
+								i++;
+							}
+							else
+							{
+								lexemes.Add(new Lexeme(LexemeType.Minus, null, curLine, curColumn));
+							}
 						}
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.MinusGets, null, curLine, curColumn));
-							i++;
+							lexemes.Add(new Lexeme(LexemeType.Minus, null, curLine, curColumn));
 						}
 					}
 					else if (text[i] == '*') // Multiply or MultiplyGets

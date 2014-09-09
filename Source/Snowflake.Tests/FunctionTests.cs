@@ -1,16 +1,15 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Snowflake.CodeGeneration;
+using Xunit;
 
 namespace Snowflake.Tests
 {
-	[TestFixture]
 	public class FunctionTests : LanguageTestFixture
 	{
-		[Test]
+		[Fact]
 		public void Declared_Function_Cannot_Be_Overwritten_By_Varaible()
 		{
 			AssertScriptIsException<CodeGenerationException>(@"
@@ -21,7 +20,7 @@ func foo() {
 var foo = 12;");
 		}
 
-		[Test]
+		[Fact]
 		public void Function_Declaration_Cannnot_Overwrite_Variable()
 		{
 			AssertScriptIsException<CodeGenerationException>(@"
@@ -33,7 +32,7 @@ func foo() {
 ");
 		}
 
-		[Test]
+		[Fact]
 		public void Named_Function_Can_Be_Assigned_To_Varaible()
 		{
 			AssertScriptReturnValue(42, @"
@@ -47,7 +46,7 @@ return bar();
 ");
 		}
 
-		[Test]
+		[Fact]
 		public void Named_Function_Can_Still_Be_Called_After_Changing_Variable_Value()
 		{
 			AssertScriptReturnValue(42, @"

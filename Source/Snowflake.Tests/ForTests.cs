@@ -1,12 +1,11 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
+using Xunit;
 
 namespace Snowflake.Tests
 {
-	[TestFixture]
 	public class ForTests : LanguageTestFixture
 	{
-		[Test]
+		[Fact]
 		public void For_With_False_Eval_Expr_Body_Never_Executed()
 		{
 			AssertScriptReturnValue(0, @"
@@ -20,7 +19,7 @@ return y;
 ");
 		}
 
-		[Test]
+		[Fact]
 		public void For_Exits_Correctly()
 		{
 			AssertScriptReturnValue(10, @"

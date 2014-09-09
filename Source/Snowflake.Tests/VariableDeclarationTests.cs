@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,16 +7,15 @@ using Snowflake.CodeGeneration;
 
 namespace Snowflake.Tests
 {
-	[TestFixture]
 	public class VariableDeclarationTests : LanguageTestFixture
 	{
-		[Test]
+		[Fact]
 		public void Variable_Declared_Twice_Is_Error()
 		{
 			AssertScriptIsException<CodeGenerationException>("var x = 42; var x = 12;");
 		}
 
-		[Test]
+		[Fact]
 		public void Variable_Declared_Inside_Function_With_Same_Name_As_Global()
 		{
 			AssertScriptReturnValue(12, @"
@@ -28,7 +27,7 @@ var doIt = func() {
 return doIt();");
 		}
 
-		[Test]
+		[Fact]
 		public void Function_Arg_With_Same_Name_As_Global()
 		{
 			AssertScriptReturnValue(12, @"
@@ -39,7 +38,7 @@ var doIt = func(x) {
 return doIt(12);");
 		}
 
-		[Test]
+		[Fact]
 		public void Variable_Declared_With_Initial_Value_Set_To_Other_Variable()
 		{
 			AssertScriptReturnValue(42, @"
@@ -49,13 +48,13 @@ x = 21;
 return y;");
 		}
 
-		[Test]
+		[Fact]
 		public void Undeclarded_Variable_Is_Undefined()
 		{
 			AssertScriptReturnValue(true, @"return x == undef;");
 		}
 
-		[Test]
+		[Fact]
 		public void Variable_Declared_Inside_Function_Is_Undefined_Outside_Function()
 		{
 			AssertScriptReturnValue(true, @"
@@ -67,7 +66,7 @@ var doIt = func() {
 return x == undef;");
 		}
 
-		[Test]
+		[Fact]
 		public void Variable_Declared_As_Function_Arg_Is_Undefined_Outside_Function()
 		{
 			AssertScriptReturnValue(true, @"

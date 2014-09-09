@@ -213,6 +213,11 @@ namespace Snowflake
 
 		#endregion
 
+		public IList<Lexeme> GetLexemes(string script)
+		{
+			return this.lexer.Lex(script);
+		}
+
 		public string GenerateCode(string script)
 		{
 			var lexemes = this.lexer.Lex(script);

@@ -9,7 +9,10 @@ namespace SnowflakeDemo
 		{			
 			Random random = new Random();
 
-			ScriptEngine engine = new ScriptEngine();			
+			ScriptEngine engine = new ScriptEngine();
+
+			var lexemes = engine.GetLexemes("return 21 - -21;");
+							
 			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 			engine.SetGlobalFunction<int>("GetNumber", () => random.Next());
 			engine.SetGlobalFunction<int, int, int>("add", (x, y) => x + y);

@@ -1,16 +1,11 @@
-﻿using NUnit.Framework;
-using Snowflake;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using Xunit;
 
 namespace Snowflake.Tests
 {
-	[TestFixture]
 	public class ClrFunctionCallTests : LanguageTestFixture
 	{
-		[Test]
+		[Fact]
 		public void Too_Few_Arguments_To_Clr_Method_Is_Error()
 		{
 			int value = 0;
@@ -24,7 +19,7 @@ namespace Snowflake.Tests
 			});
 		}
 
-		[Test]
+		[Fact]
 		public void Too_Many_Arguments_To_Clr_Method_Is_Error()
 		{
 			int value = 0;
@@ -38,7 +33,7 @@ namespace Snowflake.Tests
 			});
 		}
 
-		[Test]
+		[Fact]
 		public void Invalid_Arguments_To_Clr_Method_Is_Error()
 		{
 			int value = 0;
