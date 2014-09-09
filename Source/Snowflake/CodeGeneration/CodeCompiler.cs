@@ -4,7 +4,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Snowsoft.SnowflakeScript.CodeGeneration
+namespace Snowflake.CodeGeneration
 {
 	public class CodeCompiler
 	{

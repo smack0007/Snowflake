@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowflake
 {
 	public class ScriptExecutionException : ScriptException
 	{

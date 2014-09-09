@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
-using Snowsoft.SnowflakeScript;
-using Snowsoft.SnowflakeScript.Lexing;
+using Snowflake;
+using Snowflake.Lexing;
 
 namespace Snowflake.Tests.Lexing
 {

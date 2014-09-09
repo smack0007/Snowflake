@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript.Parsing
+namespace Snowflake.Parsing
 {
 	public class BooleanValueNode : ExpressionNode
 	{

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Snowsoft.SnowflakeScript.Lexing;
-using Snowsoft.SnowflakeScript.Parsing;
-using Snowsoft.SnowflakeScript.CodeGeneration;
+using Snowflake.Lexing;
+using Snowflake.Parsing;
+using Snowflake.CodeGeneration;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowflake
 {
 	public class ScriptEngine
 	{

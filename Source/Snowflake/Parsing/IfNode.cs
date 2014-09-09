@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript.Parsing
+namespace Snowflake.Parsing
 {
 	public class IfNode : StatementNode
 	{

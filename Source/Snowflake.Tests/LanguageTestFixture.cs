@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Snowsoft.SnowflakeScript;
+using Snowflake;
 using System;
 using System.Collections.Generic;
 using System.Linq;

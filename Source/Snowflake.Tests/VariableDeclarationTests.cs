@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Snowsoft.SnowflakeScript.CodeGeneration;
+using Snowflake.CodeGeneration;
 
 namespace Snowflake.Tests
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Snowsoft.SnowflakeScript;
+using Snowflake;
 
 namespace SnowflakeDemo
 {

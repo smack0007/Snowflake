@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowflake
 {
 	public sealed class ScriptUndefined
 	{

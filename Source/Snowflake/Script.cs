@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Snowsoft.SnowflakeScript
+namespace Snowflake
 {
 	public abstract class Script
 	{		

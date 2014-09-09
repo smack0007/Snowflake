@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Snowsoft.SnowflakeScript.Lexing;
+using Snowflake.Lexing;
 using System.Globalization;
 
-namespace Snowsoft.SnowflakeScript.Parsing
+namespace Snowflake.Parsing
 {
 	public class ScriptParser
 	{

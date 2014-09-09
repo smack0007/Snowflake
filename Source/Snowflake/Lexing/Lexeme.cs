@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Snowsoft.SnowflakeScript.Lexing
+namespace Snowflake.Lexing
 {
 	public class Lexeme
 	{

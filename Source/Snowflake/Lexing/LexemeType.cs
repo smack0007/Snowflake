@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript.Lexing
+namespace Snowflake.Lexing
 {
 	public enum LexemeType
 	{

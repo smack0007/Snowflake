@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Snowsoft.SnowflakeScript.Parsing;
+using Snowflake.Parsing;
 
-namespace Snowsoft.SnowflakeScript.CodeGeneration
+namespace Snowflake.CodeGeneration
 {
 	public class CodeGenerator
 	{
-		public const string GeneratedCodeNamespace = "Snowsoft.SnowflakeScript.Generated";
+		public const string GeneratedCodeNamespace = "Snowflake.Generated";
 
 		class DataContext
 		{

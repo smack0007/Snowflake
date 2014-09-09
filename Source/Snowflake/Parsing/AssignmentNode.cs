@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Snowsoft.SnowflakeScript.Parsing
+namespace Snowflake.Parsing
 {
 	public class AssignmentNode : StatementNode
 	{

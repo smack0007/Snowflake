@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Snowsoft.SnowflakeScript.CodeGeneration
+namespace Snowflake.CodeGeneration
 {
 	public class CodeCompilationException : ScriptException
 	{

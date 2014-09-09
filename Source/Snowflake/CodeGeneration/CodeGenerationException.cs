@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Snowsoft.SnowflakeScript.CodeGeneration
+namespace Snowflake.CodeGeneration
 {
 	public class CodeGenerationException : ScriptException
 	{

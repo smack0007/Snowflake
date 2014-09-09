@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snowsoft.SnowflakeScript.Parsing
+namespace Snowflake.Parsing
 {
 	public abstract class SyntaxNode
 	{
