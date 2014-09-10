@@ -335,8 +335,8 @@ namespace Snowflake.Parsing
 
 				OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = OperationType.ConditionalOr;
-                opNode.LHS = node;
-                opNode.RHS = this.ParseConditionalAndExpression(lexemes, ref pos);
+                opNode.LeftHand = node;
+                opNode.RightHand = this.ParseConditionalAndExpression(lexemes, ref pos);
 
 				node = opNode;
 			}
@@ -354,8 +354,8 @@ namespace Snowflake.Parsing
 
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = OperationType.ConditionalAnd;
-                opNode.LHS = node;
-                opNode.RHS = this.ParseEqualityExpression(lexemes, ref pos);
+                opNode.LeftHand = node;
+                opNode.RightHand = this.ParseEqualityExpression(lexemes, ref pos);
                 
 				node = opNode;
 			}
@@ -365,7 +365,7 @@ namespace Snowflake.Parsing
 
 		private ExpressionNode ParseEqualityExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode node = this.ParseAdditiveExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseRelationalExpression(lexemes, ref pos);
 
 			while (lexemes[pos].Type == LexemeType.EqualTo || lexemes[pos].Type == LexemeType.NotEqualTo)
 			{
@@ -374,12 +374,53 @@ namespace Snowflake.Parsing
 
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = opType;
-                opNode.LHS = node;
-                opNode.RHS = this.ParseAdditiveExpression(lexemes, ref pos);
+                opNode.LeftHand = node;
+				opNode.RightHand = this.ParseRelationalExpression(lexemes, ref pos);
                 
 				node = opNode;
 			}
 			
+			return node;
+		}
+
+		private ExpressionNode ParseRelationalExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode node = this.ParseAdditiveExpression(lexemes, ref pos);
+
+			while (lexemes[pos].Type == LexemeType.GreaterThan || lexemes[pos].Type == LexemeType.GreaterThanOrEqualTo ||
+				   lexemes[pos].Type == LexemeType.LessThan || lexemes[pos].Type == LexemeType.LessThanOrEqualTo)
+			{
+				OperationType opType = default(OperationType);
+				
+				switch (lexemes[pos].Type)
+				{
+					case LexemeType.GreaterThan:
+						opType = OperationType.GreaterThan;
+						break;
+
+					case LexemeType.GreaterThanOrEqualTo:
+						opType = OperationType.GreaterThanOrEqualTo;
+						break;
+
+					case LexemeType.LessThan:
+						opType = OperationType.LessThan;
+						break;
+
+					case LexemeType.LessThanOrEqualTo:
+						opType = OperationType.LessThanOrEqualTo;
+						break;
+				}
+				
+				pos++;
+
+				OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+				opNode.Type = opType;
+				opNode.LeftHand = node;
+				opNode.RightHand = this.ParseAdditiveExpression(lexemes, ref pos);
+
+				node = opNode;
+			}
+
 			return node;
 		}
 
@@ -394,8 +435,8 @@ namespace Snowflake.Parsing
 
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = opType;
-                opNode.LHS = node;
-                opNode.RHS = this.ParseMultiplicativeExpression(lexemes, ref pos);
+                opNode.LeftHand = node;
+                opNode.RightHand = this.ParseMultiplicativeExpression(lexemes, ref pos);
                 
 				node = opNode;
 			}
@@ -414,8 +455,8 @@ namespace Snowflake.Parsing
 
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = opType;
-                opNode.LHS = node;
-                opNode.RHS = this.ParsePrimaryExpression(lexemes, ref pos);
+                opNode.LeftHand = node;
+                opNode.RightHand = this.ParsePrimaryExpression(lexemes, ref pos);
 
 				node = opNode;
 			}

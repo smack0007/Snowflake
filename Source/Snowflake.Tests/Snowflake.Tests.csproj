@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AssignmentTests.cs" />
     <Compile Include="ClrFunctionCallTests.cs" />
+    <Compile Include="ComparisonTests.cs" />
     <Compile Include="ForTests.cs" />
     <Compile Include="FunctionCallTests.cs" />
     <Compile Include="FunctionTests.cs" />

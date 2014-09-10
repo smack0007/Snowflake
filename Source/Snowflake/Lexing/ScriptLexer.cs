@@ -103,14 +103,38 @@ namespace Snowflake.Lexing
 					}
 					else if (text[i] == '!') // Not or NotEqualTo
 					{
-						if (i + 1 < text.Length && text[i + 1] != '=')
-						{
-							lexemes.Add(new Lexeme(LexemeType.Not, null, curLine, curColumn));
-						}
-						else
+						if (i + 1 < text.Length && text[i + 1] == '=')
 						{
 							lexemes.Add(new Lexeme(LexemeType.NotEqualTo, null, curLine, curColumn));
 							i++;
+						}
+						else
+						{
+							lexemes.Add(new Lexeme(LexemeType.Not, null, curLine, curColumn));
+						}
+					}
+					else if (text[i] == '>')
+					{
+						if (i + 1 < text.Length && text[i + 1] == '=')
+						{
+							lexemes.Add(new Lexeme(LexemeType.GreaterThanOrEqualTo, null, curLine, curColumn));
+							i++;
+						}
+						else
+						{
+							lexemes.Add(new Lexeme(LexemeType.GreaterThan, null, curLine, curColumn));
+						}
+					}
+					else if (text[i] == '<')
+					{
+						if (i + 1 < text.Length && text[i + 1] == '=')
+						{
+							lexemes.Add(new Lexeme(LexemeType.LessThanOrEqualTo, null, curLine, curColumn));
+							i++;
+						}
+						else
+						{
+							lexemes.Add(new Lexeme(LexemeType.LessThan, null, curLine, curColumn));
 						}
 					}
 					else if (text[i] == '+') // Plus or PlusGets
@@ -292,10 +316,6 @@ namespace Snowflake.Lexing
 
 							case "foreach":
 								lexemes.Add(new Lexeme(LexemeType.ForEach, null, line, column));
-								break;
-
-							case "as":
-								lexemes.Add(new Lexeme(LexemeType.As, null, line, column));
 								break;
 
                             case "undef":

@@ -8,6 +8,14 @@ namespace Snowflake.Parsing
 
 		NotEquals,
 
+		GreaterThan,
+
+		GreaterThanOrEqualTo,
+
+		LessThan,
+
+		LessThanOrEqualTo,
+
 		Add,
 
 		Subtract,

@@ -6,6 +6,6 @@
 
 var x5 = buildMultiplier(5);
 
-for (var i = 0; i != 10; i += 1) {
+for (var i = 0; i < 10; i += 1) {
 	print("5 * " + i + " = " + x5(i));
 }

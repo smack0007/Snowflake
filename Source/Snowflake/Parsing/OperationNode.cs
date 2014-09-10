@@ -7,8 +7,8 @@ namespace Snowflake.Parsing
 {
 	public class OperationNode : ExpressionNode
 	{
-		ExpressionNode lhs;
-		ExpressionNode rhs;
+		ExpressionNode leftHand;
+		ExpressionNode rightHand;
 		
 		public OperationType Type
 		{
@@ -16,16 +16,16 @@ namespace Snowflake.Parsing
 			set;
 		}
 
-		public ExpressionNode LHS
+		public ExpressionNode LeftHand
 		{
-			get { return this.lhs; }
-			set { this.lhs = SetParent(this.lhs, value); }
+			get { return this.leftHand; }
+			set { this.leftHand = SetParent(this.leftHand, value); }
 		}
 
-		public ExpressionNode RHS
+		public ExpressionNode RightHand
 		{
-			get { return this.rhs; }
-			set { this.rhs = SetParent(this.rhs, value); }
+			get { return this.rightHand; }
+			set { this.rightHand = SetParent(this.rightHand, value); }
 		}
 
 		public OperationNode()
@@ -40,17 +40,17 @@ namespace Snowflake.Parsing
 				yield return node;
 			}
 
-			if (this.LHS != null)
+			if (this.LeftHand != null)
 			{
-				foreach (T node in this.LHS.Find<T>())
+				foreach (T node in this.LeftHand.Find<T>())
 				{
 					yield return node;
 				}
 			}
 
-			if (this.RHS != null)
+			if (this.RightHand != null)
 			{
-				foreach (T node in this.RHS.Find<T>())
+				foreach (T node in this.RightHand.Find<T>())
 				{
 					yield return node;
 				}

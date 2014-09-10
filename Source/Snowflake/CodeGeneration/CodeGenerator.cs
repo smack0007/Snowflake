@@ -514,7 +514,7 @@ namespace Snowflake.CodeGeneration
 
 			OperationNode operation = (OperationNode)node;
 
-			GenerateExpression(node.LHS, data);
+			GenerateExpression(node.LeftHand, data);
 					
 			switch (operation.Type)
 			{
@@ -524,6 +524,22 @@ namespace Snowflake.CodeGeneration
 
 				case OperationType.NotEquals:
 					Append(data, " != ");
+					break;
+
+				case OperationType.GreaterThan:
+					Append(data, " > ");
+					break;
+
+				case OperationType.GreaterThanOrEqualTo:
+					Append(data, " >= ");
+					break;
+
+				case OperationType.LessThan:
+					Append(data, " < ");
+					break;
+
+				case OperationType.LessThanOrEqualTo:
+					Append(data, " <= ");
 					break;
 
 				case OperationType.Add:
@@ -549,9 +565,13 @@ namespace Snowflake.CodeGeneration
 				case OperationType.ConditionalAnd:
 					Append(data, " && ");
 					break;
+
+				default:
+					ThrowUnableToGenerateException("Operation", node);
+					break;
 			}
 
-			GenerateExpression(node.RHS, data);
+			GenerateExpression(node.RightHand, data);
 
 			Append(data, ")");
 		}

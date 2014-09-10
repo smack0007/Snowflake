@@ -58,12 +58,7 @@ namespace Snowflake.Lexing
 		/// foreach
 		/// </summary>
 		ForEach,
-		
-		/// <summary>
-		/// as
-		/// </summary>
-		As,
-
+				
         /// <summary>
         /// undef
         /// </summary>
@@ -168,6 +163,26 @@ namespace Snowflake.Lexing
 		/// !=
 		/// </summary>
 		NotEqualTo,
+
+		/// <summary>
+		/// >
+		/// </summary>
+		GreaterThan,
+
+		/// <summary>
+		/// >=
+		/// </summary>
+		GreaterThanOrEqualTo,
+
+		/// <summary>
+		/// &lt;
+		/// </summary>
+		LessThan,
+
+		/// <summary>
+		/// &lt;=
+		/// </summary>
+		LessThanOrEqualTo,
 
 		/// <summary>
 		/// +

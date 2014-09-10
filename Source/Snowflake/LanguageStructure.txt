@@ -34,7 +34,9 @@ ConditionalOrExpression = <ConditionalAndExpression> ( "||" <ConditionalAndExpre
 
 ConditionalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
 
-EqualityExpression = <AdditiveExpression> ( ( "==" | "!=" ) <AdditiveExpression> )* ;
+EqualityExpression = <RelationalExpression> ( ( "==" | "!=" ) <RelationalExpression> )* ;
+
+RelationalExpression = <AdditiveExpression> ( ( "<" | "<=" | ">" | ">=" ) <AdditiveExpression> )* ;
 
 AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )* ;
 
