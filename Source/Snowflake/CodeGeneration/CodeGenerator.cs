@@ -378,6 +378,10 @@ namespace Snowflake.CodeGeneration
 				GenerateExpression(((NegateOperationNode)node).ValueExpression, data);
 				Append(data, ")");
 			}
+			else if (node is ListNode)
+			{
+				GenerateList((ListNode)node, data);
+			}
 			else if (node is VariableReferenceNode)
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
@@ -506,6 +510,21 @@ namespace Snowflake.CodeGeneration
 			}
 
 			Append(data, ")");
+		}
+
+		private static void GenerateList(ListNode node, DataContext data)
+		{
+			Append(data, "new List<dynamic> {{ ");
+
+			for (int i = 0; i < node.ValueExpressions.Count; i++)
+			{
+				if (i != 0)
+					Append(data, ", ");
+
+				GenerateExpression(node.ValueExpressions[i], data);
+			}
+
+			Append(data, " }}");
 		}
 
 		private static void GenerateOperation(OperationNode node, DataContext data)

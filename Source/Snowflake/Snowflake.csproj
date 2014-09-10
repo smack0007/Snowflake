@@ -8,8 +8,8 @@
     <ProjectGuid>{13051F85-3CCC-4999-8D51-2A7217384226}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Snowsoft.SnowflakeScript</RootNamespace>
-    <AssemblyName>Snowsoft.SnowflakeScript</AssemblyName>
+    <RootNamespace>Snowflake</RootNamespace>
+    <AssemblyName>Snowflake</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -93,6 +93,7 @@
     <Compile Include="CodeGeneration\CodeCompiler.cs" />
     <Compile Include="CodeGeneration\CodeGenerationException.cs" />
     <Compile Include="CodeGeneration\VariableMap.cs" />
+    <Compile Include="Parsing\ListNode.cs" />
     <Compile Include="Parsing\NegateOperationNode.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />

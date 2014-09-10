@@ -493,6 +493,10 @@ namespace Snowflake.Parsing
 						node = this.ParseAnonymousFunction(lexemes, ref pos);
 						break;
 
+					case LexemeType.OpenBrace:
+						node = this.ParseList(lexemes, ref pos);
+						break;
+
 					case LexemeType.Identifier:
 						node = this.ParseVariableReference(lexemes, ref pos);
 						break;
@@ -581,6 +585,30 @@ namespace Snowflake.Parsing
 
 			pos++;
 			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+
+			return node;
+		}
+
+		private ListNode ParseList(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
+
+			ListNode node = Construct<ListNode>(lexemes, pos);
+
+			pos++;
+			while (lexemes[pos].Type != LexemeType.CloseBrace && lexemes[pos].Type != LexemeType.EOF)
+			{
+				node.ValueExpressions.Add(this.ParseExpression(lexemes, ref pos));
+
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					node.ValueExpressions.Add(this.ParseExpression(lexemes, ref pos));
+				}
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseBrace, pos);
+			pos++;
 
 			return node;
 		}

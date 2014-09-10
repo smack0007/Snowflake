@@ -14,7 +14,7 @@ VariableDeclaration = "var" <Identifier> { "=" <Expression> } ;
 
 FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
 
-FunctionParameters = <Identifier> ( "," <Identifier> )+ ;
+FunctionParameters = <Identifier>? ( "," <Identifier> )* ;
 
 Assignment = <Identifier> <AssignmentOperation> <Expression> ;
 
@@ -42,11 +42,13 @@ AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeE
 
 MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )* ;
 
-PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <Identifier> | <Value> ;
+PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <List> | <Identifier> | <Value> ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
+
+List = "{" <Expression>? ( "," <Expression> )* "}"
 
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 

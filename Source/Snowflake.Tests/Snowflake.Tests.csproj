@@ -55,6 +55,7 @@
     <Compile Include="IfTests.cs" />
     <Compile Include="IntegerOperationTests.cs" />
     <Compile Include="LanguageTestFixture.cs" />
+    <Compile Include="ListTests.cs" />
     <Compile Include="LogicalOperationsTests.cs" />
     <Compile Include="OrderOfOperationsTests.cs" />
     <Compile Include="ReturnValueTests.cs" />
