@@ -107,7 +107,7 @@ namespace Snowflake.Lexing
 		/// <summary>
 		/// .
 		/// </summary>
-		Period,
+		Dot,
 		
 		/// <summary>
 		/// ,

@@ -552,9 +552,16 @@ namespace Snowflake.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
-            while (lexemes[pos].Type == LexemeType.OpenParen)
+            while (lexemes[pos].Type == LexemeType.OpenParen || lexemes[pos].Type == LexemeType.Dot)
             {
-                node = this.ParseFunctionCall(node, lexemes, ref pos);
+				if (lexemes[pos].Type == LexemeType.OpenParen)
+				{
+					node = this.ParseFunctionCall(node, lexemes, ref pos);
+				}
+				else if (lexemes[pos].Type == LexemeType.Dot)
+				{
+					node = this.ParseMemberAccess(node, lexemes, ref pos);
+				}
             }
 
 			return node;
@@ -633,6 +640,21 @@ namespace Snowflake.Parsing
 			}
 						
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+			pos++;
+			return node;
+		}
+
+		private MemberAccessNode ParseMemberAccess(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.Dot, pos);
+
+			MemberAccessNode node = Construct<MemberAccessNode>(lexemes, pos);
+			node.SourceExpression = sourceExpression;
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+			node.MemberName = lexemes[pos].Value;
 
 			pos++;
 			return node;

@@ -57,6 +57,7 @@
     <Compile Include="LanguageTestFixture.cs" />
     <Compile Include="ListTests.cs" />
     <Compile Include="LogicalOperationsTests.cs" />
+    <Compile Include="MemberAcessTests.cs" />
     <Compile Include="OrderOfOperationsTests.cs" />
     <Compile Include="ReturnValueTests.cs" />
     <Compile Include="Lexing\ScriptLexerTests.cs" />

@@ -368,6 +368,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateFunctionCall((FunctionCallNode)node, data);
 			}
+			else if (node is MemberAccessNode)
+			{
+				GenerateMemberAccess((MemberAccessNode)node, data);
+			}
 			else if (node is OperationNode)
 			{
 				GenerateOperation((OperationNode)node, data);
@@ -510,6 +514,12 @@ namespace Snowflake.CodeGeneration
 			}
 
 			Append(data, ")");
+		}
+
+		private static void GenerateMemberAccess(MemberAccessNode node, DataContext data)
+		{
+			GenerateExpression(node.SourceExpression, data);
+			Append(data, ".{0}", node.MemberName);
 		}
 
 		private static void GenerateList(ListNode node, DataContext data)

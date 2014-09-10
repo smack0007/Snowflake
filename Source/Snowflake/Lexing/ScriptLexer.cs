@@ -59,7 +59,7 @@ namespace Snowflake.Lexing
 					}
 					else if (text[i] == '.') // Period
 					{
-						lexemes.Add(new Lexeme(LexemeType.Period, null, curLine, curColumn));
+						lexemes.Add(new Lexeme(LexemeType.Dot, null, curLine, curColumn));
 					}
 					else if (text[i] == ',') // Period
 					{

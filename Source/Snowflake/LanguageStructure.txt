@@ -42,13 +42,15 @@ AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeE
 
 MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )* ;
 
-PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <List> | <Identifier> | <Value> ;
+PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <List> | <MemberAccess> | <Identifier> | <Value> ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
 List = "{" <Expression>? ( "," <Expression> )* "}"
+
+MemberAccess = <Expression> "." <Identifier> ;
 
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 
