@@ -4,7 +4,6 @@ StatementBlock = "{" <Statement>* "}" ;
 
 Statement = <VariableDeclaration> ";" |
             <FunctionDeclaration> |
-			<Assignment> ";" |
 			<If> |
 			<While> |
 			<Return> |
@@ -16,10 +15,6 @@ FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <Stateme
 
 FunctionParameters = <Identifier>? ( "," <Identifier> )* ;
 
-Assignment = <Identifier> <AssignmentOperation> <Expression> ;
-
-AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
-
 If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 
 While = "while" "(" <Expression> ")" <StatementBlock> ;
@@ -28,7 +23,9 @@ For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <A
 
 Return = "return" <Expression> ";" ;
 
-Expression = <ConditionalOrExpression> ;
+Expression = <AssignmentExpression> ;
+
+AssignmentExpression = <ConditionalOrExpression> | <Assignment> ;
 
 ConditionalOrExpression = <ConditionalAndExpression> ( "||" <ConditionalAndExpression> )* ;
 
@@ -45,6 +42,12 @@ MultiplicativeExpression = <UnaryExpression> ( ( "*" | "/" ) <UnaryExpression> )
 UnaryExpression = ( ( "-" | "!" ) <UnaryExpression> )* | <PrimaryExpression> ;
 
 PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <List> | <MemberAccess> | <Identifier> | <Value> ;
+
+Assignment = <AssignmentTarget> <AssignmentOperation> <Expression> ;
+
+AssignmentTarget = <Identifier> | <MemberAccess> ;
+
+AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 

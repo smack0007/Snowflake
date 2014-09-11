@@ -72,13 +72,6 @@ namespace Snowflake.Parsing
 			{
 				node = this.ParseFunctionDeclaration(lexemes, ref pos);
 			}
-			else if (lexemes[pos].Type == LexemeType.Identifier && pos < lexemes.Count - 1 && this.IsAssignmentOperator(lexemes[pos + 1].Type))
-			{
-				node = this.ParseAssignment(lexemes, ref pos);
-				
-				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-				pos++;
-			}
 			else if (lexemes[pos].Type == LexemeType.If)
 			{
 				node = this.ParseIf(lexemes, ref pos);
@@ -181,47 +174,7 @@ namespace Snowflake.Parsing
 
 			return node;
 		}
-
-		private AssignmentNode ParseAssignment(IList<Lexeme> lexemes, ref int pos)
-		{
-			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-
-			AssignmentNode node = Construct<AssignmentNode>(lexemes, pos);
-            node.VariableName = lexemes[pos].Value;
-
-			pos++;
-			switch (lexemes[pos].Type)
-			{
-				case LexemeType.Gets:
-					node.Operation = AssignmentOperation.Gets;
-					break;
-
-				case LexemeType.PlusGets:
-					node.Operation = AssignmentOperation.AddGets;
-					break;
-
-				case LexemeType.MinusGets:
-					node.Operation = AssignmentOperation.SubtractGets;
-					break;
-
-				case LexemeType.MultiplyGets:
-					node.Operation = AssignmentOperation.MultiplyGets;
-					break;
-
-				case LexemeType.DivideGets:
-					node.Operation = AssignmentOperation.DivideGets;
-					break;
-
-				default:
-					throw new SyntaxException(string.Format("An assignment operation was expected at line {0} column {1}.", lexemes[pos].Line, lexemes[pos].Column));
-			}
-
-			pos++;
-			node.ValueExpression = this.ParseExpression(lexemes, ref pos);
-
-			return node;
-		}
-
+				
 		private IfNode ParseIf(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.If, pos);
@@ -280,11 +233,11 @@ namespace Snowflake.Parsing
 			pos++;
 			if (lexemes[pos].Type == LexemeType.Var)
 			{
-				node.InitializeStatement = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
+				node.InitializeSyntax = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
 			}
 			else
 			{
-				node.InitializeStatement = this.ParseAssignment(lexemes, ref pos);
+				node.InitializeSyntax = this.ParseExpression(lexemes, ref pos);
 			}
 
 			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
@@ -295,7 +248,7 @@ namespace Snowflake.Parsing
 			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 
 			pos++;
-			node.IncrementStatement = this.ParseAssignment(lexemes, ref pos);
+			node.IncrementExpression = this.ParseExpression(lexemes, ref pos);
 
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 
@@ -322,7 +275,52 @@ namespace Snowflake.Parsing
 
 		private ExpressionNode ParseExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			return this.ParseConditionalOrExpression(lexemes, ref pos);
+			return this.ParseAssignmentExpression(lexemes, ref pos);
+		}
+
+		private ExpressionNode ParseAssignmentExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			ExpressionNode node = this.ParseConditionalOrExpression(lexemes, ref pos);
+
+			if ((node is VariableReferenceNode || node is MemberAccessNode) &&
+				this.IsAssignmentOperator(lexemes[pos].Type))
+			{ 
+				AssignmentOpeartionNode assignNode = Construct<AssignmentOpeartionNode>(lexemes, pos);
+				assignNode.TargetExpression = node;
+
+				switch (lexemes[pos].Type)
+				{
+					case LexemeType.Gets:
+						assignNode.Type = AssignmentOperationType.Gets;
+						break;
+
+					case LexemeType.PlusGets:
+						assignNode.Type = AssignmentOperationType.AddGets;
+						break;
+
+					case LexemeType.MinusGets:
+						assignNode.Type = AssignmentOperationType.SubtractGets;
+						break;
+
+					case LexemeType.MultiplyGets:
+						assignNode.Type = AssignmentOperationType.MultiplyGets;
+						break;
+
+					case LexemeType.DivideGets:
+						assignNode.Type = AssignmentOperationType.DivideGets;
+						break;
+
+					default:
+						throw new SyntaxException(string.Format("An assignment operation was expected at line {0} column {1}.", lexemes[pos].Line, lexemes[pos].Column));
+				}
+
+				pos++;
+				assignNode.ValueExpression = this.ParseExpression(lexemes, ref pos);
+
+				node = assignNode;
+			}
+
+			return node;
 		}
 
 		private ExpressionNode ParseConditionalOrExpression(IList<Lexeme> lexemes, ref int pos)

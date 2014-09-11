@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Snowflake.Parsing
 {
-	public class AssignmentNode : StatementNode
+	public class AssignmentOpeartionNode : ExpressionNode
 	{
+		ExpressionNode targetExpression;
 		ExpressionNode valueExpression;
 
-		public string VariableName
+		public ExpressionNode TargetExpression
 		{
-			get;
-			set;
+			get { return this.targetExpression; }
+			set { this.targetExpression = SetParent(this.targetExpression, value); }
 		}
 
-		public AssignmentOperation Operation
+		public AssignmentOperationType Type
 		{
 			get;
 			set;
@@ -27,7 +26,7 @@ namespace Snowflake.Parsing
 			set { this.valueExpression = SetParent(this.valueExpression, value); }
 		}
 
-		public AssignmentNode()
+		public AssignmentOpeartionNode()
 			: base()
 		{
 		}

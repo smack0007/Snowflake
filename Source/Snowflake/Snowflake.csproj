@@ -99,8 +99,8 @@
     <Compile Include="Parsing\UnaryOperationType.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
-    <Compile Include="Parsing\AssignmentNode.cs" />
-    <Compile Include="Parsing\AssignmentOperation.cs" />
+    <Compile Include="Parsing\AssignmentOpeartionNode.cs" />
+    <Compile Include="Parsing\AssignmentOperationType.cs" />
     <Compile Include="Parsing\BooleanValueNode.cs" />
     <Compile Include="Parsing\CharacterValueNode.cs" />
     <Compile Include="Parsing\ExpressionNode.cs" />

@@ -194,10 +194,6 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateFunctionDeclaration((FunctionNode)node, data);
 			}
-			else if (node is AssignmentNode)
-			{
-				GenerateAssignment((AssignmentNode)node, data);
-			}
 			else if (node is IfNode)
 			{
 				GenerateIf((IfNode)node, data);
@@ -250,40 +246,6 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ";");
 		}
 
-		private static void GenerateAssignment(AssignmentNode node, DataContext data)
-		{
-			string anonymousVariableName = data.VariableMap.GetVariableName(node.VariableName);
-			StartLine(data, anonymousVariableName);
-
-			switch (node.Operation)
-			{
-				case AssignmentOperation.Gets:
-					Append(data, " = ");
-					break;
-
-				case AssignmentOperation.AddGets:
-					Append(data, " += ");
-					break;
-
-				case AssignmentOperation.SubtractGets:
-					Append(data, " -= ");
-					break;
-
-				case AssignmentOperation.MultiplyGets:
-					Append(data, " *= ");
-					break;
-
-				case AssignmentOperation.DivideGets:
-					Append(data, " /= ");
-					break;
-			}
-			
-
-			GenerateExpression(node.ValueExpression, data);
-
-			EndLine(data, ";");
-		}
-
 		private static void GenerateIf(IfNode node, DataContext data)
 		{
 			StartLine(data, "if (");
@@ -329,15 +291,26 @@ namespace Snowflake.CodeGeneration
 
 			data.DisableNewLines = true;
 
-			GenerateStatement(node.InitializeStatement, data);
+			if (node.InitializeSyntax is VariableDeclarationNode)
+			{
+				GenerateStatement((VariableDeclarationNode)node.InitializeSyntax, data);
+			}
+			else if (node.InitializeSyntax is ExpressionNode)
+			{
+				GenerateExpression((ExpressionNode)node.InitializeSyntax, data);
+			}
+			else
+			{
+				ThrowUnableToGenerateException("For initializer", node.InitializeSyntax);
+			}
+
 			Append(data, " ");
 
 			GenerateExpression(node.EvaluateExpression, data);
 			Append(data, "; ");
 
-			GenerateStatement(node.IncrementStatement, data);
+			GenerateExpression(node.IncrementExpression, data);
 
-			DeleteCharacters(data, 1);
 			data.DisableNewLines = false;
 
 			EndLine(data, ") {{");
@@ -359,8 +332,12 @@ namespace Snowflake.CodeGeneration
 		}
 
 		private static void GenerateExpression(ExpressionNode node, DataContext data)
-		{			
-			if (node is FunctionNode)
+		{		
+			if (node is AssignmentOpeartionNode)
+			{
+				GenerateAssignmentOperation((AssignmentOpeartionNode)node, data);
+			}
+			else if (node is FunctionNode)
 			{
 				GenerateFunction((FunctionNode)node, data);
 			}
@@ -428,6 +405,36 @@ namespace Snowflake.CodeGeneration
 			{
 				ThrowUnableToGenerateException("Expression", node);
 			}
+		}
+
+		private static void GenerateAssignmentOperation(AssignmentOpeartionNode node, DataContext data)
+		{
+			GenerateExpression(node.TargetExpression, data);
+
+			switch (node.Type)
+			{
+				case AssignmentOperationType.Gets:
+					Append(data, " = ");
+					break;
+
+				case AssignmentOperationType.AddGets:
+					Append(data, " += ");
+					break;
+
+				case AssignmentOperationType.SubtractGets:
+					Append(data, " -= ");
+					break;
+
+				case AssignmentOperationType.MultiplyGets:
+					Append(data, " *= ");
+					break;
+
+				case AssignmentOperationType.DivideGets:
+					Append(data, " /= ");
+					break;
+			}
+			
+			GenerateExpression(node.ValueExpression, data);
 		}
 
 		private static void GenerateFunction(FunctionNode node, DataContext data)

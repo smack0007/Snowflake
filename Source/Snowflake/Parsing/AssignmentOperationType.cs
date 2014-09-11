@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Snowflake.Parsing
 {
-	public enum AssignmentOperation
+	public enum AssignmentOperationType
 	{
 		Gets,
 

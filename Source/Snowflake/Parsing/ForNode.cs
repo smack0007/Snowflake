@@ -5,15 +5,15 @@ namespace Snowflake.Parsing
 {
 	public class ForNode : StatementNode
 	{
-		StatementNode initializeStatement;
+		SyntaxNode initializeSyntax;
 		ExpressionNode evaluateExpression;
-		AssignmentNode incrementStatement;
+		ExpressionNode incrementExpression;
 		StatementBlockNode bodyStatementBlock;
 
-		public StatementNode InitializeStatement
+		public SyntaxNode InitializeSyntax
 		{
-			get { return this.initializeStatement; }
-			set { this.initializeStatement = SetParent(this.initializeStatement, value); }
+			get { return this.initializeSyntax; }
+			set { this.initializeSyntax = SetParent(this.initializeSyntax, value); }
 		}
 
 		public ExpressionNode EvaluateExpression
@@ -22,10 +22,10 @@ namespace Snowflake.Parsing
 			set { this.evaluateExpression = SetParent(this.evaluateExpression, value); }
 		}
 
-		public AssignmentNode IncrementStatement
+		public ExpressionNode IncrementExpression
 		{
-			get { return this.incrementStatement; }
-			set { this.incrementStatement = SetParent(this.incrementStatement, value); }
+			get { return this.incrementExpression; }
+			set { this.incrementExpression = SetParent(this.incrementExpression, value); }
 		}
 
 		public StatementBlockNode BodyStatementBlock
@@ -45,9 +45,9 @@ namespace Snowflake.Parsing
 				yield return node;
 			}
 
-			if (this.InitializeStatement != null)
+			if (this.InitializeSyntax != null)
 			{
-				foreach (T node in this.InitializeStatement.Find<T>())
+				foreach (T node in this.InitializeSyntax.Find<T>())
 				{
 					yield return node;
 				}
@@ -61,9 +61,9 @@ namespace Snowflake.Parsing
 				}
 			}
 
-			if (this.IncrementStatement != null)
+			if (this.IncrementExpression != null)
 			{
-				foreach (T node in this.IncrementStatement.Find<T>())
+				foreach (T node in this.IncrementExpression.Find<T>())
 				{
 					yield return node;
 				}
