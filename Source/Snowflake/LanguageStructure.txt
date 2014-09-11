@@ -40,9 +40,11 @@ RelationalExpression = <AdditiveExpression> ( ( "<" | "<=" | ">" | ">=" ) <Addit
 
 AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )* ;
 
-MultiplicativeExpression = <PrimaryExpression> ( ( "*" | "/" ) <MultiplicativeExpression> )* ;
+MultiplicativeExpression = <UnaryExpression> ( ( "*" | "/" ) <UnaryExpression> )* ;
 
-PrimaryExpression = "(" <Expression> ")" | "-" <Expression> | <AnonymousFunction> | <FunctionCall> | <List> | <MemberAccess> | <Identifier> | <Value> ;
+UnaryExpression = ( ( "-" | "!" ) <UnaryExpression> )* | <PrimaryExpression> ;
+
+PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <List> | <MemberAccess> | <Identifier> | <Value> ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 

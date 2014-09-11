@@ -446,7 +446,7 @@ namespace Snowflake.Parsing
 
 		private ExpressionNode ParseMultiplicativeExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			ExpressionNode node = this.ParsePrimaryExpression(lexemes, ref pos);
+			ExpressionNode node = this.ParseUnaryExpression(lexemes, ref pos);
 
 			if (lexemes[pos].Type == LexemeType.Multiply || lexemes[pos].Type == LexemeType.Divide)
 			{
@@ -456,12 +456,40 @@ namespace Snowflake.Parsing
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
                 opNode.Type = opType;
                 opNode.LeftHand = node;
-                opNode.RightHand = this.ParsePrimaryExpression(lexemes, ref pos);
+				opNode.RightHand = this.ParseUnaryExpression(lexemes, ref pos);
 
 				node = opNode;
 			}
 			
 			return node;
+		}
+
+		private ExpressionNode ParseUnaryExpression(IList<Lexeme> lexemes, ref int pos)
+		{
+			if (lexemes[pos].Type == LexemeType.Minus || lexemes[pos].Type == LexemeType.Not)
+			{
+				UnaryOperationNode node = Construct<UnaryOperationNode>(lexemes, pos);
+
+				switch (lexemes[pos].Type)
+				{
+					case LexemeType.Minus:
+						node.Type = UnaryOperationType.Negate;
+						break;
+
+					case LexemeType.Not:
+						node.Type = UnaryOperationType.LogicalNegate;
+						break;
+				}
+
+				pos++;
+				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
+
+				return node;
+			}
+			else
+			{
+				return this.ParsePrimaryExpression(lexemes, ref pos);
+			}
 		}
 
 		private ExpressionNode ParsePrimaryExpression(IList<Lexeme> lexemes, ref int pos)
@@ -475,15 +503,6 @@ namespace Snowflake.Parsing
 
 				this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 				pos++;
-			}
-			else if (lexemes[pos].Type == LexemeType.Minus)
-			{
-				NegateOperationNode negateOp = Construct<NegateOperationNode>(lexemes, pos);
-				
-				pos++;
-				negateOp.ValueExpression = this.ParseExpression(lexemes, ref pos);
-				
-				node = negateOp;
 			}
 			else
 			{

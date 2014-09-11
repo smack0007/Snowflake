@@ -73,5 +73,11 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue(true, "var x = true; var y = true; return x && y;");
 		}
+
+		[Fact]
+		public void Not_True_Equal_To_False()
+		{
+			AssertScriptReturnValue(false, "return !true;");
+		}
 	}
 }

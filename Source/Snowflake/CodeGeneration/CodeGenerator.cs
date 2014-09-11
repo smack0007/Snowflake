@@ -376,11 +376,9 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateOperation((OperationNode)node, data);
 			}
-			else if (node is NegateOperationNode)
+			else if (node is UnaryOperationNode)
 			{
-				Append(data, "(-");
-				GenerateExpression(((NegateOperationNode)node).ValueExpression, data);
-				Append(data, ")");
+				GenerateUnaryOperation((UnaryOperationNode)node, data);
 			}
 			else if (node is ListNode)
 			{
@@ -602,6 +600,25 @@ namespace Snowflake.CodeGeneration
 
 			GenerateExpression(node.RightHand, data);
 
+			Append(data, ")");
+		}
+
+		private static void GenerateUnaryOperation(UnaryOperationNode node, DataContext data)
+		{
+			Append(data, "(");
+			
+			switch (node.Type)
+			{
+				case UnaryOperationType.Negate:
+					Append(data, "-");
+					break;
+
+				case UnaryOperationType.LogicalNegate:
+					Append(data, "!");
+					break;
+			}
+			
+			GenerateExpression(((UnaryOperationNode)node).ValueExpression, data);
 			Append(data, ")");
 		}
 	}

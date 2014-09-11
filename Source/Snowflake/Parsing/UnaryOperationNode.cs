@@ -3,9 +3,15 @@ using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class NegateOperationNode : ExpressionNode
+	public class UnaryOperationNode : ExpressionNode
 	{
 		ExpressionNode valueExpression;
+
+		public UnaryOperationType Type
+		{
+			get;
+			set;
+		}
 
 		public ExpressionNode ValueExpression
 		{
@@ -13,7 +19,7 @@ namespace Snowflake.Parsing
 			set { this.valueExpression = SetParent(this.valueExpression, value); }
 		}
 
-		public NegateOperationNode()
+		public UnaryOperationNode()
 			: base()
 		{
 		}
