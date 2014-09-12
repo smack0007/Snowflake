@@ -13,13 +13,24 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue<T>((x) => Assert.Equal(expectedValue, x), script);
 		}
+		
+		public void AssertScriptReturnValue<T>(Action<T> assert, string script)
+		{
+			AssertScriptReturnValue(assert, (x) => { }, script);
+		}
 
-		public void AssertScriptReturnValue<T>(Action<T> assertAction, string script)
+		public void AssertScriptReturnValue<T>(T expectedValue, Action<ScriptEngine> setup, string script)
+		{
+			AssertScriptReturnValue<T>((x) => Assert.Equal(expectedValue, x), setup, script);
+		}
+
+		public void AssertScriptReturnValue<T>(Action<T> assert, Action<ScriptEngine> setup, string script)
 		{
 			ScriptEngine engine = new ScriptEngine();
+			setup(engine);
 			Console.WriteLine(engine.GenerateCode(script));
 			var result = (T)engine.Execute(script);
-			assertAction(result);
+			assert(result);
 		}
 
 		public void AssertScriptIsException<T>(string script)

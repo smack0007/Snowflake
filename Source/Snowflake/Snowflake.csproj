@@ -97,6 +97,7 @@
     <Compile Include="Parsing\MemberAccessNode.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />
     <Compile Include="Parsing\UnaryOperationType.cs" />
+    <Compile Include="Parsing\VariableDeclarationBlockNode.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="Parsing\AssignmentOpeartionNode.cs" />
