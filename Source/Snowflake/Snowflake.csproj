@@ -94,6 +94,7 @@
     <Compile Include="CodeGeneration\CodeGenerationException.cs" />
     <Compile Include="CodeGeneration\VariableMap.cs" />
     <Compile Include="Parsing\ArrayNode.cs" />
+    <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
     <Compile Include="Parsing\MemberAccessNode.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />

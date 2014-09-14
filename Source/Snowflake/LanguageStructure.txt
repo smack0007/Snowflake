@@ -59,6 +59,8 @@ Array = "[|" <Expression>? ( "," <Expression> )* "|]"
 
 MemberAccess = <Expression> "." <Identifier> ;
 
+ElementAccess = <Expression> "[" <Expression> "]" ;
+
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 
 Value = <Undefined> | <Null> | <Boolean> | <String> | <Char> | <Integer> | <Float> ;

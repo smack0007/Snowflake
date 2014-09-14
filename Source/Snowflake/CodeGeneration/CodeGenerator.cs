@@ -349,6 +349,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateMemberAccess((MemberAccessNode)node, data);
 			}
+			else if (node is ElementAccessNode)
+			{
+				GenerateElementAccess((ElementAccessNode)node, data);
+			}
 			else if (node is OperationNode)
 			{
 				GenerateOperation((OperationNode)node, data);
@@ -529,6 +533,14 @@ namespace Snowflake.CodeGeneration
 		{
 			GenerateExpression(node.SourceExpression, data);
 			Append(data, ".{0}", node.MemberName);
+		}
+
+		private static void GenerateElementAccess(ElementAccessNode node, DataContext data)
+		{
+			GenerateExpression(node.SourceExpression, data);
+			Append(data, "[");
+			GenerateExpression(node.ElementExpression, data);
+			Append(data, "]");
 		}
 
 		private static void GenerateList(ListNode node, DataContext data)

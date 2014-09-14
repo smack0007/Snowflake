@@ -87,5 +87,15 @@ namespace Snowflake.Tests
 				},
 				"return [| [ 1, 2 ], [ 3, 4 ] |];");
 		}
+
+		[Fact]
+		public void Array_Element_Access_Is_Correct()
+		{
+			AssertScriptReturnValue(
+				1,
+				@"
+var foo = [| 3, 1, 2 |];
+return foo[1];");
+		}
 	}
 }
