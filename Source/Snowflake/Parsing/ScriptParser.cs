@@ -38,6 +38,12 @@ namespace Snowflake.Parsing
 			return false;
 		}
 
+		private static void SkipWhileEndStatement(IList<Lexeme> lexemes, ref int pos)
+		{
+			while (lexemes[pos].Type == LexemeType.EndStatement)
+				pos++;
+		}
+
 		public ScriptNode Parse(string id, IList<Lexeme> lexemes)
 		{
             if (id == null)
@@ -70,7 +76,7 @@ namespace Snowflake.Parsing
 			}
 			else if (lexemes[pos].Type == LexemeType.Func)
 			{
-				node = this.ParseFunctionDeclaration(lexemes, ref pos);
+				node = this.ParseNamedFunctionDeclaration(lexemes, ref pos);
 			}
 			else if (lexemes[pos].Type == LexemeType.If)
 			{
@@ -142,7 +148,7 @@ namespace Snowflake.Parsing
 			return node;
 		}
 
-		private FunctionNode ParseFunctionDeclaration(IList<Lexeme> lexemes, ref int pos)
+		private FunctionNode ParseNamedFunctionDeclaration(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
 
@@ -171,6 +177,8 @@ namespace Snowflake.Parsing
 
 			pos++;
 			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+
+			SkipWhileEndStatement(lexemes, ref pos);
 
 			return node;
 		}

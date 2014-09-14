@@ -81,5 +81,26 @@ return (func(x) {
 	return x + x;   
 })(21);");
         }
+
+		[Fact]
+		public void Function_Returned_From_Function_Can_Be_Directly_Invoked()
+		{
+			AssertScriptReturnValue(42, @"
+func foo() {
+	return func() {
+		return 42;
+	};
+}
+
+return foo()();");
+		}
+
+		[Fact]
+		public void EndStatement_Optional_When_Declaring_Named_Function()
+		{
+			AssertScriptReturnValue(5, @"
+func foo() { return 5; };;;
+return foo();");
+		}
 	}
 }
