@@ -93,11 +93,11 @@
     <Compile Include="CodeGeneration\CodeCompiler.cs" />
     <Compile Include="CodeGeneration\CodeGenerationException.cs" />
     <Compile Include="CodeGeneration\VariableMap.cs" />
+    <Compile Include="Parsing\ArrayNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
     <Compile Include="Parsing\MemberAccessNode.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />
     <Compile Include="Parsing\UnaryOperationType.cs" />
-    <Compile Include="Parsing\VariableDeclarationBlockNode.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="Parsing\AssignmentOpeartionNode.cs" />

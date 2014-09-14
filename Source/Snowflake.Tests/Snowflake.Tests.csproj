@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayTests.cs" />
     <Compile Include="AssignmentTests.cs" />
     <Compile Include="ClrFunctionCallTests.cs" />
     <Compile Include="ComparisonTests.cs" />

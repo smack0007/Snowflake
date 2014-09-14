@@ -510,8 +510,12 @@ namespace Snowflake.Parsing
 						node = this.ParseAnonymousFunction(lexemes, ref pos);
 						break;
 
-					case LexemeType.OpenBrace:
+					case LexemeType.OpenBracket:
 						node = this.ParseList(lexemes, ref pos);
+						break;
+
+					case LexemeType.OpenPipeBracket:
+						node = this.ParseArray(lexemes, ref pos);
 						break;
 
 					case LexemeType.Identifier:
@@ -615,12 +619,12 @@ namespace Snowflake.Parsing
 
 		private ListNode ParseList(IList<Lexeme> lexemes, ref int pos)
 		{
-			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
+			this.EnsureLexemeType(lexemes, LexemeType.OpenBracket, pos);
 
 			ListNode node = Construct<ListNode>(lexemes, pos);
 
 			pos++;
-			while (lexemes[pos].Type != LexemeType.CloseBrace && lexemes[pos].Type != LexemeType.EOF)
+			while (lexemes[pos].Type != LexemeType.CloseBracket && lexemes[pos].Type != LexemeType.EOF)
 			{
 				node.ValueExpressions.Add(this.ParseExpression(lexemes, ref pos));
 
@@ -631,7 +635,31 @@ namespace Snowflake.Parsing
 				}
 			}
 
-			this.EnsureLexemeType(lexemes, LexemeType.CloseBrace, pos);
+			this.EnsureLexemeType(lexemes, LexemeType.CloseBracket, pos);
+			pos++;
+
+			return node;
+		}
+
+		private ArrayNode ParseArray(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.OpenPipeBracket, pos);
+
+			ArrayNode node = Construct<ArrayNode>(lexemes, pos);
+
+			pos++;
+			while (lexemes[pos].Type != LexemeType.ClosePipeBracket && lexemes[pos].Type != LexemeType.EOF)
+			{
+				node.ValueExpressions.Add(this.ParseExpression(lexemes, ref pos));
+
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					node.ValueExpressions.Add(this.ParseExpression(lexemes, ref pos));
+				}
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.ClosePipeBracket, pos);
 			pos++;
 
 			return node;

@@ -41,7 +41,7 @@ MultiplicativeExpression = <UnaryExpression> ( ( "*" | "/" ) <UnaryExpression> )
 
 UnaryExpression = ( ( "-" | "!" ) <UnaryExpression> )* | <PrimaryExpression> ;
 
-PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <List> | <MemberAccess> | <Identifier> | <Value> ;
+PrimaryExpression = "(" <Expression> ")" | <AnonymousFunction> | <FunctionCall> | <List> | <Array> | <MemberAccess> | <Identifier> | <Value> ;
 
 Assignment = <AssignmentTarget> <AssignmentOperation> <Expression> ;
 
@@ -53,7 +53,9 @@ AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
-List = "{" <Expression>? ( "," <Expression> )* "}"
+List = "[" <Expression>? ( "," <Expression> )* "]"
+
+Array = "[|" <Expression>? ( "," <Expression> )* "|]"
 
 MemberAccess = <Expression> "." <Identifier> ;
 

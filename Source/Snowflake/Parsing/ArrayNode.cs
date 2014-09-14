@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Snowflake.Parsing
 {
-	public class ListNode : ExpressionNode, IEnumerable<ExpressionNode>
+	public class ArrayNode : ExpressionNode, IEnumerable<ExpressionNode>
 	{
 		public SyntaxNodeCollection<ExpressionNode> ValueExpressions
 		{
@@ -11,7 +14,7 @@ namespace Snowflake.Parsing
 			private set;
 		}
 
-		public ListNode()
+		public ArrayNode()
 			: base()
 		{
 			this.ValueExpressions = new SyntaxNodeCollection<ExpressionNode>(this);

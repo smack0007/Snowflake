@@ -12,7 +12,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void List_Count_Property_Can_Be_Accessed()
 		{
-			AssertScriptReturnValue(0, "return {}.Count;");
+			AssertScriptReturnValue(0, "return [].Count;");
 		}
 	}
 }

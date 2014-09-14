@@ -145,6 +145,16 @@ namespace Snowflake.Lexing
 		CloseBrace,
 
 		/// <summary>
+		/// [|
+		/// </summary>
+		OpenPipeBracket,
+
+		/// <summary>
+		/// |]
+		/// </summary>
+		ClosePipeBracket,
+
+		/// <summary>
 		/// =
 		/// </summary>
 		Gets,
