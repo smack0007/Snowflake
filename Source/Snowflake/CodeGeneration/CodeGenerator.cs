@@ -499,30 +499,24 @@ namespace Snowflake.CodeGeneration
 
 			data.Padding++;
 
-			if (!node.IsAnonymous)
-			{
-				WriteLine(data, "stack.Push(new ScriptStackFrame(\"{0}\"));", node.FunctionName);
-				WriteLine(data, "try {{");
+			WriteLine(data, "stack.Push(new ScriptStackFrame(\"{0}\"));", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
+			WriteLine(data, "try {{");
 
-				data.Padding++;
-			}
+			data.Padding++;
 
 			GenerateStatementBlock(node.BodyStatementBlock, data, pushStackFrame: false);
 			
 			if (!(node.BodyStatementBlock.Last() is ReturnNode))
 				WriteLine(data, "return null;");
 
-			if (!node.IsAnonymous)
-			{
-				data.Padding--;
-				WriteLine(data, "}} finally {{");
+			data.Padding--;
+			WriteLine(data, "}} finally {{");
 
-				data.Padding++;
-				WriteLine(data, "stack.Pop();");
+			data.Padding++;
+			WriteLine(data, "stack.Pop();");
 
-				data.Padding--;
-				WriteLine(data, "}}");
-			}
+			data.Padding--;
+			WriteLine(data, "}}");
 
 			data.Padding--;
 
