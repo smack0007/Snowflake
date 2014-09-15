@@ -51,6 +51,7 @@
     <Compile Include="ClrFunctionCallTests.cs" />
     <Compile Include="ComparisonTests.cs" />
     <Compile Include="ElementAccessTests.cs" />
+    <Compile Include="ForEachTests.cs" />
     <Compile Include="ForTests.cs" />
     <Compile Include="FunctionCallTests.cs" />
     <Compile Include="FunctionTests.cs" />

@@ -90,6 +90,10 @@ namespace Snowflake.Parsing
 			{
 				node = this.ParseFor(lexemes, ref pos);
 			}
+			else if (lexemes[pos].Type == LexemeType.ForEach)
+			{
+				node = this.ParseForEach(lexemes, ref pos);
+			}
 			else if (lexemes[pos].Type == LexemeType.Return)
 			{
 				node = this.ParseReturn(lexemes, ref pos);
@@ -257,6 +261,37 @@ namespace Snowflake.Parsing
 
 			pos++;
 			node.IncrementExpression = this.ParseExpression(lexemes, ref pos);
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+			pos++;
+			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
+
+			return node;
+		}
+
+		private ForEachNode ParseForEach(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.ForEach, pos);
+
+			ForEachNode node = Construct<ForEachNode>(lexemes, pos);
+
+			pos++;
+			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+			pos++;
+			int variableDeclarationPos = pos;
+			node.VariableDeclaration = this.ParseVariableDeclaration(lexemes, ref pos, true);
+
+			if (node.VariableDeclaration.ValueExpression != null)
+			{
+				throw new SyntaxException(string.Format("ForEach variable declaration may not have a value expression at line {0} column {1}.", lexemes[variableDeclarationPos].Line, lexemes[variableDeclarationPos].Column));
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.In, pos);
+
+			pos++;
+			node.SourceExpression = this.ParseExpression(lexemes, ref pos);
 
 			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
 

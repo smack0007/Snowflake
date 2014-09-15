@@ -58,6 +58,11 @@ namespace Snowflake.Lexing
 		/// foreach
 		/// </summary>
 		ForEach,
+
+		/// <summary>
+		/// in
+		/// </summary>
+		In,
 				
         /// <summary>
         /// undef

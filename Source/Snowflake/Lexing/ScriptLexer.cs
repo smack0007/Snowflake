@@ -337,6 +337,10 @@ namespace Snowflake.Lexing
 								lexemes.Add(new Lexeme(LexemeType.ForEach, null, line, column));
 								break;
 
+							case "in":
+								lexemes.Add(new Lexeme(LexemeType.In, null, line, column));
+								break;
+
                             case "undef":
                                 lexemes.Add(new Lexeme(LexemeType.Undef, null, line, column));
                                 break;

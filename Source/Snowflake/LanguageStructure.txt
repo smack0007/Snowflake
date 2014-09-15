@@ -6,6 +6,8 @@ Statement = <VariableDeclaration> ";" |
             <FunctionDeclaration> |
 			<If> |
 			<While> |
+			<For> |
+			<ForEach> |
 			<Return> |
 			<Expression> ";" ;
 
@@ -20,6 +22,8 @@ If = "if" "(" <Expression> ")" <StatementBlock> { "else" <StatementBlock> } ;
 While = "while" "(" <Expression> ")" <StatementBlock> ;
 
 For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <Assignment>  ")" <StatementBlock> ;
+
+ForEach = "foreach" "(" <VariableDeclaration> "in" <Expression>  ")" <StatementBlock> ;
 
 Return = "return" <Expression> ";" ;
 

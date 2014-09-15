@@ -206,6 +206,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateFor((ForNode)node, data);
 			}
+			else if (node is ForEachNode)
+			{
+				GenerateForEach((ForEachNode)node, data);
+			}
 			else if (node is ReturnNode)
 			{
 				GenerateReturn((ReturnNode)node, data);
@@ -311,6 +315,29 @@ namespace Snowflake.CodeGeneration
 
 			GenerateExpression(node.IncrementExpression, data);
 
+			data.DisableNewLines = false;
+
+			EndLine(data, ") {{");
+
+			data.Padding++;
+			GenerateStatements(node.BodyStatementBlock, data);
+
+			data.Padding--;
+			WriteLine(data, "}}");
+		}
+
+		private static void GenerateForEach(ForEachNode node, DataContext data)
+		{
+			StartLine(data, "foreach (");
+
+			data.DisableNewLines = true;
+			GenerateVariableDeclaration(node.VariableDeclaration, data);
+			DeleteCharacters(data, 1);
+
+			Append(data, " in ");
+
+			GenerateExpression(node.SourceExpression, data);
+						
 			data.DisableNewLines = false;
 
 			EndLine(data, ") {{");
