@@ -76,5 +76,65 @@ var doIt = func(x) {
 
 return x == undef;");
 		}
+
+		[Fact]
+		public void Variable_Declared_With_Same_Name_Inside_If_Block_Is_Ok()
+		{
+			AssertScriptReturnValue(true, @"
+var x = 42;
+var y = 0;
+
+if (y <= 0) {
+	var x = ""abc"";
+	y += 1;
+}
+
+return true;");
+		}
+
+		[Fact]
+		public void Variable_Declared_With_Same_Name_Inside_While_Block_Is_Ok()
+		{
+			AssertScriptReturnValue(true, @"
+var x = 42;
+var y = 0;
+
+while (y <= 0) {
+	var x = ""abc"";
+	y += 1;
+}
+
+return true;");
+		}
+
+		[Fact]
+		public void Variable_Declared_With_Same_Name_Inside_For_Block_Is_Ok()
+		{
+			AssertScriptReturnValue(true, @"
+var x = 42;
+var y = 0;
+
+for (var i = 0; i < 1; i += 1) {
+	var x = ""abc"";
+	y += 1;
+}
+
+return true;");
+		}
+
+		[Fact]
+		public void Variable_Declared_With_Same_Name_Inside_ForEach_Block_Is_Ok()
+		{
+			AssertScriptReturnValue(true, @"
+var x = 42;
+var y = 0;
+
+foreach (var i in [ 1, 2, 3 ]) {
+	var x = ""abc"";
+	y += 1;
+}
+
+return true;");
+		}
 	}
 }

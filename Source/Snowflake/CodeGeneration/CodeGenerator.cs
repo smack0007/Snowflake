@@ -138,7 +138,10 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 
 			data.Padding++;
-			GenerateStatements(syntaxTree.Statements, data);
+			foreach (var statement in syntaxTree.Statements)
+			{
+				GenerateStatement(statement, data);
+			}
 
 			if (!(syntaxTree.Statements.Last() is ReturnNode))
 				WriteLine(data, "return null;");
@@ -176,12 +179,18 @@ namespace Snowflake.CodeGeneration
 			throw new CodeGenerationException(message, node.Line, node.Column);
 		}
 
-		private static void GenerateStatements(IEnumerable<StatementNode> statements, DataContext data)
+		private static void GenerateStatementBlock(StatementBlockNode statementBlock, DataContext data, bool pushStackFrame = true)
 		{
-			foreach (var statement in statements)
+			if (pushStackFrame)
+				data.VariableMap.PushFrame();
+
+			foreach (var statement in statementBlock)
 			{
 				GenerateStatement(statement, data);
 			}
+
+			if (pushStackFrame)
+				data.VariableMap.PopFrame();
 		}
 
 		private static void GenerateStatement(StatementNode node, DataContext data)
@@ -259,7 +268,7 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ") {{");
 
 			data.Padding++;
-			GenerateStatements(node.BodyStatementBlock, data);
+			GenerateStatementBlock(node.BodyStatementBlock, data);
 						
 			if (node.ElseStatementBlock != null)
 			{
@@ -267,7 +276,7 @@ namespace Snowflake.CodeGeneration
 				WriteLine(data, "}} else {{");
 
 				data.Padding++;
-				GenerateStatements(node.ElseStatementBlock, data);
+				GenerateStatementBlock(node.ElseStatementBlock, data);
 			}
 
 			data.Padding--;
@@ -283,7 +292,7 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ") {{");
 
 			data.Padding++;
-			GenerateStatements(node.BodyStatementBlock, data);
+			GenerateStatementBlock(node.BodyStatementBlock, data);
 
 			data.Padding--;
 			WriteLine(data, "}}");
@@ -320,7 +329,7 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ") {{");
 
 			data.Padding++;
-			GenerateStatements(node.BodyStatementBlock, data);
+			GenerateStatementBlock(node.BodyStatementBlock, data);
 
 			data.Padding--;
 			WriteLine(data, "}}");
@@ -343,7 +352,7 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ") {{");
 
 			data.Padding++;
-			GenerateStatements(node.BodyStatementBlock, data);
+			GenerateStatementBlock(node.BodyStatementBlock, data);
 
 			data.Padding--;
 			WriteLine(data, "}}");
@@ -498,7 +507,7 @@ namespace Snowflake.CodeGeneration
 				data.Padding++;
 			}
 
-			GenerateStatements(node.BodyStatementBlock, data);
+			GenerateStatementBlock(node.BodyStatementBlock, data, pushStackFrame: false);
 			
 			if (!(node.BodyStatementBlock.Last() is ReturnNode))
 				WriteLine(data, "return null;");

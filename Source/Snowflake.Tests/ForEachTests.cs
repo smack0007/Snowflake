@@ -69,6 +69,30 @@ return sum;
 		}
 
 		[Fact]
+		public void List_Can_Be_Delared_As_Source_Expression()
+		{
+			AssertScriptReturnValue(6, @"
+var sum = 0;
+foreach (var x in [ 1, 2, 3 ]) {
+	sum += x;
+}
+return sum;
+");
+		}
+
+		[Fact]
+		public void Array_Can_Be_Delared_As_Source_Expression()
+		{
+			AssertScriptReturnValue(6, @"
+var sum = 0;
+foreach (var x in [| 1, 2, 3 |]) {
+	sum += x;
+}
+return sum;
+");
+		}
+
+		[Fact]
 		public void VariableDeclaration_With_Value_Is_Syntax_Error()
 		{
 			AssertScriptIsException<SyntaxException>(@"
