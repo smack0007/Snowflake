@@ -389,6 +389,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateElementAccess((ElementAccessNode)node, data);
 			}
+			else if (node is PostfixOperationNode)
+			{
+				GeneratePostfixOperation((PostfixOperationNode)node, data);
+			}
 			else if (node is OperationNode)
 			{
 				GenerateOperation((OperationNode)node, data);
@@ -603,15 +607,37 @@ namespace Snowflake.CodeGeneration
 			Append(data, " }}");
 		}
 
+		private static void GeneratePostfixOperation(PostfixOperationNode node, DataContext data)
+		{
+			Append(data, "(");
+
+			GenerateExpression(node.SourceExpression, data);
+
+			switch (node.Type)
+			{
+				case PostfixOperationType.Increment:
+					Append(data, "++");
+					break;
+
+				case PostfixOperationType.Decrement:
+					Append(data, "--");
+					break;
+
+				default:
+					ThrowUnableToGenerateException("PostfixOperation", node);
+					break;
+			}
+
+			Append(data, ")");
+		}
+
 		private static void GenerateOperation(OperationNode node, DataContext data)
 		{
 			Append(data, "(");
 
-			OperationNode operation = (OperationNode)node;
-
 			GenerateExpression(node.LeftHand, data);
 					
-			switch (operation.Type)
+			switch (node.Type)
 			{
 				case OperationType.Equals:
 					Append(data, " == ");

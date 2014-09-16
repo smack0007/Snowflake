@@ -147,21 +147,31 @@ namespace Snowflake.Lexing
 					}
 					else if (text[i] == '+') // Plus or PlusGets
 					{
-						if (i + 1 < text.Length && text[i + 1] != '=')
+						if (text[i + 1] == '+')
 						{
-							lexemes.Add(new Lexeme(LexemeType.Plus, null, curLine, curColumn));
+							lexemes.Add(new Lexeme(LexemeType.Increment, null, curLine, curColumn));
+							i++;
 						}
-						else
+						else if (i + 1 < text.Length && text[i + 1] == '=')
 						{
 							lexemes.Add(new Lexeme(LexemeType.PlusGets, null, curLine, curColumn));
 							i++;
+						}
+						else
+						{
+							lexemes.Add(new Lexeme(LexemeType.Plus, null, curLine, curColumn));
 						}
 					}
 					else if (text[i] == '-') // Minus or MinusGets
 					{
 						if (i + 1 < text.Length && !char.IsWhiteSpace(text[i + 1]))
 						{
-							if (text[i + 1] == '=')
+							if (text[i + 1] == '-')
+							{
+								lexemes.Add(new Lexeme(LexemeType.Decrement, null, curLine, curColumn));
+								i++;
+							}
+							else if (text[i + 1] == '=')
 							{
 								lexemes.Add(new Lexeme(LexemeType.MinusGets, null, curLine, curColumn));
 								i++;

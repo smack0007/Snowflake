@@ -30,9 +30,17 @@ namespace Snowflake.Parsing
 			throw new SyntaxException(string.Format("Unable to parse lexeme type \"{0}\" as \"{1}\" at line {2} column {3}.", lexemes[pos].Type, parseType, lexemes[pos].Line, lexemes[pos].Column));
 		}
 
-		private bool IsAssignmentOperator(LexemeType type)
+		private static bool IsAssignmentOperator(LexemeType type)
 		{
 			if (type == LexemeType.Gets || type == LexemeType.PlusGets || type == LexemeType.MinusGets || type == LexemeType.MultiplyGets || type == LexemeType.DivideGets)
+				return true;
+
+			return false;
+		}
+
+		private static bool IsPostfixOperator(LexemeType type)
+		{
+			if (type == LexemeType.Increment || type == LexemeType.Decrement)
 				return true;
 
 			return false;
@@ -326,7 +334,7 @@ namespace Snowflake.Parsing
 			ExpressionNode node = this.ParseConditionalOrExpression(lexemes, ref pos);
 
 			if ((node is VariableReferenceNode || node is MemberAccessNode) &&
-				this.IsAssignmentOperator(lexemes[pos].Type))
+				IsAssignmentOperator(lexemes[pos].Type))
 			{ 
 				AssignmentOpeartionNode assignNode = Construct<AssignmentOpeartionNode>(lexemes, pos);
 				assignNode.TargetExpression = node;
@@ -618,7 +626,8 @@ namespace Snowflake.Parsing
 
             while (lexemes[pos].Type == LexemeType.OpenParen ||
 				   lexemes[pos].Type == LexemeType.Dot ||
-				   lexemes[pos].Type == LexemeType.OpenBracket)
+				   lexemes[pos].Type == LexemeType.OpenBracket ||
+				   IsPostfixOperator(lexemes[pos].Type))
             {
 				if (lexemes[pos].Type == LexemeType.OpenParen)
 				{
@@ -631,6 +640,10 @@ namespace Snowflake.Parsing
 				else if (lexemes[pos].Type == LexemeType.OpenBracket)
 				{
 					node = this.ParseElementAccess(node, lexemes, ref pos);
+				}
+				else if (IsPostfixOperator(lexemes[pos].Type))
+				{
+					node = this.ParsePostfixOperation(node, lexemes, ref pos);
 				}
             }
 
@@ -767,6 +780,31 @@ namespace Snowflake.Parsing
 			this.EnsureLexemeType(lexemes, LexemeType.CloseBracket, pos);
 			pos++;
 
+			return node;
+		}
+
+		private PostfixOperationNode ParsePostfixOperation(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)
+		{
+			if (sourceExpression is PostfixOperationNode)
+				throw new SyntaxException(string.Format("Postfix opeartion may not be applied to postfix operation at line {0} column {1}.", lexemes[pos].Line, lexemes[pos].Column));
+
+			PostfixOperationNode node = Construct<PostfixOperationNode>(lexemes, pos);
+			node.SourceExpression = sourceExpression;
+
+			if (lexemes[pos].Type == LexemeType.Increment)
+			{
+				node.Type = PostfixOperationType.Increment;
+			}
+			else if (lexemes[pos].Type == LexemeType.Decrement)
+			{
+				node.Type = PostfixOperationType.Decrement;
+			}
+			else
+			{
+				ThrowUnableToParseException("PostfixOperation", lexemes, pos);
+			}
+
+			pos++;
 			return node;
 		}
 

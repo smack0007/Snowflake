@@ -98,6 +98,8 @@
     <Compile Include="Parsing\ForEachNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
     <Compile Include="Parsing\MemberAccessNode.cs" />
+    <Compile Include="Parsing\PostfixOperationNode.cs" />
+    <Compile Include="Parsing\PostfixOperationType.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />
     <Compile Include="Parsing\UnaryOperationType.cs" />
     <Compile Include="ScriptExecutionException.cs" />

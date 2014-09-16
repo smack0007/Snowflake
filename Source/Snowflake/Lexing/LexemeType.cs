@@ -203,6 +203,11 @@ namespace Snowflake.Lexing
 		/// +
 		/// </summary>
 		Plus,
+
+		/// <summary>
+		/// ++
+		/// </summary>
+		Increment,
 		
 		/// <summary>
 		/// +=
@@ -213,6 +218,11 @@ namespace Snowflake.Lexing
 		/// -
 		/// </summary>
 		Minus,
+
+		/// <summary>
+		/// --
+		/// </summary>
+		Decrement,
 		
 		/// <summary>
 		/// -=

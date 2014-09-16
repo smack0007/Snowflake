@@ -62,6 +62,7 @@
     <Compile Include="LogicalOperationsTests.cs" />
     <Compile Include="MemberAcessTests.cs" />
     <Compile Include="OrderOfOperationsTests.cs" />
+    <Compile Include="PostfixOperationTests.cs" />
     <Compile Include="ReturnValueTests.cs" />
     <Compile Include="Lexing\ScriptLexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
