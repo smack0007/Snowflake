@@ -710,6 +710,18 @@ namespace Snowflake.CodeGeneration
 				case UnaryOperationType.LogicalNegate:
 					Append(data, "!");
 					break;
+
+				case UnaryOperationType.Increment:
+					Append(data, "++");
+					break;
+
+				case UnaryOperationType.Decrement:
+					Append(data, "--");
+					break;
+
+				default:
+					ThrowUnableToGenerateException("UnaryOperation", node);
+					break;
 			}
 			
 			GenerateExpression(((UnaryOperationNode)node).ValueExpression, data);

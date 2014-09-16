@@ -6,6 +6,10 @@ namespace Snowflake.Parsing
 	{
 		Negate,
 
-		LogicalNegate
+		LogicalNegate,
+
+		Increment,
+
+		Decrement
 	}
 }

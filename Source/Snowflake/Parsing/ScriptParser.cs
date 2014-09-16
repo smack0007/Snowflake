@@ -46,6 +46,14 @@ namespace Snowflake.Parsing
 			return false;
 		}
 
+		private static bool IsUnaryOperator(LexemeType type)
+		{
+			if (type == LexemeType.Minus || type == LexemeType.Not || type == LexemeType.Increment || type == LexemeType.Decrement)
+				return true;
+
+			return false;
+		}
+
 		private static void SkipWhileEndStatement(IList<Lexeme> lexemes, ref int pos)
 		{
 			while (lexemes[pos].Type == LexemeType.EndStatement)
@@ -515,7 +523,7 @@ namespace Snowflake.Parsing
 
 		private ExpressionNode ParseUnaryExpression(IList<Lexeme> lexemes, ref int pos)
 		{
-			if (lexemes[pos].Type == LexemeType.Minus || lexemes[pos].Type == LexemeType.Not)
+			if (IsUnaryOperator(lexemes[pos].Type))
 			{
 				UnaryOperationNode node = Construct<UnaryOperationNode>(lexemes, pos);
 
@@ -527,6 +535,18 @@ namespace Snowflake.Parsing
 
 					case LexemeType.Not:
 						node.Type = UnaryOperationType.LogicalNegate;
+						break;
+
+					case LexemeType.Increment:
+						node.Type = UnaryOperationType.Increment;
+						break;
+
+					case LexemeType.Decrement:
+						node.Type = UnaryOperationType.Decrement;
+						break;
+
+					default:
+						ThrowUnableToParseException("UnaryExpression", lexemes, pos);
 						break;
 				}
 

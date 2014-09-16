@@ -55,5 +55,23 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue(42, "return 21 - -21;");
 		}
+
+		[Fact]
+		public void Prefix_Increment_Works_As_Expected()
+		{
+			AssertScriptReturnValue(4, @"
+var x = 1;
+var y = ++x;
+return x + y;");
+		}
+
+		[Fact]
+		public void Prefix_Decrement_Works_As_Expected()
+		{
+			AssertScriptReturnValue(2, @"
+var x = 2;
+var y = --x;
+return x + y;");
+		}
 	}
 }
