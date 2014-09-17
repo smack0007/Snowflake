@@ -97,6 +97,8 @@
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
+    <Compile Include="Parsing\MapNode.cs" />
+    <Compile Include="Parsing\MapPairNode.cs" />
     <Compile Include="Parsing\MemberAccessNode.cs" />
     <Compile Include="Parsing\PostfixOperationNode.cs" />
     <Compile Include="Parsing\PostfixOperationType.cs" />

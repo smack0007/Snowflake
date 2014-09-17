@@ -50,6 +50,7 @@ PrimaryExpression = "(" <Expression> ")" |
 					<FunctionCall> |
 					<List> |
 					<Array> |
+					<Map> |
 					<MemberAccess> |
 					<PostfixOperation> |
 					<Identifier> |
@@ -65,9 +66,13 @@ AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
-List = "[" <Expression>? ( "," <Expression> )* "]"
+List = "[" <Expression>? ( "," <Expression> )* "]" ;
 
-Array = "[|" <Expression>? ( "," <Expression> )* "|]"
+Array = "[|" <Expression>? ( "," <Expression> )* "|]" ;
+
+Map = "{" <MapPair>? ( "," <MapPair> )* "}" ;
+
+MapPair = ( <Identifier> | <Expression> ) ":" <Expression> ;
 
 MemberAccess = <Expression> "." <Identifier> ;
 

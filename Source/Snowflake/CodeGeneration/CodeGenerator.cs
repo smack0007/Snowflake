@@ -409,6 +409,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateArray((ArrayNode)node, data);
 			}
+			else if (node is MapNode)
+			{
+				GenerateMap((MapNode)node, data);
+			}
 			else if (node is VariableReferenceNode)
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
@@ -602,6 +606,25 @@ namespace Snowflake.CodeGeneration
 					Append(data, ", ");
 
 				GenerateExpression(node.ValueExpressions[i], data);
+			}
+
+			Append(data, " }}");
+		}
+
+		private static void GenerateMap(MapNode node, DataContext data)
+		{
+			Append(data, "new Dictionary<dynamic, dynamic> {{ ");
+
+			for (int i = 0; i < node.Pairs.Count; i++)
+			{
+				if (i != 0)
+					Append(data, ", ");
+
+				Append(data, "{{ ");
+				GenerateExpression(node.Pairs[i].KeyExpression, data);
+				Append(data, ", ");
+				GenerateExpression(node.Pairs[i].ValueExpression, data);
+				Append(data, " }}");
 			}
 
 			Append(data, " }}");

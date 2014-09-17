@@ -97,6 +97,10 @@ namespace Snowflake.Lexing
 					{
 						lexemes.Add(new Lexeme(LexemeType.CloseBrace, null, curLine, curColumn));
 					}
+					else if (text[i] == ':')
+					{
+						lexemes.Add(new Lexeme(LexemeType.Colon, null, curLine, curColumn));
+					}
 					else if (text[i] == '=') // Gets or EqualTo or MapsTo
 					{
 						if (i + 1 < text.Length && text[i + 1] == '=')

@@ -60,6 +60,7 @@
     <Compile Include="LanguageTestFixture.cs" />
     <Compile Include="ListTests.cs" />
     <Compile Include="LogicalOperationsTests.cs" />
+    <Compile Include="MapTests.cs" />
     <Compile Include="MemberAcessTests.cs" />
     <Compile Include="OrderOfOperationsTests.cs" />
     <Compile Include="PostfixOperationTests.cs" />

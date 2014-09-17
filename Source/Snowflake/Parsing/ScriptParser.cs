@@ -589,6 +589,10 @@ namespace Snowflake.Parsing
 						node = this.ParseArray(lexemes, ref pos);
 						break;
 
+					case LexemeType.OpenBrace:
+						node = this.ParseMap(lexemes, ref pos);
+						break;
+
 					case LexemeType.Identifier:
 						node = this.ParseVariableReference(lexemes, ref pos);
 						break;
@@ -743,6 +747,52 @@ namespace Snowflake.Parsing
 
 			this.EnsureLexemeType(lexemes, LexemeType.ClosePipeBracket, pos);
 			pos++;
+
+			return node;
+		}
+
+		private MapNode ParseMap(IList<Lexeme> lexemes, ref int pos)
+		{
+			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
+
+			MapNode node = Construct<MapNode>(lexemes, pos);
+
+			pos++;
+			while (lexemes[pos].Type != LexemeType.CloseBrace && lexemes[pos].Type != LexemeType.EOF)
+			{
+				node.Pairs.Add(this.ParseMapPair(lexemes, ref pos));
+
+				while (lexemes[pos].Type == LexemeType.Comma)
+				{
+					pos++;
+					node.Pairs.Add(this.ParseMapPair(lexemes, ref pos));
+				}
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.CloseBrace, pos);
+			pos++;
+
+			return node;
+		}
+
+		private MapPairNode ParseMapPair(IList<Lexeme> lexemes, ref int pos)
+		{
+			MapPairNode node = Construct<MapPairNode>(lexemes, pos);
+
+			if (lexemes[pos].Type == LexemeType.Identifier)
+			{
+				node.KeyExpression = new StringValueNode() { Value = lexemes[pos].Value };
+				pos++;
+			}
+			else
+			{
+				node.KeyExpression = this.ParseExpression(lexemes, ref pos);
+			}
+
+			this.EnsureLexemeType(lexemes, LexemeType.Colon, pos);
+            pos++;
+
+			node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 
 			return node;
 		}

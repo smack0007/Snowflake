@@ -160,6 +160,11 @@ namespace Snowflake.Lexing
 		ClosePipeBracket,
 
 		/// <summary>
+		/// :
+		/// </summary>
+		Colon,
+
+		/// <summary>
 		/// =
 		/// </summary>
 		Gets,
