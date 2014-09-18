@@ -71,13 +71,13 @@ namespace Snowflake.Generated
 Snowflake scripts by default do not have access to any .NET BCL classes or methods besides those types which are baked into the language. Access can
 be given to scripts if necessary by setting global variables inside the ScriptEngine:
 
-```
+```csharp
 engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 ```
 
 In order to allow objects to be created, you'll need to provide the ScriptEngine with a function which calls the constructor of the object:
 
-```
+```csharp
 engine.SetGlobalFunction("createPerson", () => new Person());
 ```
 
@@ -94,6 +94,7 @@ person.Age = 42;
 
 The following is the structure of the language following the EBNF language as closely as possible:
 
+```
 Script = <Statement>* EOF ;
 
 StatementBlock = "{" <Statement>* "}" ;
@@ -191,3 +192,4 @@ String = "\"" <chars>* "\"" ;
 Integer = [1-9]* ;
 
 Float = [1-9]*[.][1-9]* ;
+```
