@@ -1,4 +1,4 @@
-= Snowflake
+# Snowflake
 
 Snowflake is a scripting language which compiles to C#. The following is an example Snowflake script:
 
@@ -21,7 +21,7 @@ print(values.Count);
 
 This script compiles to the following C# code:
 
-```
+```csharp
 using System;
 using System.Collections.Generic;
 
@@ -66,7 +66,7 @@ namespace Snowflake.Generated
 }
 ```
 
-== Interop
+## Interop
 
 Snowflake scripts by default do not have access to any .NET BCL classes or methods besides those types which are baked into the language. Access can
 be given to scripts if necessary by setting global variables inside the ScriptEngine:
@@ -90,7 +90,7 @@ person.LastName = "Freeman";
 person.Age = 42;
 ```
 
-== Language Structure
+## Language Structure
 
 The following is the structure of the language following the EBNF language as closely as possible:
 
