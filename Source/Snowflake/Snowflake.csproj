@@ -152,6 +152,9 @@
     <Content Include="LanguageStructure.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Readme.md">
+      <Link>Readme.md</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

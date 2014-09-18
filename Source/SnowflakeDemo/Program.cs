@@ -1,5 +1,6 @@
 ﻿using System;
 using Snowflake;
+using System.IO;
 
 namespace SnowflakeDemo
 {
@@ -11,7 +12,7 @@ namespace SnowflakeDemo
 
 			ScriptEngine engine = new ScriptEngine();
 
-			var lexemes = engine.GetLexemes("return 21 - -21;");
+            File.WriteAllText("Output.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs")));
 							
 			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 			engine.SetGlobalFunction<int>("GetNumber", () => random.Next());
