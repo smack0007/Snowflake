@@ -409,9 +409,9 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateArray((ArrayNode)node, data);
 			}
-			else if (node is MapNode)
+			else if (node is DictionaryNode)
 			{
-				GenerateMap((MapNode)node, data);
+				GenerateDictionary((DictionaryNode)node, data);
 			}
 			else if (node is VariableReferenceNode)
 			{
@@ -611,9 +611,9 @@ namespace Snowflake.CodeGeneration
 			Append(data, " }}");
 		}
 
-		private static void GenerateMap(MapNode node, DataContext data)
+		private static void GenerateDictionary(DictionaryNode node, DataContext data)
 		{
-			Append(data, "new Dictionary<dynamic, dynamic> {{ ");
+			Append(data, "new ScriptDictionary() {{ ");
 
 			for (int i = 0; i < node.Pairs.Count; i++)
 			{

@@ -50,7 +50,7 @@ PrimaryExpression = "(" <Expression> ")" |
 					<FunctionCall> |
 					<List> |
 					<Array> |
-					<Map> |
+					<Dictionary> |
 					<MemberAccess> |
 					<PostfixOperation> |
 					<Identifier> |
@@ -70,9 +70,9 @@ List = "[" <Expression>? ( "," <Expression> )* "]" ;
 
 Array = "[|" <Expression>? ( "," <Expression> )* "|]" ;
 
-Map = "{" <MapPair>? ( "," <MapPair> )* "}" ;
+Dictionary = "{" <DictionaryPair>? ( "," <DictionaryPair> )* "}" ;
 
-MapPair = ( <Identifier> | <Expression> ) ":" <Expression> ;
+DictionaryPair = ( <Identifier> | <Expression> ) ":" <Expression> ;
 
 MemberAccess = <Expression> "." <Identifier> ;
 

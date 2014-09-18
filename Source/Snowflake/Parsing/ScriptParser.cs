@@ -590,7 +590,7 @@ namespace Snowflake.Parsing
 						break;
 
 					case LexemeType.OpenBrace:
-						node = this.ParseMap(lexemes, ref pos);
+						node = this.ParseDictionary(lexemes, ref pos);
 						break;
 
 					case LexemeType.Identifier:
@@ -751,21 +751,21 @@ namespace Snowflake.Parsing
 			return node;
 		}
 
-		private MapNode ParseMap(IList<Lexeme> lexemes, ref int pos)
+		private DictionaryNode ParseDictionary(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.OpenBrace, pos);
 
-			MapNode node = Construct<MapNode>(lexemes, pos);
+			DictionaryNode node = Construct<DictionaryNode>(lexemes, pos);
 
 			pos++;
 			while (lexemes[pos].Type != LexemeType.CloseBrace && lexemes[pos].Type != LexemeType.EOF)
 			{
-				node.Pairs.Add(this.ParseMapPair(lexemes, ref pos));
+				node.Pairs.Add(this.ParseDictionaryPair(lexemes, ref pos));
 
 				while (lexemes[pos].Type == LexemeType.Comma)
 				{
 					pos++;
-					node.Pairs.Add(this.ParseMapPair(lexemes, ref pos));
+					node.Pairs.Add(this.ParseDictionaryPair(lexemes, ref pos));
 				}
 			}
 
@@ -775,9 +775,9 @@ namespace Snowflake.Parsing
 			return node;
 		}
 
-		private MapPairNode ParseMapPair(IList<Lexeme> lexemes, ref int pos)
+		private DictionaryPairNode ParseDictionaryPair(IList<Lexeme> lexemes, ref int pos)
 		{
-			MapPairNode node = Construct<MapPairNode>(lexemes, pos);
+			DictionaryPairNode node = Construct<DictionaryPairNode>(lexemes, pos);
 
 			if (lexemes[pos].Type == LexemeType.Identifier)
 			{

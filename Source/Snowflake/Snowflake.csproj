@@ -14,6 +14,8 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -97,13 +99,14 @@
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
-    <Compile Include="Parsing\MapNode.cs" />
-    <Compile Include="Parsing\MapPairNode.cs" />
+    <Compile Include="Parsing\DictionaryNode.cs" />
+    <Compile Include="Parsing\DictionaryPairNode.cs" />
     <Compile Include="Parsing\MemberAccessNode.cs" />
     <Compile Include="Parsing\PostfixOperationNode.cs" />
     <Compile Include="Parsing\PostfixOperationType.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />
     <Compile Include="Parsing\UnaryOperationType.cs" />
+    <Compile Include="ScriptDictionary.cs" />
     <Compile Include="ScriptExecutionException.cs" />
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="Parsing\AssignmentOpeartionNode.cs" />
@@ -152,6 +155,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

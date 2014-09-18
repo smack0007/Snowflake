@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class MapNode : ExpressionNode, IEnumerable<MapPairNode>
+	public class DictionaryNode : ExpressionNode, IEnumerable<DictionaryPairNode>
 	{
-		public SyntaxNodeCollection<MapPairNode> Pairs
+		public SyntaxNodeCollection<DictionaryPairNode> Pairs
 		{
 			get;
 			private set;
 		}
 
-		public MapNode()
+		public DictionaryNode()
 			: base()
 		{
-			this.Pairs = new SyntaxNodeCollection<MapPairNode>(this);
+			this.Pairs = new SyntaxNodeCollection<DictionaryPairNode>(this);
 		}
 
 		public override IEnumerable<T> Find<T>()
@@ -33,7 +33,7 @@ namespace Snowflake.Parsing
 			}
 		}
 
-		public IEnumerator<MapPairNode> GetEnumerator()
+		public IEnumerator<DictionaryPairNode> GetEnumerator()
 		{
 			return this.Pairs.GetEnumerator();
 		}

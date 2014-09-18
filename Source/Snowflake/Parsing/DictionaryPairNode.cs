@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class MapPairNode : SyntaxNode
+	public class DictionaryPairNode : SyntaxNode
 	{
 		ExpressionNode keyExpression;
 		ExpressionNode valueExpression;
@@ -20,7 +20,7 @@ namespace Snowflake.Parsing
 			set { this.valueExpression = SetParent(this.valueExpression, value); }
 		}
 
-		public MapPairNode()
+		public DictionaryPairNode()
 			: base()
 		{
 		}
