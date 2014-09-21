@@ -83,5 +83,13 @@ namespace Snowflake.Tests
                 },
                 "return { foo: { bar: { baz: 42 } } };");
         }
+
+        [Fact]
+        public void Access_Dictionary_Value_Which_Is_Not_Set_Is_Error()
+        {
+            AssertScriptIsException<ScriptExecutionException>(@"
+var map = { foo: 42 };
+return map.bar;");
+        }
 	}
 }
