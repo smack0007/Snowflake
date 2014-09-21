@@ -64,7 +64,7 @@ namespace Snowflake.CodeGeneration
 					return frame[realName];
 			}
 
-			return "this.GetGlobalVariable(\"" + realName + "\")";
+			return "context.GetGlobalVariable(\"" + realName + "\")";
 		}
 	}
 }

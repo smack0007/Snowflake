@@ -128,7 +128,7 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 
 			data.Padding++;
-			WriteLine(data, "protected override object Execute()");
+			WriteLine(data, "public override dynamic Execute(ScriptExecutionContext context)");
 			WriteLine(data, "{{");
 									
 			data.Padding++;
@@ -554,7 +554,7 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateFunctionCall(FunctionCallNode node, DataContext data)
 		{
-			Append(data, "Invoke(");
+			Append(data, "Invoke(context, ");
 
 			GenerateExpression(node.FunctionExpression, data);
 
