@@ -134,7 +134,6 @@
     <Compile Include="Parsing\ScriptNode.cs" />
     <Compile Include="Parsing\SyntaxNodeCollection.cs" />
     <Compile Include="Parsing\SyntaxNode.cs" />
-    <Compile Include="Parsing\UndefinedValueNode.cs" />
     <Compile Include="Parsing\VariableDeclarationNode.cs" />
     <Compile Include="Parsing\VariableReferenceNode.cs" />
     <Compile Include="Parsing\WhileNode.cs" />
@@ -149,7 +148,6 @@
     <Compile Include="Parsing\SyntaxException.cs" />
     <Compile Include="ScriptFunction.cs" />
     <Compile Include="ScriptStackFrame.cs" />
-    <Compile Include="ScriptUndefined.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />

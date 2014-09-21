@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Snowflake
 {
 	public class ScriptExecutionException : ScriptException
 	{
-		public IList<ScriptStackFrame> Stack
+        public ScriptStackFrame[] Stack
 		{
 			get;
 			private set;
 		}
-                
-		public ScriptExecutionException(string message, Exception innerException, Stack<ScriptStackFrame> stack)
+
+        public ScriptExecutionException(string message, ScriptStackFrame[] stack)
+            : base(message)
+        {
+            this.Stack = stack;
+        }
+
+        public ScriptExecutionException(string message, ScriptStackFrame[] stack, Exception innerException)
 			: base(message, innerException)
 		{
-			this.Stack = stack.ToList();
+            this.Stack = stack;
 		}
 	}
 }

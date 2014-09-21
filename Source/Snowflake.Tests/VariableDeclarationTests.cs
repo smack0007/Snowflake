@@ -49,32 +49,32 @@ return y;");
 		}
 
 		[Fact]
-		public void Undeclarded_Variable_Is_Undefined()
+		public void Undeclarded_Variable_Is_Error()
 		{
-			AssertScriptReturnValue(true, @"return x == undef;");
+			AssertScriptIsException<ScriptExecutionException>(@"return x;");
 		}
 
 		[Fact]
-		public void Variable_Declared_Inside_Function_Is_Undefined_Outside_Function()
+		public void Variable_Declared_Inside_Function_Is_Not_Defined_Outside_Function()
 		{
-			AssertScriptReturnValue(true, @"
+            AssertScriptIsException<ScriptExecutionException>(@"
 var doIt = func() {
 	var x = 5;
 	return x;
 };
 
-return x == undef;");
+return x;");
 		}
 
 		[Fact]
-		public void Variable_Declared_As_Function_Arg_Is_Undefined_Outside_Function()
+		public void Variable_Declared_As_Function_Arg_Is_Not_Defined_Outside_Function()
 		{
-			AssertScriptReturnValue(true, @"
+            AssertScriptIsException<ScriptExecutionException>(@"
 var doIt = func(x) {
 	return x;
 };
 
-return x == undef;");
+return x;");
 		}
 
 		[Fact]

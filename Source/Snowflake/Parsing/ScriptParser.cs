@@ -598,12 +598,7 @@ namespace Snowflake.Parsing
 						node = Construct<NullValueNode>(lexemes, pos);
 						pos++;
 						break;
-
-					case LexemeType.Undef:
-                        node = Construct<UndefinedValueNode>(lexemes, pos);
-						pos++;
-						break;
-
+                        					
 					case LexemeType.True:
                     case LexemeType.False:
                         var boolNode = Construct<BooleanValueNode>(lexemes, pos);

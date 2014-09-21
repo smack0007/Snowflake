@@ -132,8 +132,6 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 									
 			data.Padding++;
-			WriteLine(data, "var stack = new Stack<ScriptStackFrame>();");
-
 			WriteLine(data, "try");
 			WriteLine(data, "{{");
 
@@ -152,7 +150,7 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 
 			data.Padding++;
-			WriteLine(data, "throw new ScriptExecutionException(ex.Message, ex, stack);");
+			WriteLine(data, "throw new ScriptExecutionException(ex.Message, context.GetStackFrames(), ex);");
 
 			data.Padding--;
 			WriteLine(data, "}}");
@@ -422,10 +420,6 @@ namespace Snowflake.CodeGeneration
 			{
 				Append(data, "null");
 			}
-			else if (node is UndefinedValueNode)
-			{
-				Append(data, "ScriptUndefined.Value");
-			}
 			else if (node is BooleanValueNode)
 			{
 				if (((BooleanValueNode)node).Value)
@@ -507,7 +501,7 @@ namespace Snowflake.CodeGeneration
 
 			data.Padding++;
 
-			WriteLine(data, "stack.Push(new ScriptStackFrame(\"{0}\"));", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
+			WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
 			WriteLine(data, "try {{");
 
 			data.Padding++;
@@ -521,7 +515,7 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "}} finally {{");
 
 			data.Padding++;
-			WriteLine(data, "stack.Pop();");
+            WriteLine(data, "context.PopStackFrame();");
 
 			data.Padding--;
 			WriteLine(data, "}}");

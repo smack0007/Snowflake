@@ -96,12 +96,15 @@ namespace Snowflake
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            result = ScriptUndefined.Value;
+            result = null;
 
             if (this.data.ContainsKey(binder.Name))
+            {
                 result = this.data[binder.Name];
+                return true;
+            }
 
-            return true;
+            return false;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)

@@ -64,11 +64,6 @@ namespace Snowflake.Lexing
 		/// </summary>
 		In,
 				
-        /// <summary>
-        /// undef
-        /// </summary>
-        Undef,
-		
 		/// <summary>
 		/// null
 		/// </summary>
