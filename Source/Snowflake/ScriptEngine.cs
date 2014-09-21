@@ -71,7 +71,6 @@ namespace Snowflake
 			var code = this.codeGenerator.Generate(syntaxTree);
 
             Script compiled = this.codeCompiler.Compile(id, code);
-            compiled.Id = id;
             return compiled.Execute(this.executionContext);
         }
 	}

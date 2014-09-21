@@ -126,8 +126,11 @@ namespace Snowflake.CodeGeneration
 			data.Padding++;
 			WriteLine(data, "public class {0}Script : Script", syntaxTree.Id);
 			WriteLine(data, "{{");
-
+            
 			data.Padding++;
+            WriteLine(data, "public override string Id {{ get {{ return \"{0}\"; }} }}", syntaxTree.Id);
+            WriteLine(data);
+
 			WriteLine(data, "public override dynamic Execute(ScriptExecutionContext context)");
 			WriteLine(data, "{{");
 									

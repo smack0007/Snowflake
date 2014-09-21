@@ -6,11 +6,7 @@ namespace Snowflake
 {
     public abstract class Script
 	{		
-		public string Id
-		{
-			get;
-			internal set;
-		}
+		public abstract string Id { get; }
         		
 		public Script()
             : base()
