@@ -7,16 +7,14 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Snowflake.CodeGeneration
 {
 	public class CodeCompiler
-	{
-		public Script Compile(string id, string code)
+	{        
+		public Script Compile(string code, string className)
 		{
 			SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-			string scriptName = id + "Script";
-
 			var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
-			var compilation = CSharpCompilation.Create(scriptName)
+            var compilation = CSharpCompilation.Create(className)
 				.WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
 				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "mscorlib.dll")))
 				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "System.dll")))
@@ -32,11 +30,11 @@ namespace Snowflake.CodeGeneration
 				if (!result.Success)
 				{
 					string message = string.Join(Environment.NewLine, result.Diagnostics);
-					throw new CodeCompilationException(string.Format("Failed to compile {0}:\n{1}", id, message), id, code);
+					throw new CodeCompilationException(string.Format("Failed to compile script:\n{0}", message), code);
 				}
 
 				Assembly assembly = Assembly.Load(stream.ToArray());
-				return (Script)Activator.CreateInstance(assembly.GetType(CodeGenerator.GeneratedCodeNamespace + "." + scriptName));
+                return (Script)Activator.CreateInstance(assembly.GetType(CodeGenerator.GeneratedCodeNamespace + "." + className));
 			}			
 		}
 	}

@@ -32,7 +32,7 @@ namespace Snowflake
 				args = newArgs;
 			}
 
-			return ((Delegate)this.func).DynamicInvoke(args);
+			return this.func.DynamicInvoke(args);
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace SnowflakeDemo
             ScriptDictionary export = new ScriptDictionary();
             ScriptEngine engine = new ScriptEngine();
 
-            File.WriteAllText("Output.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs")));
+            File.WriteAllText("Output.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs"), "Script1"));
 							
 			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 			engine.SetGlobalVariable("export", export);

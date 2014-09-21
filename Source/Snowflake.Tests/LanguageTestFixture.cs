@@ -28,7 +28,7 @@ namespace Snowflake.Tests
 		{
 			ScriptEngine engine = new ScriptEngine();
 			setup(engine);
-			Console.WriteLine(engine.GenerateCode(script));
+			Console.WriteLine(engine.GenerateCode(script, "Script1"));
 			var result = (T)engine.Execute(script);
 			assert(result);
 		}
@@ -39,7 +39,7 @@ namespace Snowflake.Tests
 			ScriptEngine engine = new ScriptEngine();
 			Assert.Throws<T>(() =>
 			{
-				Console.WriteLine(engine.GenerateCode(script));
+                Console.WriteLine(engine.GenerateCode(script, "Script1"));
 				engine.Execute(script);
 			});
 		}

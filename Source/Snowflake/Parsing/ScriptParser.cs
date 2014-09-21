@@ -60,15 +60,12 @@ namespace Snowflake.Parsing
 				pos++;
 		}
 
-		public ScriptNode Parse(string id, IList<Lexeme> lexemes)
+		public ScriptNode Parse(IList<Lexeme> lexemes)
 		{
-            if (id == null)
-                throw new ArgumentNullException("id");
-
-			if (lexemes == null)
+            if (lexemes == null)
 				throw new ArgumentNullException("lexemes");
 
-			ScriptNode node = new ScriptNode(id);
+			ScriptNode node = new ScriptNode();
 
 			int pos = 0;
 			while (lexemes[pos].Type != LexemeType.EOF)

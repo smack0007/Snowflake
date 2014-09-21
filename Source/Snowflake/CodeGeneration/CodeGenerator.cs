@@ -112,8 +112,8 @@ namespace Snowflake.CodeGeneration
 			data.Code.Remove(data.Code.Length - count, count);
 		}
 
-		public string Generate(ScriptNode syntaxTree)
-		{
+		public string Generate(ScriptNode syntaxTree, string className)
+		{            
 			DataContext data = new DataContext();
 
 			WriteLine(data, "using System;");
@@ -124,14 +124,11 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 
 			data.Padding++;
-			WriteLine(data, "public class {0}Script : Script", syntaxTree.Id);
+			WriteLine(data, "public class {0} : Script", className);
 			WriteLine(data, "{{");
             
 			data.Padding++;
-            WriteLine(data, "public override string Id {{ get {{ return \"{0}\"; }} }}", syntaxTree.Id);
-            WriteLine(data);
-
-			WriteLine(data, "public override dynamic Execute(ScriptExecutionContext context)");
+            WriteLine(data, "public override dynamic Execute(ScriptExecutionContext context)");
 			WriteLine(data, "{{");
 									
 			data.Padding++;
@@ -155,7 +152,7 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "{{");
 
 			data.Padding++;
-			WriteLine(data, "throw new ScriptExecutionException(ex.Message, ex, this.Id, stack);");
+			WriteLine(data, "throw new ScriptExecutionException(ex.Message, ex, stack);");
 
 			data.Padding--;
 			WriteLine(data, "}}");

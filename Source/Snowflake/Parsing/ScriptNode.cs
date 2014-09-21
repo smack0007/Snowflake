@@ -5,24 +5,14 @@ namespace Snowflake.Parsing
 {
 	public class ScriptNode : SyntaxNode
 	{
-        public string Id
-        {
-            get;
-            private set;
-        }
-
-		public SyntaxNodeCollection<StatementNode> Statements
+        public SyntaxNodeCollection<StatementNode> Statements
 		{
 			get;
 			private set;
 		}
 
-		public ScriptNode(string id)
+		public ScriptNode()
 		{
-            if (id == null)
-                throw new ArgumentNullException("id");
-
-            this.Id = id;
 			this.Statements = new SyntaxNodeCollection<StatementNode>(this);
 		}
 

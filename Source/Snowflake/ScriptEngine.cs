@@ -14,8 +14,9 @@ namespace Snowflake
 		CodeGenerator codeGenerator;
         CodeCompiler codeCompiler;
 
+        int scriptCount;
         ScriptExecutionContext executionContext;
-
+                
 		public ScriptEngine()
 		{
 			this.lexer = new ScriptLexer();
@@ -41,37 +42,55 @@ namespace Snowflake
 			return this.lexer.Lex(script);
 		}
 
-		public string GenerateCode(string script)
+		public string GenerateCode(string script, string className)
 		{
 			var lexemes = this.lexer.Lex(script);
-			var syntaxTree = this.parser.Parse("Compiled", lexemes);
-			return this.codeGenerator.Generate(syntaxTree);
+			var syntaxTree = this.parser.Parse(lexemes);
+			return this.codeGenerator.Generate(syntaxTree, className);
 		}
+
+        private string GetNextScriptClassName()
+        {
+            this.scriptCount++;
+            return "Script" + this.scriptCount;
+        }
+
+        public Script Compile(string script)
+        {
+            return this.Compile(script, this.GetNextScriptClassName());
+        }
+
+        public Script Compile(string script, string className)
+        {
+            var lexemes = this.lexer.Lex(script);
+            var syntaxTree = this.parser.Parse(lexemes);
+            var code = this.codeGenerator.Generate(syntaxTree, className);
+            return this.codeCompiler.Compile(code, className);
+        }
 
         public dynamic Execute(string script)
         {
-			return this.Execute("Compiled", script);
+            var lexemes = this.lexer.Lex(script);
+            var syntaxTree = this.parser.Parse(lexemes);
+
+            string className = this.GetNextScriptClassName();
+            var code = this.codeGenerator.Generate(syntaxTree, className);
+            var compiled = this.codeCompiler.Compile(code, className);
+            return compiled.Execute(this.executionContext);
         }
 
         public dynamic ExecuteFile(string fileName)
 		{
 			string script = File.ReadAllText(fileName);
-			return this.Execute(Path.GetFileNameWithoutExtension(fileName), script);
+			return this.Execute(script);
 		}
 
-        private dynamic Execute(string id, string script)
+        public dynamic Execute(Script script)
         {
-			if (string.IsNullOrEmpty(id))
-			{
-				id = "Compiled";
-			}
+            if (script == null)
+                throw new ArgumentNullException("script");
 
-            var lexemes = this.lexer.Lex(script);
-            var syntaxTree = this.parser.Parse(id, lexemes);
-			var code = this.codeGenerator.Generate(syntaxTree);
-
-            Script compiled = this.codeCompiler.Compile(id, code);
-            return compiled.Execute(this.executionContext);
+            return script.Execute(this.executionContext);
         }
 	}
 }
