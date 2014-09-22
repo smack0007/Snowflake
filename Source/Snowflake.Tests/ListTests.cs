@@ -9,7 +9,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void Empty_List_Is_Correct()
 		{
-			AssertScriptReturnValue<List<dynamic>>(
+			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
 					Assert.Equal(0, x.Count);
@@ -20,7 +20,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void List_With_One_Element_Is_Correct()
 		{
-			AssertScriptReturnValue<List<dynamic>>(
+			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
 					Assert.Equal(1, x.Count);
@@ -32,7 +32,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void List_With_Two_Elements_Is_Correct()
 		{
-			AssertScriptReturnValue<List<dynamic>>(
+			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
 					Assert.Equal(2, x.Count);
@@ -45,7 +45,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void List_With_List_Elements_Is_Correct()
 		{
-			AssertScriptReturnValue<List<dynamic>>(
+			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
 					Assert.Equal(2, x.Count);
@@ -62,7 +62,7 @@ namespace Snowflake.Tests
 		[Fact]
 		public void List_With_Array_Elements_Is_Correct()
 		{
-			AssertScriptReturnValue<List<dynamic>>(
+			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
 					Assert.Equal(2, x.Count);

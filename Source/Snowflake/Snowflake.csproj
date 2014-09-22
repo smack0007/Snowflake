@@ -147,6 +147,7 @@
     <Compile Include="Lexing\ScriptLexer.cs" />
     <Compile Include="Parsing\SyntaxException.cs" />
     <Compile Include="ScriptFunction.cs" />
+    <Compile Include="ScriptList.cs" />
     <Compile Include="ScriptStackFrame.cs" />
   </ItemGroup>
   <ItemGroup>

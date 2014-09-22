@@ -577,7 +577,7 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateList(ListNode node, DataContext data)
 		{
-			Append(data, "new List<dynamic> {{ ");
+			Append(data, "new ScriptList {{ ");
 
 			for (int i = 0; i < node.ValueExpressions.Count; i++)
 			{
