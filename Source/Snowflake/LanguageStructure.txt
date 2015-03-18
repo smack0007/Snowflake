@@ -46,7 +46,8 @@ MultiplicativeExpression = <UnaryExpression> ( ( "*" | "/" ) <UnaryExpression> )
 UnaryExpression = ( ( "-" | "!" ) <UnaryExpression> )* | <PrimaryExpression> ;
 
 PrimaryExpression = "(" <Expression> ")" |
-                    <AnonymousFunction> |
+					<AnonymousFunction> |
+					<ConstructorCall> |
 					<FunctionCall> |
 					<List> |
 					<Array> |
@@ -65,6 +66,8 @@ AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
+
+ConstructorCall = "new" <Identifier> "(" { <Expression> ("," <Expression>)* } ")" ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 

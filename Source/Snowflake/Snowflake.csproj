@@ -98,6 +98,7 @@
     <Compile Include="IScriptExecutionContext.cs" />
     <Compile Include="IScriptExecutionContextExtensions.cs" />
     <Compile Include="Parsing\ArrayNode.cs" />
+    <Compile Include="Parsing\ConstructorCallNode.cs" />
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />

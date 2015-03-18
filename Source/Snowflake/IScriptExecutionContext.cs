@@ -8,5 +8,7 @@ namespace Snowflake
         dynamic GetGlobalVariable(string name);
 
         void SetGlobalVariable(string name, dynamic value);
+
+        void RegisterType(string name, Type type);
     }
 }

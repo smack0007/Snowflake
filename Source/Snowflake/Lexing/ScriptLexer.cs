@@ -323,6 +323,10 @@ namespace Snowflake.Lexing
 								lexemes.Add(new Lexeme(LexemeType.Var, null, curLine, curColumn));
 								break;
 
+                            case "new":
+                                lexemes.Add(new Lexeme(LexemeType.New, null, curLine, curColumn));
+                                break;
+
 							case "func":
 								lexemes.Add(new Lexeme(LexemeType.Func, null, line, column));
 								break;

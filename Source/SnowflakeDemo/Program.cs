@@ -7,6 +7,13 @@ namespace SnowflakeDemo
 {
 	class Program
 	{
+        class Person
+        {
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+        }
+
 		static void Main(string[] args)
 		{			
 			Random random = new Random();
@@ -18,6 +25,7 @@ namespace SnowflakeDemo
 							
 			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 			engine.SetGlobalVariable("export", export);
+            engine.RegisterType("Person", typeof(Person));
                         
             var result = engine.ExecuteFile("SnowflakeDemo.sfs");
 

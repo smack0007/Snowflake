@@ -37,6 +37,11 @@ namespace Snowflake
             this.executionContext.SetGlobalVariable(name, value);
         }
 
+        public void RegisterType(string name, Type type)
+        {
+            this.executionContext.RegisterType(name, type);
+        }
+
 		public IList<Lexeme> GetLexemes(string script)
 		{
 			return this.lexer.Lex(script);

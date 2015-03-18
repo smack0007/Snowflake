@@ -379,6 +379,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateFunctionCall((FunctionCallNode)node, data);
 			}
+            else if (node is ConstructorCallNode)
+            {
+                GenerateConstructorCall((ConstructorCallNode)node, data);
+            }
 			else if (node is MemberAccessNode)
 			{
 				GenerateMemberAccess((MemberAccessNode)node, data);
@@ -545,6 +549,19 @@ namespace Snowflake.CodeGeneration
 
 			data.VariableMap.PopFrame();
 		}
+
+        private static void GenerateConstructorCall(ConstructorCallNode node, DataContext data)
+        {
+            Append(data, "Construct(context, \"{0}\"", node.ConstructorName);
+                        
+            for (int i = 0; i < node.Args.Count; i++)
+            {
+                Append(data, ", ");
+                GenerateExpression(node.Args[i], data);
+            }
+
+            Append(data, ")");
+        }
 
 		private static void GenerateFunctionCall(FunctionCallNode node, DataContext data)
 		{

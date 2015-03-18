@@ -18,7 +18,7 @@ namespace Snowflake.Parsing
 			if (lexemes[pos].Type != expected)
 				throw new SyntaxException(string.Format("{0} was expected at line {1} column {2}.", expected, lexemes[pos].Line, lexemes[pos].Column));
 		}
-
+                
 		private void EnsureNotLexemeType(IList<Lexeme> lexemes, LexemeType unexpected, int pos)
 		{
 			if (lexemes[pos].Type == unexpected)
@@ -29,6 +29,22 @@ namespace Snowflake.Parsing
 		{
 			throw new SyntaxException(string.Format("Unable to parse lexeme type \"{0}\" as \"{1}\" at line {2} column {3}.", lexemes[pos].Type, parseType, lexemes[pos].Line, lexemes[pos].Column));
 		}
+
+        private T ParseExpressionAndEnsureType<T>(IList<Lexeme> lexemes, ref int pos)
+            where T : ExpressionNode
+        {
+            Type expected = typeof(T);
+            int startPos = pos;
+
+            ExpressionNode node = this.ParseExpression(lexemes, ref pos);
+
+            if (!(node is T))
+            {
+                throw new SyntaxException(string.Format("{0} expression was expected at line {1} column {2}.", expected.Name.Substring(0, expected.Name.Length - "Node".Length), lexemes[startPos].Line, lexemes[startPos].Column));
+            }
+
+            return (T)node;
+        }
 
 		private static bool IsAssignmentOperator(LexemeType type)
 		{
@@ -578,6 +594,10 @@ namespace Snowflake.Parsing
 						node = this.ParseAnonymousFunction(lexemes, ref pos);
 						break;
 
+                    case LexemeType.New:
+                        node = this.ParseConstructorCall(lexemes, ref pos);
+                        break;
+
 					case LexemeType.OpenBracket:
 						node = this.ParseList(lexemes, ref pos);
 						break;
@@ -813,6 +833,37 @@ namespace Snowflake.Parsing
 			pos++;
 			return node;
 		}
+
+        private ConstructorCallNode ParseConstructorCall(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.New, pos);
+
+            ConstructorCallNode node = Construct<ConstructorCallNode>(lexemes, pos);
+
+            pos++;
+            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+            node.ConstructorName = lexemes[pos].Value;
+
+            pos++;
+            this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
+
+            pos++;
+            while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
+            {
+                node.Args.Add(this.ParseExpression(lexemes, ref pos));
+
+                while (lexemes[pos].Type == LexemeType.Comma)
+                {
+                    pos++;
+                    node.Args.Add(this.ParseExpression(lexemes, ref pos));
+                }
+            }
+
+            this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+
+            pos++;
+            return node;
+        }
 
 		private MemberAccessNode ParseMemberAccess(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)
 		{

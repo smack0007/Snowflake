@@ -103,6 +103,11 @@ namespace Snowflake.Lexing
 		/// var
 		/// </summary>
 		Var,
+
+        /// <summary>
+        /// new
+        /// </summary>
+        New,
 		
 		/// <summary>
 		/// .
