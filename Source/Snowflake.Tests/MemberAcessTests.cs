@@ -14,5 +14,11 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue(0, "return [].Count;");
 		}
+
+        [Fact]
+        public void List_Clear_Method_Can_Be_Called()
+        {
+            AssertScriptReturnValue(0, "var x = [1, 2, 3]; x.Clear(); return x.Count;");
+        }
 	}
 }

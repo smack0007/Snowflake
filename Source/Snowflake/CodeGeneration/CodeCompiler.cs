@@ -16,11 +16,11 @@ namespace Snowflake.CodeGeneration
 
             var compilation = CSharpCompilation.Create(className)
 				.WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "mscorlib.dll")))
-				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "System.dll")))
-				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "System.Core.dll")))
-				.AddReferences(new MetadataFileReference(Path.Combine(assemblyPath, "Microsoft.CSharp.dll")))
-				.AddReferences(new MetadataFileReference(typeof(Script).Assembly.Location))
+                .AddReferences(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "mscorlib.dll")))
+                .AddReferences(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.dll")))
+                .AddReferences(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Core.dll")))
+                .AddReferences(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "Microsoft.CSharp.dll")))
+                .AddReferences(MetadataReference.CreateFromFile(typeof(Script).Assembly.Location))
 				.AddSyntaxTrees(syntaxTree);
 
 			using (MemoryStream stream = new MemoryStream())
