@@ -565,17 +565,23 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateFunctionCall(FunctionCallNode node, DataContext data)
 		{
-			Append(data, "Invoke(context, ");
+            bool shouldCallInvoke = !(node.FunctionExpression is MemberAccessNode);
 
-			GenerateExpression(node.FunctionExpression, data);
+            if (shouldCallInvoke)
+                Append(data, "Invoke(context, ");
 
-			for (int i = 0; i < node.Args.Count; i++)
-			{
-				Append(data, ", ");
-				GenerateExpression(node.Args[i], data);
-			}
+            GenerateExpression(node.FunctionExpression, data);
 
-			Append(data, ")");
+            if (!shouldCallInvoke)
+                Append(data, "(");
+
+            for (int i = 0; i < node.Args.Count; i++)
+            {
+                Append(data, ", ");
+                GenerateExpression(node.Args[i], data);
+            }
+
+            Append(data, ")");
 		}
 
 		private static void GenerateMemberAccess(MemberAccessNode node, DataContext data)

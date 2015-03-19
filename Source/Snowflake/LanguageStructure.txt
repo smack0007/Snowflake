@@ -77,7 +77,7 @@ Dictionary = "{" <DictionaryPair>? ( "," <DictionaryPair> )* "}" ;
 
 DictionaryPair = ( <Identifier> | <Expression> ) ":" <Expression> ;
 
-MemberAccess = <Expression> "." <Identifier> ;
+MemberAccess = <Expression> "." <Identifier> { "(" { <Expression> ("," <Expression>)* } ")" } ;
 
 PostfixOperation = <Expression> ( "++" | "--" ) ;
 

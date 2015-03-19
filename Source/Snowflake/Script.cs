@@ -23,10 +23,12 @@ namespace Snowflake
         {
             Type type = context.GetType(typeName);
 
-            return typeof(Script)
+            dynamic instance = typeof(Script)
                 .GetMethod("ConstructObject", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(type)
                 .Invoke(null, new object[] { args });
+
+            return instance;
         }
 
 		protected static dynamic Invoke(ScriptExecutionContext context, dynamic func, params dynamic[] args)

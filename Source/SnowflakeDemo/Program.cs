@@ -5,15 +5,15 @@ using System.IO;
 
 namespace SnowflakeDemo
 {
+    public class Person
+    {
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+    }
+
 	class Program
 	{
-        class Person
-        {
-            public string FirstName { get; set; }
-
-            public string LastName { get; set; }
-        }
-
 		static void Main(string[] args)
 		{			
 			Random random = new Random();
@@ -21,7 +21,7 @@ namespace SnowflakeDemo
             ScriptDictionary export = new ScriptDictionary();
             ScriptEngine engine = new ScriptEngine();
 
-            File.WriteAllText("Output.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs"), "Script1"));
+            File.WriteAllText(@"..\..\..\SnowflakeDemoOutput\Script1.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs"), "Script1"));
 							
 			engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 			engine.SetGlobalVariable("export", export);

@@ -1,4 +1,9 @@
-﻿func buildMultiplier(x) {
+﻿var person1 = new Person();
+print(person1.GetType());
+person1.FirstName = "Bob";
+person1.LastName = "Freeman";
+
+func buildMultiplier(x) {
 	return func(y) {
 		return x * y;
 	};
@@ -12,9 +17,5 @@ for (var i = 0; i < 10; i += 1) {
 
 var values = [ 1, 2, 3, 4, 5 ];
 print(values.Count);
-
-var person1 = new Person();
-person1.FirstName = "Bob";
-person1.LastName = "Freeman";
 
 export.number = 42;
