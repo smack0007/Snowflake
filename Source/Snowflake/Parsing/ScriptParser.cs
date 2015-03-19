@@ -337,7 +337,7 @@ namespace Snowflake.Parsing
 			ReturnNode node = Construct<ReturnNode>(lexemes, pos);
 
 			pos++;
-			node.Expression = this.ParseExpression(lexemes, ref pos);
+			node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 
 			this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
 			pos++;

@@ -7,7 +7,7 @@ namespace Snowflake.Parsing
 	{
 		ExpressionNode expression;
 
-		public ExpressionNode Expression
+		public ExpressionNode ValueExpression
 		{
 			get { return this.expression; }
 			set { this.expression = SetParent(this.expression, value); }
@@ -25,9 +25,9 @@ namespace Snowflake.Parsing
 				yield return node;
 			}
 
-			if (this.Expression != null)
+			if (this.ValueExpression != null)
 			{
-				foreach (T node in this.Expression.Find<T>())
+				foreach (T node in this.ValueExpression.Find<T>())
 				{
 					yield return node;
 				}

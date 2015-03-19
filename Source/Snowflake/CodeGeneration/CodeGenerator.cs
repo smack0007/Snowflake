@@ -360,7 +360,7 @@ namespace Snowflake.CodeGeneration
 		{
 			StartLine(data, "return ");
 
-			GenerateExpression(node.Expression, data);
+			GenerateExpression(node.ValueExpression, data);
 
 			EndLine(data, ";");
 		}
