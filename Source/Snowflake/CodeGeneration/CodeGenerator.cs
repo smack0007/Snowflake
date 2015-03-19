@@ -577,7 +577,9 @@ namespace Snowflake.CodeGeneration
 
             for (int i = 0; i < node.Args.Count; i++)
             {
-                Append(data, ", ");
+                if (i != 0 || shouldCallInvoke)
+                    Append(data, ", ");
+                
                 GenerateExpression(node.Args[i], data);
             }
 

@@ -1,7 +1,14 @@
 ﻿var person1 = new Person();
-print(person1.GetType());
 person1.FirstName = "Bob";
 person1.LastName = "Freeman";
+
+var person2 = new Person();
+person2.FirstName = "Joe";
+person2.LastName = "Montana";
+
+person1.Friends.Add(person2);
+
+print(person1.Friends[0].FirstName);
 
 func buildMultiplier(x) {
 	return func(y) {

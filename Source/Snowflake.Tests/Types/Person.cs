@@ -25,5 +25,15 @@ namespace Snowflake.Tests.Types
 			get;
 			set;
 		}
+
+        public Person()
+        {
+        }
+
+        public Person(string firstName, string lastName)
+        {
+            this.FirstName = firstName;
+            this.LastName = lastName;
+        }
 	}
 }

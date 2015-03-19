@@ -2,6 +2,7 @@
 using System.Linq;
 using Snowflake;
 using System.IO;
+using System.Collections.Generic;
 
 namespace SnowflakeDemo
 {
@@ -10,6 +11,13 @@ namespace SnowflakeDemo
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+        public List<Person> Friends { get; private set; }
+
+        public Person()
+        {
+            this.Friends = new List<Person>();
+        }
     }
 
 	class Program
