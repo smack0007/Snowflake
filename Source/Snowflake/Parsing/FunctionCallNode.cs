@@ -4,11 +4,13 @@ using System.Collections.Generic;
 namespace Snowflake.Parsing
 {
 	public class FunctionCallNode : ExpressionNode
-	{		
+	{
+        ExpressionNode functionExpression;
+
         public ExpressionNode FunctionExpression
         {
-            get;
-            set;
+            get { return this.functionExpression; }
+            set { this.functionExpression = SetParent(this.functionExpression, value); }
         }
 
 		public SyntaxNodeCollection<ExpressionNode> Args
