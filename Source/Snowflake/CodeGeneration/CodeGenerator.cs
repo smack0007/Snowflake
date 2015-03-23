@@ -569,7 +569,7 @@ namespace Snowflake.CodeGeneration
 
 			data.Padding--;
 
-			StartLine(data, " }})");
+			StartLine(data, "}})");
 
             data.VariableMap.PopFrame();
 

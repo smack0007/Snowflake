@@ -102,5 +102,20 @@ return foo()();");
 func foo() { return 5; };;;
 return foo();");
 		}
+
+        [Fact]
+        public void Global_Function_Can_Call_Other_Global_Function()
+        {
+            AssertScriptReturnValue(42, @"
+func foo(x) {
+    return x * 4 + bar(x);
+};
+
+func bar(x) {
+    return x * 2;
+};
+
+return foo(7);");
+        }
 	}
 }
