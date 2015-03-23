@@ -9,37 +9,56 @@ namespace Snowflake.Generated
 		{
 			try
 			{
-				dynamic v1 = Construct(context, "Person");
-				v1.FirstName = "Bob";
-				v1.LastName = "Freeman";
-				dynamic v2 = Construct(context, "Person");
-				v2.FirstName = "Joe";
-				v2.LastName = "Montana";
-				v1.Friends.Add(v2);
-				context.GetGlobalVariable("Console").WriteLine(v1.Friends[0].FirstName);
-				context.GetGlobalVariable("Console").WriteLine(v1);
-				dynamic v3 = new ScriptFunction(new Func<dynamic, dynamic>((v4) => { 
+				context.DeclareVariable("person1", Construct(context, "Person"));
+				context["person1"].FirstName = "Bob";
+				context["person1"].LastName = "Freeman";
+				context.DeclareVariable("person2", Construct(context, "Person"));
+				context["person2"].FirstName = "Joe";
+				context["person2"].LastName = "Montana";
+				context["person1"].Friends.Add(context["person2"]);
+				context["Console"].WriteLine(context["person1"].Friends[0].FirstName);
+				context["Console"].WriteLine(context["person1"]);
+				context.DeclareVariable("buildMultiplier", new ScriptFunction(new Func<dynamic, dynamic>((v4) => { 
 					context.PushStackFrame("buildMultiplier");
+					context.DeclareVariable("x", v4);
+					bool isError1 = false;
 					try {
 						return new ScriptFunction(new Func<dynamic, dynamic>((v5) => { 
 							context.PushStackFrame("<anonymous>");
+							context.DeclareVariable("y", v5);
+							context.DeclareVariable("x", v4);
+							bool isError2 = false;
 							try {
-								return (v4 * v5);
+								return (context["x"] * context["y"]);
+							} catch(Exception) {
+								isError2 = true;
+								throw;
 							} finally {
-								context.PopStackFrame();
+								if (!isError2) {
+									context.PopStackFrame();
+								}
 							}
 						 }), null);
+					} catch(Exception) {
+						isError1 = true;
+						throw;
 					} finally {
-						context.PopStackFrame();
+						if (!isError1) {
+							context.PopStackFrame();
+						}
 					}
-				 }), null);
-				dynamic v6 = Invoke(context, v3, 5);
-				for (dynamic v7 = 0; (v7 < 10); v7 += 1) {
-					context.GetGlobalVariable("Console").WriteLine(((("5 * " + v7) + " = ") + Invoke(context, v6, v7)));
+				 }), null));
+				context.DeclareVariable("x5", Invoke(context, context["buildMultiplier"], 5));
+				for (context.DeclareVariable("i", 0); (context["i"] < 10); context["i"] += 1) {
+					context["Console"].WriteLine(((("5 * " + context["i"]) + " = ") + Invoke(context, context["x5"], context["i"])));
 				}
-				dynamic v8 = new ScriptList { 1, 2, 3, 4, 5 };
-				context.GetGlobalVariable("Console").WriteLine(v8.Count);
-				context.GetGlobalVariable("export").number = 42;
+				context.DeclareVariable("values", new ScriptList { 5, 4, 3, 2, 1 });
+				context.DeclareVariable("value");
+				foreach (dynamic v9 in context["values"]) {
+					context.SetVariable("value", v9);
+					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
+				}
+				context["export"].number = 42;
 				return null;
 			}
 			catch (Exception ex)

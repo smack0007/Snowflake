@@ -13,6 +13,8 @@ namespace Snowflake.CodeGeneration
 
 		class DataContext
 		{
+            int errorTrackerCount;
+
 			public StringBuilder Code
 			{
 				get;
@@ -37,17 +39,22 @@ namespace Snowflake.CodeGeneration
 				set;
 			}
 
-			public VariableMap VariableMap
-			{
-				get;
-				private set;
-			}
-
+            public VariableMap VariableMap
+            {
+                get;
+                set;
+            }
+                                    			
 			public DataContext()
 			{
 				this.Code = new StringBuilder();
-				this.VariableMap = new VariableMap();
+                this.VariableMap = new VariableMap();
 			}
+
+            public int GetNextErrorTrackerIndex()
+            {
+                return ++this.errorTrackerCount;
+            }
 		}
 
 		public CodeGenerator()
@@ -179,16 +186,16 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateStatementBlock(StatementBlockNode statementBlock, DataContext data, bool pushStackFrame = true)
 		{
-			if (pushStackFrame)
-				data.VariableMap.PushFrame();
+            //if (pushStackFrame)
+            //    data.VariableMap.PushFrame();
 
 			foreach (var statement in statementBlock)
 			{
 				GenerateStatement(statement, data);
 			}
 
-			if (pushStackFrame)
-				data.VariableMap.PopFrame();
+            //if (pushStackFrame)
+            //    data.VariableMap.PopFrame();
 		}
 
 		private static void GenerateStatement(StatementNode node, DataContext data)
@@ -235,26 +242,28 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateVariableDeclaration(VariableDeclarationNode node, DataContext data)
 		{
-			string anonymousVariableName = data.VariableMap.DeclarVariable(node.VariableName, node.Line, node.Column);
-			StartLine(data, "dynamic {0}", anonymousVariableName);
+            data.VariableMap.DeclareVariable(node.VariableName, node.Line, node.Column);
+
+			StartLine(data, "context.DeclareVariable(\"{0}\"", node.VariableName);
 
 			if (node.ValueExpression != null)
 			{
-				Append(data, " = ");
+                Append(data, ", ");
 				GenerateExpression(node.ValueExpression, data);
 			}
-
-			EndLine(data, ";");
+            
+			EndLine(data, ");");
 		}
 
 		private static void GenerateFunctionDeclaration(FunctionNode node, DataContext data)
 		{
-			string anonymousVariableName = data.VariableMap.DeclarVariable(node.FunctionName, node.Line, node.Column);
-			StartLine(data, "dynamic {0} = ", anonymousVariableName);
+            data.VariableMap.DeclareVariable(node.FunctionName, node.Line, node.Column);
+
+            StartLine(data, "context.DeclareVariable(\"{0}\", ", node.FunctionName);
 
 			GenerateFunction(node, data);
 
-			EndLine(data, ";");
+			EndLine(data, ");");
 		}
 
 		private static void GenerateIf(IfNode node, DataContext data)
@@ -335,21 +344,22 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateForEach(ForEachNode node, DataContext data)
 		{
-			StartLine(data, "foreach (");
+            WriteLine(data, "context.DeclareVariable(\"{0}\");", node.VariableDeclaration.VariableName);
 
-			data.DisableNewLines = true;
-			GenerateVariableDeclaration(node.VariableDeclaration, data);
-			DeleteCharacters(data, 1);
+            data.VariableMap.DeclareVariable(node.VariableDeclaration.VariableName, node.Line, node.Column);
 
-			Append(data, " in ");
+            StartLine(data, "foreach (dynamic {0} in ", data.VariableMap.GetVariableName(node.VariableDeclaration.VariableName));
+            	                        
+            data.DisableNewLines = true;
 
 			GenerateExpression(node.SourceExpression, data);
 						
 			data.DisableNewLines = false;
 
 			EndLine(data, ") {{");
-
+            
 			data.Padding++;
+            WriteLine(data, "context.SetVariable(\"{0}\", {1});", node.VariableDeclaration.VariableName, data.VariableMap.GetVariableName(node.VariableDeclaration.VariableName));
 			GenerateStatementBlock(node.BodyStatementBlock, data);
 
 			data.Padding--;
@@ -418,7 +428,7 @@ namespace Snowflake.CodeGeneration
 			else if (node is VariableReferenceNode)
 			{
 				var variableReferenceNode = (VariableReferenceNode)node;
-				Append(data, data.VariableMap.GetVariableName(variableReferenceNode.VariableName));
+				Append(data, "context[\"{0}\"]", variableReferenceNode.VariableName);
 			}
 			else if (node is NullValueNode)
 			{
@@ -459,32 +469,32 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateAssignmentOperation(AssignmentOpeartionNode node, DataContext data)
 		{
-			GenerateExpression(node.TargetExpression, data);
+            GenerateExpression(node.TargetExpression, data);
 
-			switch (node.Type)
-			{
-				case AssignmentOperationType.Gets:
-					Append(data, " = ");
-					break;
+            switch (node.Type)
+            {
+                case AssignmentOperationType.Gets:
+                    Append(data, " = ");
+                    break;
 
-				case AssignmentOperationType.AddGets:
-					Append(data, " += ");
-					break;
+                case AssignmentOperationType.AddGets:
+                    Append(data, " += ");
+                    break;
 
-				case AssignmentOperationType.SubtractGets:
-					Append(data, " -= ");
-					break;
+                case AssignmentOperationType.SubtractGets:
+                    Append(data, " -= ");
+                    break;
 
-				case AssignmentOperationType.MultiplyGets:
-					Append(data, " *= ");
-					break;
+                case AssignmentOperationType.MultiplyGets:
+                    Append(data, " *= ");
+                    break;
 
-				case AssignmentOperationType.DivideGets:
-					Append(data, " /= ");
-					break;
-			}
-			
-			GenerateExpression(node.ValueExpression, data);
+                case AssignmentOperationType.DivideGets:
+                    Append(data, " /= ");
+                    break;
+            }
+
+            GenerateExpression(node.ValueExpression, data);
 		}
 
 		private static void GenerateFunction(FunctionNode node, DataContext data)
@@ -495,9 +505,12 @@ namespace Snowflake.CodeGeneration
 					
 			Append(data, ">((");
 
-			data.VariableMap.PushFrame();
-
-			Append(data, string.Join(", ", node.Args.Select(x => data.VariableMap.DeclarVariable(x.VariableName, x.Line, x.Column))));
+            data.VariableMap.PushFrame();
+            
+            foreach (var arg in node.Args)
+                data.VariableMap.DeclareVariable(arg.VariableName, node.Line, node.Column);
+                        
+			Append(data, string.Join(", ", node.Args.Select(x => data.VariableMap.GetVariableName(x.VariableName))));
 						
 			Append(data, ") => {{ ");
 			
@@ -506,7 +519,24 @@ namespace Snowflake.CodeGeneration
 			data.Padding++;
 
 			WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
-			WriteLine(data, "try {{");
+
+            foreach (var arg in node.Args)
+                WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", arg.VariableName, data.VariableMap.GetVariableName(arg.VariableName));
+
+            var variableDeclarations = node.BodyStatementBlock.Find<VariableDeclarationNode>().Where(x => x.FindParent<FunctionNode>() == node).Select(x => x.VariableName);
+
+            foreach (var capturedVariable in node.BodyStatementBlock.Find<VariableReferenceNode>().Where(x => x.FindParent<FunctionNode>() == node && !variableDeclarations.Contains(x.VariableName)))
+            {
+                if (!data.VariableMap.CurrentFrameContainsKey(capturedVariable.VariableName))
+                {
+                    WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", capturedVariable.VariableName, data.VariableMap.GetVariableName(capturedVariable.VariableName));
+                }
+            }
+
+            int errorTracker = data.GetNextErrorTrackerIndex();
+            WriteLine(data, "bool isError{0} = false;", errorTracker);
+			
+            WriteLine(data, "try {{");
 
 			data.Padding++;
 
@@ -515,11 +545,24 @@ namespace Snowflake.CodeGeneration
 			if (!(node.BodyStatementBlock.Last() is ReturnNode))
 				WriteLine(data, "return null;");
 
+            data.Padding--;
+            WriteLine(data, "}} catch(Exception) {{");
+
+            data.Padding++;
+            WriteLine(data, "isError{0} = true;", errorTracker);
+            WriteLine(data, "throw;");
+            
 			data.Padding--;
 			WriteLine(data, "}} finally {{");
 
+            data.Padding++;
+            WriteLine(data, "if (!isError{0}) {{", errorTracker);
+
 			data.Padding++;
             WriteLine(data, "context.PopStackFrame();");
+
+            data.Padding--;
+            WriteLine(data, "}}");
 
 			data.Padding--;
 			WriteLine(data, "}}");
@@ -527,6 +570,8 @@ namespace Snowflake.CodeGeneration
 			data.Padding--;
 
 			StartLine(data, " }})");
+
+            data.VariableMap.PopFrame();
 
 			if (node.Args.Count != 0)
 			{
@@ -546,8 +591,6 @@ namespace Snowflake.CodeGeneration
 			}
 
 			Append(data, ")");
-
-			data.VariableMap.PopFrame();
 		}
 
         private static void GenerateConstructorCall(ConstructorCallNode node, DataContext data)

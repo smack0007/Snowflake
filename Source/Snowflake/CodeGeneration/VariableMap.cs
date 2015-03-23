@@ -45,7 +45,7 @@ namespace Snowflake.CodeGeneration
 			return 'v' + this.variableCount.ToString();
 		}
 
-		public string DeclarVariable(string realName, int line, int column)
+		public string DeclareVariable(string realName, int line, int column)
 		{
 			if (this.CurrentFrame.ContainsKey(realName))
 				throw new CodeGenerationException(string.Format("Variable {0} declared more than once.", realName), line, column);

@@ -5,7 +5,7 @@ namespace Snowflake
 {
 	public class ScriptExecutionException : ScriptException
 	{
-        public ScriptStackFrame[] Stack
+        public ScriptStackFrame[] ScriptStack
 		{
 			get;
 			private set;
@@ -14,19 +14,19 @@ namespace Snowflake
         public ScriptExecutionException(string message)
             : base(message)
         {
-            this.Stack = null;
+            this.ScriptStack = null;
         }
 
         public ScriptExecutionException(string message, ScriptStackFrame[] stack)
             : base(message)
         {
-            this.Stack = stack;
+            this.ScriptStack = stack;
         }
 
         public ScriptExecutionException(string message, ScriptStackFrame[] stack, Exception innerException)
 			: base(message, innerException)
 		{
-            this.Stack = stack;
+            this.ScriptStack = stack;
 		}
 	}
 }

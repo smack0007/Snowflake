@@ -33,15 +33,27 @@ namespace Snowflake.Tests
 			assert(result);
 		}
 
-		public void AssertScriptIsException<T>(string script)
+        public void AssertScriptIsException<T>(string script)
+            where T : Exception
+        {
+            AssertScriptIsException<T>(script, (x) => { });
+        }
+
+		public void AssertScriptIsException<T>(string script, Action<Exception> assert)
 			where T : Exception
 		{
 			ScriptEngine engine = new ScriptEngine();
-			Assert.Throws<T>(() =>
-			{
+            
+            try
+            {
                 Console.WriteLine(engine.GenerateCode(script, "Script1"));
-				engine.Execute(script);
-			});
+                engine.Execute(script);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<T>(ex);
+                assert(ex);
+            }
 		}
 	}
 }

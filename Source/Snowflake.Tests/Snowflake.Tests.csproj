@@ -79,6 +79,7 @@
     <Compile Include="ReturnValueTests.cs" />
     <Compile Include="Lexing\ScriptLexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StackTests.cs" />
     <Compile Include="StringOperationsTests.cs" />
     <Compile Include="Types\Person.cs" />
     <Compile Include="VariableDeclarationTests.cs" />
