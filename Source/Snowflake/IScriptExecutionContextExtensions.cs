@@ -173,5 +173,10 @@ namespace Snowflake
         {
             context.SetGlobalVariable(name, value);
         }
+
+        public static void SetGlobalStaticObject(this IScriptExecutionContext context, string name, Type type)
+        {
+            context.SetGlobalVariable(name, new ScriptStaticObjectProxy(type));
+        }
     }
 }

@@ -11,6 +11,12 @@ namespace Snowflake
 			private set;
 		}
 
+        public ScriptExecutionException(string message)
+            : base(message)
+        {
+            this.Stack = null;
+        }
+
         public ScriptExecutionException(string message, ScriptStackFrame[] stack)
             : base(message)
         {

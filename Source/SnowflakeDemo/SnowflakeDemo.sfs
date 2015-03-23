@@ -8,21 +8,23 @@ person2.LastName = "Montana";
 
 person1.Friends.Add(person2);
 
-print(person1.Friends[0].FirstName);
+Console.WriteLine(person1.Friends[0].FirstName);
+
+Console.WriteLine(person1);
 
 func buildMultiplier(x) {
 	return func(y) {
 		return x * y;
 	};
-}
+};
 
 var x5 = buildMultiplier(5);
 
 for (var i = 0; i < 10; i += 1) {
-	print("5 * " + i + " = " + x5(i));
+	Console.WriteLine("5 * " + i + " = " + x5(i));
 }
 
 var values = [ 1, 2, 3, 4, 5 ];
-print(values.Count);
+Console.WriteLine(values.Count);
 
 export.number = 42;

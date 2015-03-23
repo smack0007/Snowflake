@@ -33,8 +33,10 @@ namespace Snowflake
 
         public dynamic GetGlobalVariable(string name)
         {
-            if (this.globals.ContainsKey(name))
-                return this.globals[name];
+            dynamic result;
+
+            if (this.globals.TryGetValue(name, out result))
+                return result;
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
@@ -54,8 +56,10 @@ namespace Snowflake
 
         public Type GetType(string name)
         {
-            if (this.types.ContainsKey(name))
-                return this.types[name];
+            Type result;
+
+            if (this.types.TryGetValue(name, out result))
+                return result;
 
             throw new ScriptExecutionException(string.Format("Type \"{0}\" is not registered.", name), this.stack.ToArray());
         }
