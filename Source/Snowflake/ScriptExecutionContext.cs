@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Snowflake
 {
-    public class ScriptExecutionContext : MarshalByRefObject, IScriptExecutionContext
+    public class ScriptExecutionContext : IScriptExecutionContext
     {
         Dictionary<string, dynamic> globals;
         Dictionary<string, Type> types;

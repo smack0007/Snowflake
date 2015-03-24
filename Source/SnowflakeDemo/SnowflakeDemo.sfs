@@ -1,9 +1,42 @@
-﻿func foo(x) {
-    return x * 4 + bar(x);
+﻿func foo() {
+	bar();
 };
 
-func bar(x) {
-    return x * 2;
+func bar() {
+	Console.WriteLine("bar");
 };
 
-return foo(7);
+foo();
+
+var person1 = new Person();
+person1.FirstName = "Bob";
+person1.LastName = "Freeman";
+
+var person2 = new Person();
+person2.FirstName = "Joe";
+person2.LastName = "Montana";
+
+person1.Friends.Add(person2);
+
+Console.WriteLine(person1.Friends[0].FirstName);
+
+Console.WriteLine(person1);
+
+func buildMultiplier(x) {
+	return func(y) {
+		return x * y;
+	};
+};
+
+var x5 = buildMultiplier(5);
+
+for (var i = 0; i < 10; i += 1) {
+	Console.WriteLine("5 * " + i + " = " + x5(i));
+}
+
+var values = [ 5, 4, 3, 2, 1 ];
+foreach (var value in values) {
+	Console.WriteLine("5 * " + value + " = " + x5(value));
+}
+
+export.number = 42;
