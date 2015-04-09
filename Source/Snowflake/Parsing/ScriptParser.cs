@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Snowflake.Lexing;
 using System.Globalization;
+using System.Text;
 
 namespace Snowflake.Parsing
 {
@@ -842,9 +843,8 @@ namespace Snowflake.Parsing
 
             pos++;
             this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-            node.ConstructorName = lexemes[pos].Value;
+            node.TypeName = this.ParseTypeName(lexemes, ref pos);
 
-            pos++;
             this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
 
             pos++;
@@ -863,6 +863,29 @@ namespace Snowflake.Parsing
 
             pos++;
             return node;
+        }
+
+        private string ParseTypeName(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+
+            StringBuilder typeName = new StringBuilder(lexemes[pos].Value.Length);
+            
+            while (lexemes[pos].Type == LexemeType.Identifier)
+            {
+                typeName.Append(lexemes[pos].Value);
+
+                pos++;
+                if (lexemes[pos].Type == LexemeType.Dot)
+                {
+                    typeName.Append(".");
+                    
+                    pos++;
+                    this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+                }
+            }
+
+            return typeName.ToString();
         }
 
 		private MemberAccessNode ParseMemberAccess(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)

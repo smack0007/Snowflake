@@ -8,7 +8,7 @@ namespace Snowflake.Parsing
 {
     public class ConstructorCallNode : ExpressionNode
     {
-        public string ConstructorName
+        public string TypeName
         {
             get;
             set;

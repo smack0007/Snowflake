@@ -41,7 +41,7 @@ namespace Snowflake
         {
             this.executionContext.RegisterType(name, type);
         }
-
+                
 		public IList<Lexeme> GetLexemes(string script)
 		{
 			return this.lexer.Lex(script);
@@ -97,5 +97,5 @@ namespace Snowflake
 
             return script.Execute(this.executionContext);
         }
-	}
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Snowflake
 {
@@ -177,6 +178,18 @@ namespace Snowflake
         public static void SetGlobalStaticObject(this IScriptExecutionContext context, string name, Type type)
         {
             context.SetGlobalVariable(name, new ScriptStaticObjectProxy(type));
+        }
+
+        public static void RegisterAllTypesInNamespace(this IScriptExecutionContext context, string scriptNamespace, string dotNetNamespace)
+        {
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => x.IsPublic && x.Namespace == dotNetNamespace && !x.IsAbstract && !x.IsInterface && !x.IsGenericType);
+
+            foreach (Type type in types)
+            {
+                context.RegisterType(scriptNamespace + "." + type.Name, type);
+            }
         }
     }
 }

@@ -39,7 +39,8 @@ namespace SnowflakeDemo
             //engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
             engine.SetGlobalStaticObject("Console", typeof(Console));
 			engine.SetGlobalVariable("export", export);
-            engine.RegisterType("Person", typeof(Person));
+            engine.RegisterType("Namespace.Person", typeof(Person));
+            engine.RegisterAllTypesInNamespace("MySystem", "System");
                         
             var result = engine.ExecuteFile("SnowflakeDemo.sfs");
 

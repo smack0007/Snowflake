@@ -8,11 +8,14 @@ func bar() {
 
 foo();
 
-var person1 = new Person();
+var timeSpan = new MySystem.TimeSpan(1, 2, 3);
+Console.WriteLine(timeSpan);
+
+var person1 = new Namespace.Person();
 person1.FirstName = "Bob";
 person1.LastName = "Freeman";
 
-var person2 = new Person();
+var person2 = new Namespace.Person();
 person2.FirstName = "Joe";
 person2.LastName = "Montana";
 

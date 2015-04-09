@@ -67,7 +67,9 @@ AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
-ConstructorCall = "new" <Identifier> "(" { <Expression> ("," <Expression>)* } ")" ;
+ConstructorCall = "new" <TypeName> "(" { <Expression> ("," <Expression>)* } ")" ;
+
+TypeName = <Identifier> ( "." <Identifier> ) ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 

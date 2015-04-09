@@ -595,7 +595,7 @@ namespace Snowflake.CodeGeneration
 
         private static void GenerateConstructorCall(ConstructorCallNode node, DataContext data)
         {
-            Append(data, "Construct(context, \"{0}\"", node.ConstructorName);
+            Append(data, "Construct(context, \"{0}\"", node.TypeName);
                         
             for (int i = 0; i < node.Args.Count; i++)
             {

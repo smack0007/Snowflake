@@ -40,24 +40,26 @@ namespace Snowflake.Generated
 					}
 				})));
 				Invoke(context, context["foo"]);
-				context.DeclareVariable("person1", Construct(context, "Person"));
+				context.DeclareVariable("timeSpan", Construct(context, "MySystem.TimeSpan", 1, 2, 3));
+				context["Console"].WriteLine(context["timeSpan"]);
+				context.DeclareVariable("person1", Construct(context, "Namespace.Person"));
 				context["person1"].FirstName = "Bob";
 				context["person1"].LastName = "Freeman";
-				context.DeclareVariable("person2", Construct(context, "Person"));
+				context.DeclareVariable("person2", Construct(context, "Namespace.Person"));
 				context["person2"].FirstName = "Joe";
 				context["person2"].LastName = "Montana";
 				context["person1"].Friends.Add(context["person2"]);
 				context["Console"].WriteLine(context["person1"].Friends[0].FirstName);
 				context["Console"].WriteLine(context["person1"]);
-				context.DeclareVariable("buildMultiplier", new ScriptFunction(new Func<dynamic, dynamic>((v6) => { 
+				context.DeclareVariable("buildMultiplier", new ScriptFunction(new Func<dynamic, dynamic>((v7) => { 
 					context.PushStackFrame("buildMultiplier");
-					context.DeclareVariable("x", v6);
+					context.DeclareVariable("x", v7);
 					bool isError3 = false;
 					try {
-						return new ScriptFunction(new Func<dynamic, dynamic>((v7) => { 
+						return new ScriptFunction(new Func<dynamic, dynamic>((v8) => { 
 							context.PushStackFrame("<anonymous>");
-							context.DeclareVariable("y", v7);
-							context.DeclareVariable("x", v6);
+							context.DeclareVariable("y", v8);
+							context.DeclareVariable("x", v7);
 							bool isError4 = false;
 							try {
 								return (context["x"] * context["y"]);
@@ -85,8 +87,8 @@ namespace Snowflake.Generated
 				}
 				context.DeclareVariable("values", new ScriptList { 5, 4, 3, 2, 1 });
 				context.DeclareVariable("value");
-				foreach (dynamic v11 in context["values"]) {
-					context.SetVariable("value", v11);
+				foreach (dynamic v12 in context["values"]) {
+					context.SetVariable("value", v12);
 					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
 				}
 				context["export"].number = 42;
