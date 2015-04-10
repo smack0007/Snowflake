@@ -34,16 +34,27 @@ namespace Snowflake.CodeGeneration
 			this.frames.RemoveAt(this.frames.Count - 1);
 		}
 
-		public bool CurrentFrameContainsKey(string key)
-		{
-			return this.CurrentFrame.ContainsKey(key);
-		}
-
 		private string GetNextVariableName()
 		{
 			this.variableCount++;
 			return 'v' + this.variableCount.ToString();
 		}
+                
+        public bool IsVariableDeclaredInCurrentFrame(string realName)
+        {
+            return this.CurrentFrame.ContainsKey(realName);
+        }
+
+        public bool IsVariableDeclared(string realName)
+        {
+            for (int i = this.frames.Count - 1; i >= 0; i--)
+            {
+                if (this.frames[i].ContainsKey(realName))
+                    return true;
+            }
+
+            return false;
+        }
 
 		public string DeclareVariable(string realName, int line, int column)
 		{

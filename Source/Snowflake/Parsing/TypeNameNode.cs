@@ -14,6 +14,11 @@ namespace Snowflake.Parsing
             set;
         }
 
+        public bool IsGeneric
+        {
+            get { return this.GenericArgs != null && this.GenericArgs.Count > 0; }
+        }
+
         public SyntaxNodeCollection<TypeNameNode> GenericArgs
         {
             get;

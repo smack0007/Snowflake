@@ -1,4 +1,14 @@
-﻿func foo() {
+﻿var scriptListType = import("Snowflake.ScriptList");
+var scriptList = new scriptListType(["a", "b", "c"]);
+Console.WriteLine(scriptList);
+
+var stringBuilderType = import("System.Text.StringBuilder");
+var sb = new stringBuilderType();
+sb.Append("Hello");
+sb.Append(" World!");
+Console.WriteLine(sb);
+
+func foo() {
 	bar();
 };
 
@@ -19,6 +29,10 @@ Console.WriteLine(tuple2);
 
 var tuple3 = new System.Tuple<System.Tuple<int, string>, System.Tuple<int, string>>(new System.Tuple<int, string>(42, "foo"), new System.Tuple<int, string>(21, "bar"));
 Console.WriteLine(tuple3);
+
+var tupleType = GetTupleType();
+var tuple4 = new tupleType(42, "foo");
+Console.WriteLine(tuple4);
 
 var person1 = new Namespace.Person();
 person1.FirstName = "Bob";

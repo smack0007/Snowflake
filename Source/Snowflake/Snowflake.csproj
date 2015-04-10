@@ -159,7 +159,7 @@
     <Compile Include="ScriptStackFrame.cs" />
     <Compile Include="ScriptStaticObjectProxy.cs" />
     <Compile Include="ScriptType.cs" />
-    <Compile Include="ScriptUtilities.cs" />
+    <Compile Include="ScriptUtilityFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />

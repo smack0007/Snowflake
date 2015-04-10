@@ -186,16 +186,10 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateStatementBlock(StatementBlockNode statementBlock, DataContext data, bool pushStackFrame = true)
 		{
-            //if (pushStackFrame)
-            //    data.VariableMap.PushFrame();
-
 			foreach (var statement in statementBlock)
 			{
 				GenerateStatement(statement, data);
 			}
-
-            //if (pushStackFrame)
-            //    data.VariableMap.PopFrame();
 		}
 
 		private static void GenerateStatement(StatementNode node, DataContext data)
@@ -527,7 +521,7 @@ namespace Snowflake.CodeGeneration
 
             foreach (var capturedVariable in node.BodyStatementBlock.Find<VariableReferenceNode>().Where(x => x.FindParent<FunctionNode>() == node && !variableDeclarations.Contains(x.VariableName)))
             {
-                if (!data.VariableMap.CurrentFrameContainsKey(capturedVariable.VariableName))
+                if (!data.VariableMap.IsVariableDeclaredInCurrentFrame(capturedVariable.VariableName))
                 {
                     WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", capturedVariable.VariableName, data.VariableMap.GetVariableName(capturedVariable.VariableName));
                 }
@@ -597,7 +591,14 @@ namespace Snowflake.CodeGeneration
         {
             Append(data, "Construct(context, ");
 
-            GenerateTypeName(node.TypeName, data);            
+            if (!node.TypeName.IsGeneric && data.VariableMap.IsVariableDeclared(node.TypeName.Name))
+            {
+                Append(data, "context[\"{0}\"]", node.TypeName.Name);
+            }
+            else
+            {
+                GenerateTypeName(node.TypeName, data);            
+            }
 
             if (node.Args.Count > 0)
             {

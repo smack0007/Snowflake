@@ -21,7 +21,7 @@ namespace Snowflake
         {
         }
 
-        public ScriptType(string name, ScriptType[] genericArgs)
+        public ScriptType(string name, params ScriptType[] genericArgs)
         {
             this.Name = name;
             this.GenericArgs = genericArgs;
