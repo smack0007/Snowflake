@@ -40,10 +40,10 @@ namespace SnowflakeDemo
             engine.SetGlobalStaticObject("Console", typeof(Console));
 			engine.SetGlobalVariable("export", export);
             engine.RegisterType("Namespace.Person", typeof(Person));
-            engine.RegisterType("System.TimeSpan", typeof(TimeSpan));
-            engine.RegisterType("System.Tuple", typeof(Tuple<>));
-            engine.RegisterType("System.Tuple", typeof(Tuple<,>));
-            //engine.RegisterAllTypesInNamespace("MySystem", "System");
+            //engine.RegisterType("System.TimeSpan", typeof(TimeSpan));
+            //engine.RegisterType("System.Tuple", typeof(Tuple<>));
+            //engine.RegisterType("System.Tuple", typeof(Tuple<,>));
+            engine.RegisterAllTypesInNamespace("System", "System");
                         
             var result = engine.ExecuteFile("SnowflakeDemo.sfs");
 

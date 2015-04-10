@@ -34,9 +34,14 @@ namespace Snowflake
                 }
             }
 
-            public bool TryGetValue(int count, out Type type)
+            public bool ContainsKey(int key)
             {
-                return this.types.TryGetValue(count, out type);
+                return this.types.ContainsKey(key);
+            }
+
+            public bool TryGetValue(int key, out Type value)
+            {
+                return this.types.TryGetValue(key, out value);
             }
         }
 
@@ -68,6 +73,9 @@ namespace Snowflake
                 
         public void PushStackFrame(string function)
         {
+            if (function == null)
+                throw new ArgumentNullException("function");
+
             this.stack.Add(new ScriptStackFrame(function));
         }
 
@@ -83,6 +91,9 @@ namespace Snowflake
 
         public void DeclareVariable(string name, dynamic value = null)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
             if (this.stack.Count > 0)
             {
                 if (this.stack[this.stack.Count - 1].Variables.ContainsKey(name))
@@ -101,6 +112,9 @@ namespace Snowflake
 
         public dynamic GetVariable(string name)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
             dynamic result = null;
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
@@ -114,6 +128,9 @@ namespace Snowflake
 
         public dynamic SetVariable(string name, dynamic value)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
                 if (this.stack[i].Variables.ContainsKey(name))
@@ -134,6 +151,9 @@ namespace Snowflake
                 
         public dynamic GetGlobalVariable(string name)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
             dynamic result;
 
             if (this.globals.TryGetValue(name, out result))
@@ -144,11 +164,20 @@ namespace Snowflake
 
         public void SetGlobalVariable(string name, dynamic value)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
             this.globals[name] = value;
         }
 
         public void RegisterType(string name, Type type)
         {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
+            if (type == null)
+                throw new ArgumentNullException("type");
+
             TypeSet typeSet = null;
 
             if (this.types.TryGetValue(name, out typeSet))
@@ -156,9 +185,8 @@ namespace Snowflake
                 if (type.IsGenericType)
                 {
                     Type[] genericArgs = type.GetGenericArguments();
-                    Type existingType = null;
 
-                    if (!typeSet.TryGetValue(genericArgs.Length, out existingType))
+                    if (!typeSet.ContainsKey(genericArgs.Length))
                     {
                         typeSet[genericArgs.Length] = type;
                     }
@@ -167,9 +195,13 @@ namespace Snowflake
                         throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered with the given generic argument variation.", name));
                     }
                 }
+                else if (!typeSet.ContainsKey(0))
+                {
+                    typeSet[0] = type;
+                }
                 else
                 {
-                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered and is not generic argument variation on the existing type.", name));
+                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered and is not a generic argument variation on the existing type.", name));
                 }
             }
             else
@@ -180,10 +212,25 @@ namespace Snowflake
 
         public Type GetType(string name, int genericArgCount)
         {
-            TypeSet result;
+            if (name == null)
+                throw new ArgumentNullException("name");
 
-            if (this.types.TryGetValue(name, out result))
-                return result[genericArgCount];
+            if (genericArgCount < 0)
+                throw new ArgumentOutOfRangeException("genericArgCount", "genericArgCount must be >= 0.");
+
+            TypeSet typeSet;
+
+            if (this.types.TryGetValue(name, out typeSet))
+            {
+                Type type;
+
+                if (!typeSet.TryGetValue(genericArgCount, out type))
+                {
+                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is registered but not with generic argument variation of {1}.", name, genericArgCount), this.stack.ToArray());
+                }
+
+                return typeSet[genericArgCount];
+            }
 
             throw new ScriptExecutionException(string.Format("Type \"{0}\" is not registered.", name), this.stack.ToArray());
         }

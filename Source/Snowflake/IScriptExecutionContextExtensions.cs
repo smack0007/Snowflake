@@ -184,11 +184,18 @@ namespace Snowflake
         {
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(x => x.IsPublic && x.Namespace == dotNetNamespace && !x.IsAbstract && !x.IsInterface);
+                .Where(x => x.IsPublic && x.Namespace == dotNetNamespace);
 
             foreach (Type type in types)
             {
-                context.RegisterType(scriptNamespace + "." + type.Name, type);
+                string name = type.Name;
+
+                if (type.IsGenericType)
+                {
+                    name = name.Substring(0, name.Length - (type.GetGenericArguments().Length.ToString().Length) - 1); 
+                }
+
+                context.RegisterType(scriptNamespace + "." + name, type);
             }
         }
     }
