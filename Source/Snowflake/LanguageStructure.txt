@@ -69,7 +69,7 @@ FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
 
 ConstructorCall = "new" <TypeName> "(" { <Expression> ("," <Expression>)* } ")" ;
 
-TypeName = <Identifier> ( "." <Identifier> ) ;
+TypeName = <Identifier> ( "." <Identifier> )* ( "<" <TypeName> ( "," <TypeName> )* ">" )? ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Reflection;
 
 namespace Snowflake
@@ -19,10 +20,27 @@ namespace Snowflake
             return (T)Activator.CreateInstance(typeof(T), args);
         }
 
-        protected static dynamic Construct(ScriptExecutionContext context, string typeName, params dynamic[] args)
+        private static Type GetType(ScriptExecutionContext context, ScriptType scriptType)
         {
-            Type type = context.GetType(typeName);
+            Type type = null;
 
+            if (scriptType.GenericArgs != null && scriptType.GenericArgs.Length > 0)
+            {
+                type = context.GetType(scriptType.Name, scriptType.GenericArgs.Length);
+                type = type.MakeGenericType(scriptType.GenericArgs.Select(x => GetType(context, x)).ToArray());
+            }
+            else
+            {
+                type = context.GetType(scriptType.Name, 0);
+            }
+
+            return type;
+        }
+
+        protected static dynamic Construct(ScriptExecutionContext context, ScriptType scriptType, params dynamic[] args)
+        {
+            Type type = GetType(context, scriptType);
+            
             dynamic instance = typeof(Script)
                 .GetMethod("ConstructObject", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(type)

@@ -184,7 +184,7 @@ namespace Snowflake
         {
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(x => x.IsPublic && x.Namespace == dotNetNamespace && !x.IsAbstract && !x.IsInterface && !x.IsGenericType);
+                .Where(x => x.IsPublic && x.Namespace == dotNetNamespace && !x.IsAbstract && !x.IsInterface);
 
             foreach (Type type in types)
             {

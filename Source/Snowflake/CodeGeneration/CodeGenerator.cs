@@ -595,12 +595,45 @@ namespace Snowflake.CodeGeneration
 
         private static void GenerateConstructorCall(ConstructorCallNode node, DataContext data)
         {
-            Append(data, "Construct(context, \"{0}\"", node.TypeName);
-                        
-            for (int i = 0; i < node.Args.Count; i++)
+            Append(data, "Construct(context, ");
+
+            GenerateTypeName(node.TypeName, data);            
+
+            if (node.Args.Count > 0)
             {
-                Append(data, ", ");
-                GenerateExpression(node.Args[i], data);
+                Append(data, ", new dynamic[] {{ ");
+
+                for (int i = 0; i < node.Args.Count; i++)
+                {
+                    if (i > 0)
+                        Append(data, ", ");
+                    
+                    GenerateExpression(node.Args[i], data);
+                }
+
+                Append(data, " }}");
+            }
+
+            Append(data, ")");
+        }
+
+        private static void GenerateTypeName(TypeNameNode node, DataContext data)
+        {
+            Append(data, "new ScriptType(\"{0}\"", node.Name);
+
+            if (node.GenericArgs.Count > 0)
+            {
+                Append(data, ", new ScriptType[] {{ ");
+
+                for (int i = 0; i < node.GenericArgs.Count; i++)
+                {
+                    if (i > 0)
+                        Append(data, ", ");
+
+                    GenerateTypeName(node.GenericArgs[i], data);
+                }
+
+                Append(data, " }}");
             }
 
             Append(data, ")");

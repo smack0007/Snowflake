@@ -8,8 +8,17 @@ func bar() {
 
 foo();
 
-var timeSpan = new MySystem.TimeSpan(1, 2, 3);
+var timeSpan = new System.TimeSpan(1, 2, 3);
 Console.WriteLine(timeSpan);
+
+var tuple1 = new System.Tuple<int>(21);
+Console.WriteLine(tuple1);
+
+var tuple2 = new System.Tuple<int, string>(42, "foo");
+Console.WriteLine(tuple2);
+
+var tuple3 = new System.Tuple<System.Tuple<int, string>, System.Tuple<int, string>>(new System.Tuple<int, string>(42, "foo"), new System.Tuple<int, string>(21, "bar"));
+Console.WriteLine(tuple3);
 
 var person1 = new Namespace.Person();
 person1.FirstName = "Bob";

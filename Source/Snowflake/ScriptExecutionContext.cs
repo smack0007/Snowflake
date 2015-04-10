@@ -4,11 +4,47 @@ using System.Collections.Generic;
 namespace Snowflake
 {
     public class ScriptExecutionContext : IScriptExecutionContext
-    {
+    {   
+        class TypeSet
+        {
+            Dictionary<int, Type> types;
+
+            public Type this[int index]
+            {
+                get { return this.types[index]; }
+                set { this.types[index] = value; }
+            }
+
+            public TypeSet()
+            {
+                this.types = new Dictionary<int, Type>();
+            }
+
+            public TypeSet(Type type)
+                : this()
+            {
+                if (type.IsGenericType)
+                {
+                    Type[] genericArgs = type.GetGenericArguments();
+                    this.types[genericArgs.Length] = type;
+                }
+                else
+                {
+                    this.types[0] = type;
+                }
+            }
+
+            public bool TryGetValue(int count, out Type type)
+            {
+                return this.types.TryGetValue(count, out type);
+            }
+        }
+
         Dictionary<string, dynamic> globals;
-        Dictionary<string, Type> types;
         List<ScriptStackFrame> stack;
 
+        Dictionary<string, TypeSet> types;
+        
         public dynamic this[string name]
         {
             get { return this.GetVariable(name); }
@@ -18,8 +54,16 @@ namespace Snowflake
         public ScriptExecutionContext()
         {
             this.globals = new Dictionary<string, dynamic>();
-            this.types = new Dictionary<string, Type>();
             this.stack = new List<ScriptStackFrame>();
+
+            this.types = new Dictionary<string, TypeSet>()
+            {
+                { "bool", new TypeSet(typeof(Boolean)) },
+                { "char", new TypeSet(typeof(Char)) },
+                { "float", new TypeSet(typeof(Single)) },
+                { "int", new TypeSet(typeof(Int32)) },
+                { "string", new TypeSet(typeof(String)) }
+            };
         }
                 
         public void PushStackFrame(string function)
@@ -105,18 +149,41 @@ namespace Snowflake
 
         public void RegisterType(string name, Type type)
         {
-            if (this.types.ContainsKey(name))
-                throw new InvalidOperationException(string.Format("A type is already registered under the name \"{0}\".", name));
+            TypeSet typeSet = null;
 
-            this.types[name] = type;
+            if (this.types.TryGetValue(name, out typeSet))
+            {
+                if (type.IsGenericType)
+                {
+                    Type[] genericArgs = type.GetGenericArguments();
+                    Type existingType = null;
+
+                    if (!typeSet.TryGetValue(genericArgs.Length, out existingType))
+                    {
+                        typeSet[genericArgs.Length] = type;
+                    }
+                    else
+                    {
+                        throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered with the given generic argument variation.", name));
+                    }
+                }
+                else
+                {
+                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered and is not generic argument variation on the existing type.", name));
+                }
+            }
+            else
+            {
+                this.types[name] = new TypeSet(type);
+            }
         }
 
-        public Type GetType(string name)
+        public Type GetType(string name, int genericArgCount)
         {
-            Type result;
+            TypeSet result;
 
             if (this.types.TryGetValue(name, out result))
-                return result;
+                return result[genericArgCount];
 
             throw new ScriptExecutionException(string.Format("Type \"{0}\" is not registered.", name), this.stack.ToArray());
         }

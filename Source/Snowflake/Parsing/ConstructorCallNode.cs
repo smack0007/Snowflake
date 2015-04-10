@@ -8,7 +8,7 @@ namespace Snowflake.Parsing
 {
     public class ConstructorCallNode : ExpressionNode
     {
-        public string TypeName
+        public TypeNameNode TypeName
         {
             get;
             set;
@@ -31,6 +31,14 @@ namespace Snowflake.Parsing
             foreach (T node in base.Find<T>())
             {
                 yield return node;
+            }
+
+            if (this.TypeName != null)
+            {
+                foreach (T node in this.TypeName.Find<T>())
+                {
+                    yield return node;
+                }
             }
 
             foreach (T node in this.Args.Find<T>())

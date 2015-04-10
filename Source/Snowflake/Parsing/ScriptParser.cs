@@ -865,27 +865,48 @@ namespace Snowflake.Parsing
             return node;
         }
 
-        private string ParseTypeName(IList<Lexeme> lexemes, ref int pos)
+        private TypeNameNode ParseTypeName(IList<Lexeme> lexemes, ref int pos)
         {
             this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
 
-            StringBuilder typeName = new StringBuilder(lexemes[pos].Value.Length);
+            StringBuilder name = new StringBuilder(lexemes[pos].Value.Length);
             
             while (lexemes[pos].Type == LexemeType.Identifier)
             {
-                typeName.Append(lexemes[pos].Value);
+                name.Append(lexemes[pos].Value);
 
                 pos++;
                 if (lexemes[pos].Type == LexemeType.Dot)
                 {
-                    typeName.Append(".");
+                    name.Append(".");
                     
                     pos++;
                     this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
                 }
             }
 
-            return typeName.ToString();
+            TypeNameNode node = new TypeNameNode()
+            {
+                Name = name.ToString()
+            };
+
+            if (lexemes[pos].Type == LexemeType.LessThan)
+            {
+                pos++;
+
+                node.GenericArgs.Add(this.ParseTypeName(lexemes, ref pos));
+                
+                while (lexemes[pos].Type == LexemeType.Comma)
+                {
+                    pos++;
+                    node.GenericArgs.Add(this.ParseTypeName(lexemes, ref pos));
+                }
+
+                this.EnsureLexemeType(lexemes, LexemeType.GreaterThan, pos);
+                pos++;
+            }
+
+            return node;
         }
 
 		private MemberAccessNode ParseMemberAccess(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)
