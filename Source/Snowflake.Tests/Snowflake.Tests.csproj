@@ -70,6 +70,8 @@
     <Compile Include="IfTests.cs" />
     <Compile Include="IntegerOperationTests.cs" />
     <Compile Include="LanguageTestFixture.cs" />
+    <Compile Include="Lexing\CommentsTests.cs" />
+    <Compile Include="Lexing\LexerTestFixture.cs" />
     <Compile Include="ListTests.cs" />
     <Compile Include="LogicalOperationsTests.cs" />
     <Compile Include="DictionaryTests.cs" />

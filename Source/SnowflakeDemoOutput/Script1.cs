@@ -102,12 +102,6 @@ namespace Snowflake.Generated
 				for (context.DeclareVariable("i", 0); (context["i"] < 10); context["i"] += 1) {
 					context["Console"].WriteLine(((("5 * " + context["i"]) + " = ") + Invoke(context, context["x5"], context["i"])));
 				}
-				context.DeclareVariable("values", new ScriptList { 5, 4, 3, 2, 1 });
-				context.DeclareVariable("value");
-				foreach (dynamic v21 in context["values"]) {
-					context.SetVariable("value", v21);
-					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
-				}
 				context["export"].number = 42;
 				return null;
 			}

@@ -209,16 +209,36 @@ namespace Snowflake.Lexing
 							i++;
 						}
 					}
-					else if (text[i] == '/') // Multiply or MultiplyGets
+					else if (text[i] == '/') // Divide or DivideGets or Comments
 					{
-						if (i + 1 < text.Length && text[i + 1] != '=')
+						if (i + 1 < text.Length && text[i + 1] == '=')
 						{
-							lexemes.Add(new Lexeme(LexemeType.Divide, null, curLine, curColumn));
+                            lexemes.Add(new Lexeme(LexemeType.DivideGets, null, curLine, curColumn));
+                            i++;
 						}
+                        else if (i + 1 < text.Length && text[i + 1] == '/') // Single line comment
+                        {
+                            i += 2;
+                            while (i < text.Length && text[i] != '\n')
+                                i++;
+                        }
+                        else if (i + 1 < text.Length && text[i + 1] == '*') // Multi line comment
+                        {
+                            i += 2;
+                            while (i < text.Length)
+                            {
+                                if (text[i] == '*' && i + 1 < text.Length && text[i + 1] == '/')
+                                {
+                                    i++;
+                                    break;
+                                }
+                                
+                                i++;
+                            }
+                        }
 						else
 						{
-							lexemes.Add(new Lexeme(LexemeType.DivideGets, null, curLine, curColumn));
-							i++;
+                            lexemes.Add(new Lexeme(LexemeType.Divide, null, curLine, curColumn));
 						}
 					}
 					else if (text[i] == '&' && i + 1 < text.Length && text[i + 1] == '&') // And
