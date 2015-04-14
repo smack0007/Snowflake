@@ -2,8 +2,13 @@
 
 namespace Snowflake.Parsing
 {
-	public class CharacterValueNode : ExpressionNode
+	public class CharacterValueNode : ValueNode
 	{
+        public override Type ValueType
+        {
+            get { return typeof(char); }
+        }
+
 		public char Value
 		{
 			get;
@@ -13,5 +18,10 @@ namespace Snowflake.Parsing
 		public CharacterValueNode()
 		{
 		}
-	}
+               
+        public override object GetValue()
+        {
+            return this.Value;
+        }
+    }
 }

@@ -10,7 +10,7 @@ namespace Snowflake.Tests
 	public class FunctionTests : LanguageTestFixture
 	{
 		[Fact]
-		public void Declared_Function_Cannot_Be_Overwritten_By_Varaible()
+		public void Variable_Cannot_Be_Declared_With_Same_Name_As_Function()
 		{
 			AssertScriptIsException<CodeGenerationException>(@"
 func foo() {
@@ -19,6 +19,19 @@ func foo() {
 
 var foo = 12;");
 		}
+
+        [Fact]
+        public void Function_Name_Cannot_Be_Reassigned()
+        {
+            AssertScriptIsException<ScriptExecutionException>(@"
+func foo() {
+	return 42;
+}
+
+foo = func() {
+    return 21;
+};");
+        }
 
 		[Fact]
 		public void Function_Declaration_Cannnot_Overwrite_Variable()

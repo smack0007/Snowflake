@@ -12,7 +12,7 @@ namespace Snowflake
 			private set;
 		}
 
-        public Dictionary<string, dynamic> Variables
+        public Dictionary<string, ScriptVariable> Variables
         {
             get;
             private set;
@@ -21,7 +21,7 @@ namespace Snowflake
 		public ScriptStackFrame(string function)
 		{
 			this.FunctionName = function;
-            this.Variables = new Dictionary<string, dynamic>();
+            this.Variables = new Dictionary<string, ScriptVariable>();
 		}
 	}
 }

@@ -2,7 +2,8 @@ Script = <Statement>* EOF ;
 
 StatementBlock = "{" <Statement>* "}" ;
 
-Statement = <VariableDeclaration> ";" |
+Statement = <ConstDeclaration> ";" |
+            <VariableDeclaration> ";" |
             <FunctionDeclaration> |
 			<If> |
 			<While> |
@@ -11,7 +12,9 @@ Statement = <VariableDeclaration> ";" |
 			<Return> |
 			<Expression> ";" ;
 
-VariableDeclaration = "var" <Identifier> { "=" <Expression> } ;
+ConstDeclaration = "const" <Identifier> "=" <Expression> ;
+
+VariableDeclaration = "var" <Identifier> ( "=" <Expression> )? ;
 
 FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
 
@@ -65,9 +68,9 @@ AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
 AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
 
-FunctionCall = <Expression> "(" { <Expression> ("," <Expression>)* } ")" ;
+FunctionCall = <Expression> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 
-ConstructorCall = "new" <TypeName> "(" { <Expression> ("," <Expression>)* } ")" ;
+ConstructorCall = "new" <TypeName> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 
 TypeName = <Identifier> ( "." <Identifier> )* ( "<" <TypeName> ( "," <TypeName> )* ">" )? ;
 
@@ -79,7 +82,7 @@ Dictionary = "{" <DictionaryPair>? ( "," <DictionaryPair> )* "}" ;
 
 DictionaryPair = ( <Identifier> | <Expression> ) ":" <Expression> ;
 
-MemberAccess = <Expression> "." <Identifier> { "(" { <Expression> ("," <Expression>)* } ")" } ;
+MemberAccess = <Expression> "." <Identifier> ( "(" ( <Expression> ( "," <Expression> )* )? ")" )? ;
 
 PostfixOperation = <Expression> ( "++" | "--" ) ;
 
@@ -87,9 +90,7 @@ ElementAccess = <Expression> "[" <Expression> "]" ;
 
 Identifier = [A-Za-z_][A-Za-z0-9_]* ;
 
-Value = <Undefined> | <Null> | <Boolean> | <String> | <Char> | <Integer> | <Float> ;
-
-Undefined = "undef" ;
+Value = <Null> | <Boolean> | <String> | <Char> | <Integer> | <Float> ;
 
 Null = "null" ;
 
@@ -100,6 +101,3 @@ String = "\"" <chars>* "\"" ;
 Integer = [1-9]* ;
 
 Float = [1-9]*[.][1-9]* ;
-
-
-

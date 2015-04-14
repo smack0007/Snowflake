@@ -31,22 +31,6 @@ namespace Snowflake.Parsing
 			throw new SyntaxException(string.Format("Unable to parse lexeme type \"{0}\" as \"{1}\" at line {2} column {3}.", lexemes[pos].Type, parseType, lexemes[pos].Line, lexemes[pos].Column));
 		}
 
-        private T ParseExpressionAndEnsureType<T>(IList<Lexeme> lexemes, ref int pos)
-            where T : ExpressionNode
-        {
-            Type expected = typeof(T);
-            int startPos = pos;
-
-            ExpressionNode node = this.ParseExpression(lexemes, ref pos);
-
-            if (!(node is T))
-            {
-                throw new SyntaxException(string.Format("{0} expression was expected at line {1} column {2}.", expected.Name.Substring(0, expected.Name.Length - "Node".Length), lexemes[startPos].Line, lexemes[startPos].Column));
-            }
-
-            return (T)node;
-        }
-
 		private static bool IsAssignmentOperator(LexemeType type)
 		{
 			if (type == LexemeType.Gets || type == LexemeType.PlusGets || type == LexemeType.MinusGets || type == LexemeType.MultiplyGets || type == LexemeType.DivideGets)
@@ -97,7 +81,14 @@ namespace Snowflake.Parsing
 		{
 			StatementNode node = null;
 
-			if (lexemes[pos].Type == LexemeType.Var)
+            if (lexemes[pos].Type == LexemeType.Const)
+            {
+                node = this.ParseConstDeclaration(lexemes, ref pos);
+
+                this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+                pos++;
+            }
+			else if (lexemes[pos].Type == LexemeType.Var)
 			{
 				node = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
 
@@ -157,6 +148,25 @@ namespace Snowflake.Parsing
 			pos++;
 			return node;
 		}
+
+        private ConstDeclarationNode ParseConstDeclaration(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.Const, pos);
+            pos++;
+
+            ConstDeclarationNode node = Construct<ConstDeclarationNode>(lexemes, pos);
+
+            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+            node.ConstName = lexemes[pos].Value;
+
+            pos++;
+            this.EnsureLexemeType(lexemes, LexemeType.Gets, pos);
+
+            pos++;
+            node.ValueExpression = this.ParseExpression(lexemes, ref pos);
+                        
+            return node;
+        }
 
 		private VariableDeclarationNode ParseVariableDeclaration(IList<Lexeme> lexemes, ref int pos, bool varKeyword)
 		{
@@ -616,44 +626,13 @@ namespace Snowflake.Parsing
 						break;
 
 					case LexemeType.Null:
-						node = Construct<NullValueNode>(lexemes, pos);
-						pos++;
-						break;
-                        					
 					case LexemeType.True:
                     case LexemeType.False:
-                        var boolNode = Construct<BooleanValueNode>(lexemes, pos);
-                        boolNode.Value = lexemes[pos].Type == LexemeType.True;
-                        node = boolNode;
-						pos++;
-                        break;
-
-					case LexemeType.String:
-						var stringNode = Construct<StringValueNode>(lexemes, pos);
-                        stringNode.Value = lexemes[pos].Value;
-                        node = stringNode;
-						pos++;
-						break;
-
 					case LexemeType.Char:
-                        var charNode = Construct<CharacterValueNode>(lexemes, pos);
-                        charNode.Value = lexemes[pos].Value[0];
-                        node = charNode;
-						pos++;
-						break;
-
 					case LexemeType.Integer:
-                        var intNode = Construct<IntegerValueNode>(lexemes, pos);
-                        intNode.Value = int.Parse(lexemes[pos].Value);
-                        node = intNode;
-						pos++;
-						break;
-
 					case LexemeType.Float:
-                        var floatNode = Construct<FloatValueNode>(lexemes, pos);
-						floatNode.Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture);
-                        node = floatNode;
-                        pos++;
+                    case LexemeType.String:
+                        node = this.ParseValue(lexemes, ref pos);
 						break;
 				}
 			}
@@ -686,7 +665,7 @@ namespace Snowflake.Parsing
 
 			return node;
 		}
-
+               
 		private FunctionNode ParseAnonymousFunction(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
@@ -975,5 +954,59 @@ namespace Snowflake.Parsing
 			pos++;
 			return node;
 		}
+
+        private ValueNode ParseValue(IList<Lexeme> lexemes, ref int pos)
+        {
+            ValueNode node = null;
+
+            switch (lexemes[pos].Type)
+            {
+                case LexemeType.Null:
+                    node = Construct<NullValueNode>(lexemes, pos);
+                    pos++;
+                    break;
+
+                case LexemeType.True:
+                case LexemeType.False:
+                    var boolNode = Construct<BooleanValueNode>(lexemes, pos);
+                    boolNode.Value = lexemes[pos].Type == LexemeType.True;
+                    node = boolNode;
+                    pos++;
+                    break;
+
+                case LexemeType.String:
+                    var stringNode = Construct<StringValueNode>(lexemes, pos);
+                    stringNode.Value = lexemes[pos].Value;
+                    node = stringNode;
+                    pos++;
+                    break;
+
+                case LexemeType.Char:
+                    var charNode = Construct<CharacterValueNode>(lexemes, pos);
+                    charNode.Value = lexemes[pos].Value[0];
+                    node = charNode;
+                    pos++;
+                    break;
+
+                case LexemeType.Integer:
+                    var intNode = Construct<IntegerValueNode>(lexemes, pos);
+                    intNode.Value = int.Parse(lexemes[pos].Value);
+                    node = intNode;
+                    pos++;
+                    break;
+
+                case LexemeType.Float:
+                    var floatNode = Construct<FloatValueNode>(lexemes, pos);
+                    floatNode.Value = float.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture);
+                    node = floatNode;
+                    pos++;
+                    break;
+            }
+
+            if (node == null)
+                this.ThrowUnableToParseException("Value", lexemes, pos);
+
+            return node;
+        }
 	}
 }

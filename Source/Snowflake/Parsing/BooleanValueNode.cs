@@ -2,8 +2,13 @@
 
 namespace Snowflake.Parsing
 {
-	public class BooleanValueNode : ExpressionNode
+	public class BooleanValueNode : ValueNode
 	{
+        public override Type ValueType
+        {
+            get { return typeof(bool); }
+        }
+
 		public bool Value
 		{
 			get;
@@ -13,5 +18,10 @@ namespace Snowflake.Parsing
 		public BooleanValueNode()
 		{
 		}
-	}
+
+        public override object GetValue()
+        {
+            return this.Value;
+        }
+    }
 }

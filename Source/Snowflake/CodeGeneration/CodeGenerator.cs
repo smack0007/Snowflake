@@ -194,7 +194,11 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateStatement(StatementNode node, DataContext data)
 		{
-			if (node is VariableDeclarationNode)
+            if (node is ConstDeclarationNode)
+            {
+                GenerateConstDeclaration((ConstDeclarationNode)node, data);
+            }
+			else if (node is VariableDeclarationNode)
 			{
 				GenerateVariableDeclaration((VariableDeclarationNode)node, data);
 			}
@@ -234,6 +238,17 @@ namespace Snowflake.CodeGeneration
 			}
 		}
 
+        private static void GenerateConstDeclaration(ConstDeclarationNode node, DataContext data)
+        {
+            data.VariableMap.DeclareVariable(node.ConstName, node.Line, node.Column);
+
+            StartLine(data, "context.DeclareVariable(\"{0}\", isConst: true, value: ", node.ConstName);
+            
+            GenerateExpression(node.ValueExpression, data);
+
+            EndLine(data, ");");
+        }
+
 		private static void GenerateVariableDeclaration(VariableDeclarationNode node, DataContext data)
 		{
             data.VariableMap.DeclareVariable(node.VariableName, node.Line, node.Column);
@@ -242,7 +257,7 @@ namespace Snowflake.CodeGeneration
 
 			if (node.ValueExpression != null)
 			{
-                Append(data, ", ");
+                Append(data, ", value: ");
 				GenerateExpression(node.ValueExpression, data);
 			}
             
@@ -253,7 +268,7 @@ namespace Snowflake.CodeGeneration
 		{
             data.VariableMap.DeclareVariable(node.FunctionName, node.Line, node.Column);
 
-            StartLine(data, "context.DeclareVariable(\"{0}\", ", node.FunctionName);
+            StartLine(data, "context.DeclareVariable(\"{0}\", isConst: true, value: ", node.FunctionName);
 
 			GenerateFunction(node, data);
 

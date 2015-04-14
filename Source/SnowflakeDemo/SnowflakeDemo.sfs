@@ -1,5 +1,7 @@
 ﻿// Start with a comment
 
+const MaxMultiplier = 10;
+
 var scriptListType = import("Snowflake.ScriptList");
 var scriptList = new scriptListType(["a", "b", "c"]);
 Console.WriteLine(scriptList);
@@ -58,16 +60,15 @@ func buildMultiplier(x) {
 
 var x5 = buildMultiplier(5);
 
-for (var i = 0; i < 10; i += 1) {
+for (var i = 0; i < MaxMultiplier; i += 1) {
 	Console.WriteLine("5 * " + i + " = " + x5(i));
 }
 
-/*
 var values = [ 5, 4, 3, 2, 1 ];
 foreach (var value in values) {
 	Console.WriteLine("5 * " + value + " = " + x5(value));
 }
-*/
+
 
 export.number = 42;
 

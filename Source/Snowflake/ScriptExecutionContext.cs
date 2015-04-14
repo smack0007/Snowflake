@@ -45,7 +45,7 @@ namespace Snowflake
             }
         }
 
-        Dictionary<string, dynamic> globals;
+        Dictionary<string, ScriptVariable> globals;
         List<ScriptStackFrame> stack;
 
         Dictionary<string, TypeSet> types;
@@ -58,16 +58,16 @@ namespace Snowflake
 
         public ScriptExecutionContext()
         {
-            this.globals = new Dictionary<string, dynamic>();
+            this.globals = new Dictionary<string, ScriptVariable>();
             this.stack = new List<ScriptStackFrame>();
 
             this.types = new Dictionary<string, TypeSet>()
             {
-                { "bool", new TypeSet(typeof(Boolean)) },
-                { "char", new TypeSet(typeof(Char)) },
-                { "float", new TypeSet(typeof(Single)) },
-                { "int", new TypeSet(typeof(Int32)) },
-                { "string", new TypeSet(typeof(String)) }
+                { "bool", new TypeSet(typeof(bool)) },
+                { "char", new TypeSet(typeof(char)) },
+                { "float", new TypeSet(typeof(float)) },
+                { "int", new TypeSet(typeof(int)) },
+                { "string", new TypeSet(typeof(string)) }
             };
         }
                 
@@ -89,24 +89,26 @@ namespace Snowflake
             return this.stack.ToArray();
         }
 
-        public void DeclareVariable(string name, dynamic value = null)
+        public void DeclareVariable(string name, dynamic value = null, bool isConst = false)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
 
+            ScriptVariable variable = new ScriptVariable(value, isConst);
+            
             if (this.stack.Count > 0)
             {
                 if (this.stack[this.stack.Count - 1].Variables.ContainsKey(name))
                     throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
 
-                this.stack[this.stack.Count - 1].Variables[name] = value;
+                this.stack[this.stack.Count - 1].Variables[name] = variable;
             }
             else
             {
                 if (this.globals.ContainsKey(name))
                     throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
 
-                this.globals[name] = value;
+                this.globals[name] = variable;
             }
         }
 
@@ -115,12 +117,12 @@ namespace Snowflake
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            dynamic result = null;
+            ScriptVariable variable = null;
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
-                if (this.stack[i].Variables.TryGetValue(name, out result))
-                    return result;
+                if (this.stack[i].Variables.TryGetValue(name, out variable))
+                    return variable.Value;
             }
 
             return this.GetGlobalVariable(name);
@@ -135,14 +137,14 @@ namespace Snowflake
             {
                 if (this.stack[i].Variables.ContainsKey(name))
                 {
-                    this.stack[i].Variables[name] = value;
+                    this.stack[i].Variables[name].Value = value;
                     return value;
                 }
             }
 
             if (this.globals.ContainsKey(name))
             {
-                this.globals[name] = value;
+                this.globals[name].Value = value;
                 return value;
             }
 
@@ -154,10 +156,10 @@ namespace Snowflake
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            dynamic result;
+            ScriptVariable variable;
 
-            if (this.globals.TryGetValue(name, out result))
-                return result;
+            if (this.globals.TryGetValue(name, out variable))
+                return variable.Value;
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
@@ -167,7 +169,7 @@ namespace Snowflake
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            this.globals[name] = value;
+            this.globals[name] = new ScriptVariable(value, false);
         }
 
         public void RegisterType(string name, Type type)

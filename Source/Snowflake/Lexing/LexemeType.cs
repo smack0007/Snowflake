@@ -99,6 +99,11 @@ namespace Snowflake.Lexing
 		/// </summary>
 		EndStatement,
 		
+        /// <summary>
+        /// const
+        /// </summary>
+        Const,
+
 		/// <summary>
 		/// var
 		/// </summary>

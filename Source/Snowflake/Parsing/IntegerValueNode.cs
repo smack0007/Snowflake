@@ -2,8 +2,13 @@
 
 namespace Snowflake.Parsing
 {
-	public class IntegerValueNode : ExpressionNode
+	public class IntegerValueNode : ValueNode
 	{
+        public override Type ValueType
+        {
+            get { return typeof(int); }
+        }
+
 		public int Value
 		{
 			get;
@@ -13,5 +18,10 @@ namespace Snowflake.Parsing
 		public IntegerValueNode()
 		{
 		}
-	}
+
+        public override object GetValue()
+        {
+            return this.Value;
+        }
+    }
 }

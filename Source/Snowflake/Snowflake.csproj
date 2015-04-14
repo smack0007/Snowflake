@@ -104,6 +104,7 @@
     <Compile Include="IScriptExecutionContext.cs" />
     <Compile Include="IScriptExecutionContextExtensions.cs" />
     <Compile Include="Parsing\ArrayNode.cs" />
+    <Compile Include="Parsing\ConstDeclarationNode.cs" />
     <Compile Include="Parsing\ConstructorCallNode.cs" />
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Parsing\TypeNameNode.cs" />
     <Compile Include="Parsing\UnaryOperationNode.cs" />
     <Compile Include="Parsing\UnaryOperationType.cs" />
+    <Compile Include="Parsing\ValueNode.cs" />
     <Compile Include="ScriptDictionary.cs" />
     <Compile Include="ScriptExecutionContext.cs" />
     <Compile Include="ScriptExecutionException.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="ScriptStaticObjectProxy.cs" />
     <Compile Include="ScriptType.cs" />
     <Compile Include="ScriptUtilityFunctions.cs" />
+    <Compile Include="ScriptVariable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LanguageStructure.txt" />
