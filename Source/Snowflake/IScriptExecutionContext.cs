@@ -7,7 +7,7 @@ namespace Snowflake
     {
         dynamic GetGlobalVariable(string name);
 
-        void SetGlobalVariable(string name, dynamic value);
+        void SetGlobalVariable(string name, dynamic value, bool isConst = false);
 
         void RegisterType(string name, Type type);
     }

@@ -1,5 +1,7 @@
 ﻿// Start with a comment
 
+System.Console.WriteLine("Hello World!");
+
 const MaxMultiplier = 10;
 
 var scriptListType = import("Snowflake.ScriptList");

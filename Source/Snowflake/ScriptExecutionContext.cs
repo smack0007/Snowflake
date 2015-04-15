@@ -1,54 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Snowflake
 {
     public class ScriptExecutionContext : IScriptExecutionContext
-    {   
-        class TypeSet
-        {
-            Dictionary<int, Type> types;
-
-            public Type this[int index]
-            {
-                get { return this.types[index]; }
-                set { this.types[index] = value; }
-            }
-
-            public TypeSet()
-            {
-                this.types = new Dictionary<int, Type>();
-            }
-
-            public TypeSet(Type type)
-                : this()
-            {
-                if (type.IsGenericType)
-                {
-                    Type[] genericArgs = type.GetGenericArguments();
-                    this.types[genericArgs.Length] = type;
-                }
-                else
-                {
-                    this.types[0] = type;
-                }
-            }
-
-            public bool ContainsKey(int key)
-            {
-                return this.types.ContainsKey(key);
-            }
-
-            public bool TryGetValue(int key, out Type value)
-            {
-                return this.types.TryGetValue(key, out value);
-            }
-        }
-
-        Dictionary<string, ScriptVariable> globals;
+    {           
+        ScriptNamespace globals;
         List<ScriptStackFrame> stack;
 
-        Dictionary<string, TypeSet> types;
+        Dictionary<string, ScriptTypeSet> types;
         
         public dynamic this[string name]
         {
@@ -58,16 +19,16 @@ namespace Snowflake
 
         public ScriptExecutionContext()
         {
-            this.globals = new Dictionary<string, ScriptVariable>();
+            this.globals = new ScriptNamespace("<global>");
             this.stack = new List<ScriptStackFrame>();
 
-            this.types = new Dictionary<string, TypeSet>()
+            this.types = new Dictionary<string, ScriptTypeSet>()
             {
-                { "bool", new TypeSet(typeof(bool)) },
-                { "char", new TypeSet(typeof(char)) },
-                { "float", new TypeSet(typeof(float)) },
-                { "int", new TypeSet(typeof(int)) },
-                { "string", new TypeSet(typeof(string)) }
+                { "bool", new ScriptTypeSet(typeof(bool)) },
+                { "char", new ScriptTypeSet(typeof(char)) },
+                { "float", new ScriptTypeSet(typeof(float)) },
+                { "int", new ScriptTypeSet(typeof(int)) },
+                { "string", new ScriptTypeSet(typeof(string)) }
             };
         }
                 
@@ -105,10 +66,10 @@ namespace Snowflake
             }
             else
             {
-                if (this.globals.ContainsKey(name))
+                if (this.globals.ContainsVariable(name))
                     throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
 
-                this.globals[name] = variable;
+                this.globals.SetVariable(name, variable);
             }
         }
 
@@ -125,7 +86,10 @@ namespace Snowflake
                     return variable.Value;
             }
 
-            return this.GetGlobalVariable(name);
+            if (this.globals.TryGetVariable(name, out variable))
+                return variable.Value;
+
+            throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
 
         public dynamic SetVariable(string name, dynamic value)
@@ -142,15 +106,16 @@ namespace Snowflake
                 }
             }
 
-            if (this.globals.ContainsKey(name))
+            ScriptVariable variable;
+            if (this.globals.TryGetVariable(name, out variable))
             {
-                this.globals[name].Value = value;
+                variable.Value = value;
                 return value;
             }
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
-                
+  
         public dynamic GetGlobalVariable(string name)
         {
             if (name == null)
@@ -158,18 +123,80 @@ namespace Snowflake
 
             ScriptVariable variable;
 
-            if (this.globals.TryGetValue(name, out variable))
-                return variable.Value;
+            if (name.IndexOf('.') > 0)
+            {
+                string[] nameParts = name.Split('.');
 
-            throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
+                ScriptNamespace pointer = this.globals;
+
+                for (int i = 0; i < nameParts.Length - 1; i++)
+                {
+                    if (pointer.TryGetVariable(nameParts[i], out variable))
+                    {
+                        if (variable.Value is ScriptNamespace)
+                        {
+                            pointer = variable.Value;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (pointer.TryGetVariable(nameParts[nameParts.Length - 1], out variable))
+                    return variable.Value;
+            }
+            else
+            {
+                if (this.globals.TryGetVariable(name, out variable))
+                    return variable.Value;
+            }
+
+            throw new ScriptExecutionException("Global variable \"{0}\" is not defined.");
         }
 
-        public void SetGlobalVariable(string name, dynamic value)
+        public void SetGlobalVariable(string name, dynamic value, bool isConst = false)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            this.globals[name] = new ScriptVariable(value, false);
+            if (name.IndexOf('.') > 0)
+            {
+                string[] nameParts = name.Split('.');
+
+                ScriptNamespace pointer = this.globals;
+                                
+                for (int i = 0; i < nameParts.Length - 1; i++)
+                {
+                    ScriptVariable variable;
+                    if (pointer.TryGetVariable(nameParts[i], out variable))
+                    {
+                        if (variable.Value is ScriptNamespace)
+                        {
+                            pointer = variable.Value;
+                        }
+                        else
+                        {
+                            throw new ScriptExecutionException(string.Format("Unable to set global variable \"{0}\". \"{1}\" is already a variable.", name, string.Join(".", nameParts.Take(i + 1))));
+                        }
+                    }
+                    else
+                    {
+                        pointer = pointer.DeclareSubNamespace(nameParts[i]);
+                    }
+                }
+
+                pointer.SetVariable(nameParts[nameParts.Length - 1], new ScriptVariable(value, isConst));
+            }
+            else
+            {
+                this.globals.SetVariable(name, new ScriptVariable(value, isConst));
+            }
         }
 
         public void RegisterType(string name, Type type)
@@ -180,7 +207,7 @@ namespace Snowflake
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            TypeSet typeSet = null;
+            ScriptTypeSet typeSet = null;
 
             if (this.types.TryGetValue(name, out typeSet))
             {
@@ -208,7 +235,7 @@ namespace Snowflake
             }
             else
             {
-                this.types[name] = new TypeSet(type);
+                this.types[name] = new ScriptTypeSet(type);
             }
         }
 
@@ -220,7 +247,7 @@ namespace Snowflake
             if (genericArgCount < 0)
                 throw new ArgumentOutOfRangeException("genericArgCount", "genericArgCount must be >= 0.");
 
-            TypeSet typeSet;
+            ScriptTypeSet typeSet;
 
             if (this.types.TryGetValue(name, out typeSet))
             {

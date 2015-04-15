@@ -32,9 +32,9 @@ namespace Snowflake
             return this.executionContext.GetGlobalVariable(name);
         }
 
-        public void SetGlobalVariable(string name, dynamic value)
+        public void SetGlobalVariable(string name, dynamic value, bool isConst = false)
         {
-            this.executionContext.SetGlobalVariable(name, value);
+            this.executionContext.SetGlobalVariable(name, value, isConst);
         }
 
         public void RegisterType(string name, Type type)

@@ -158,9 +158,11 @@
     <Compile Include="Parsing\SyntaxException.cs" />
     <Compile Include="ScriptFunction.cs" />
     <Compile Include="ScriptList.cs" />
+    <Compile Include="ScriptNamespace.cs" />
     <Compile Include="ScriptStackFrame.cs" />
     <Compile Include="ScriptStaticObjectProxy.cs" />
     <Compile Include="ScriptType.cs" />
+    <Compile Include="ScriptTypeSet.cs" />
     <Compile Include="ScriptUtilityFunctions.cs" />
     <Compile Include="ScriptVariable.cs" />
   </ItemGroup>
