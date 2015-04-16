@@ -81,7 +81,12 @@ namespace Snowflake
             string className = this.GetNextScriptClassName();
             var code = this.codeGenerator.Generate(syntaxTree, className);
             var compiled = this.codeCompiler.Compile(code, className);
-            return compiled.Execute(this.executionContext);
+
+            this.executionContext.PushStackFrame("<script>");
+            var result = compiled.Execute(this.executionContext);
+            this.executionContext.PopStackFrame();
+
+            return result;
         }
 
         public dynamic ExecuteFile(string fileName)

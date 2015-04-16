@@ -38,7 +38,7 @@ namespace SnowflakeDemo
 							
             engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
             engine.SetGlobalStaticObject("System.Console", typeof(Console));
-            engine.SetGlobalStaticObject("Console", typeof(Console));
+            //engine.SetGlobalStaticObject("Console", typeof(Console));
 			engine.SetGlobalVariable("export", export);
             engine.RegisterType("Namespace.Person", typeof(Person));
             //engine.RegisterType("System.TimeSpan", typeof(TimeSpan));

@@ -9,7 +9,8 @@ namespace Snowflake.Generated
 		{
 			try
 			{
-				context["System"].Console.WriteLine("Hello World!");
+				context.UsingNamespace("System");
+				context["Console"].WriteLine("Hello World!");
 				context.DeclareVariable("MaxMultiplier", isConst: true, value: 10);
 				context.DeclareVariable("scriptListType", value: Invoke(context, context["import"], "Snowflake.ScriptList"));
 				context.DeclareVariable("scriptList", value: Construct(context, context["scriptListType"], new dynamic[] { new ScriptList { "a", "b", "c" } }));

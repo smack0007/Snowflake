@@ -13,17 +13,13 @@ namespace Snowflake.Tests
         public void Depth_Of_One_Stack_Trace()
         {
             AssertScriptIsException<ScriptExecutionException>(@"
-func isException() {
-    foo();
-};
-
-isException();
+foo();
 ",
             (x) =>
             {
                 var ex = (ScriptExecutionException)x;
                 Assert.Equal(1, ex.ScriptStack.Length);
-                Assert.Equal("isException", ex.ScriptStack[0].FunctionName);
+                Assert.Equal("<script>", ex.ScriptStack[0].FunctionName);
             });
         }
 
@@ -32,10 +28,6 @@ isException();
         {
             AssertScriptIsException<ScriptExecutionException>(@"
 func isException() {
-    isException2();
-};
-
-func isException2() {
     foo();
 };
 
@@ -45,8 +37,8 @@ isException();
             {
                 var ex = (ScriptExecutionException)x;
                 Assert.Equal(2, ex.ScriptStack.Length);
-                Assert.Equal("isException", ex.ScriptStack[0].FunctionName);
-                Assert.Equal("isException2", ex.ScriptStack[1].FunctionName);
+                Assert.Equal("<script>", ex.ScriptStack[0].FunctionName);
+                Assert.Equal("isException", ex.ScriptStack[1].FunctionName);
             });
         }
     }

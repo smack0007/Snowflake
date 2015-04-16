@@ -17,11 +17,18 @@ namespace Snowflake
             get;
             private set;
         }
+
+        public List<ScriptNamespace> UsingNamespaces
+        {
+            get;
+            private set;
+        }
                 
 		public ScriptStackFrame(string function)
 		{
 			this.FunctionName = function;
             this.Variables = new Dictionary<string, ScriptVariable>();
+            this.UsingNamespaces = new List<ScriptNamespace>();
 		}
 	}
 }

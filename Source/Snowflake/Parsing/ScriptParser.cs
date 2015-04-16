@@ -81,51 +81,78 @@ namespace Snowflake.Parsing
 		{
 			StatementNode node = null;
 
-            if (lexemes[pos].Type == LexemeType.Const)
+            switch (lexemes[pos].Type)
             {
-                node = this.ParseConstDeclaration(lexemes, ref pos);
+                case LexemeType.Using:
+                    {
+                        node = this.ParseUsingDeclaration(lexemes, ref pos);
 
-                this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-                pos++;
+                        this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+                        pos++;
+                    }
+                    break;
+
+                case LexemeType.Const:
+				    {
+					    node = this.ParseConstDeclaration(lexemes, ref pos);
+
+					    this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+					    pos++;
+				    }
+				    break;
+
+			    case LexemeType.Var:
+				    {
+					    node = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
+
+					    this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+					    pos++;
+				    }
+				    break;
+
+			    case LexemeType.Func:
+				    {
+					    node = this.ParseNamedFunctionDeclaration(lexemes, ref pos);
+				    }
+				    break;
+
+			    case LexemeType.If:
+				    {
+					    node = this.ParseIf(lexemes, ref pos);
+				    }
+				    break;
+                case LexemeType.While:
+				    {
+					    node = this.ParseWhile(lexemes, ref pos);
+				    }
+				    break;
+
+                case LexemeType.For:
+				    {
+					    node = this.ParseFor(lexemes, ref pos);
+				    }
+				    break;
+                case LexemeType.ForEach:
+				    {
+					    node = this.ParseForEach(lexemes, ref pos);
+				    }
+				    break;
+
+                case LexemeType.Return:
+				    {
+					    node = this.ParseReturn(lexemes, ref pos);
+				    }
+				    break;
+
+			    default:
+				    {
+					    node = this.ParseExpression(lexemes, ref pos);
+
+					    this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+					    pos++;
+				    }
+                    break;
             }
-			else if (lexemes[pos].Type == LexemeType.Var)
-			{
-				node = this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: true);
-
-				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-				pos++;
-			}
-			else if (lexemes[pos].Type == LexemeType.Func)
-			{
-				node = this.ParseNamedFunctionDeclaration(lexemes, ref pos);
-			}
-			else if (lexemes[pos].Type == LexemeType.If)
-			{
-				node = this.ParseIf(lexemes, ref pos);
-			}
-            else if (lexemes[pos].Type == LexemeType.While)
-            {
-                node = this.ParseWhile(lexemes, ref pos);
-            }
-			else if (lexemes[pos].Type == LexemeType.For)
-			{
-				node = this.ParseFor(lexemes, ref pos);
-			}
-			else if (lexemes[pos].Type == LexemeType.ForEach)
-			{
-				node = this.ParseForEach(lexemes, ref pos);
-			}
-			else if (lexemes[pos].Type == LexemeType.Return)
-			{
-				node = this.ParseReturn(lexemes, ref pos);
-			}
-			else
-			{
-				node = this.ParseExpression(lexemes, ref pos);
-
-				this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
-				pos++;
-			}
 			
 			return node;
 		}
@@ -148,6 +175,18 @@ namespace Snowflake.Parsing
 			pos++;
 			return node;
 		}
+
+        private UsingDeclarationNode ParseUsingDeclaration(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.Using, pos);
+            pos++;
+
+            UsingDeclarationNode node = Construct<UsingDeclarationNode>(lexemes, pos);
+
+            node.NamespaceName = this.ParseNamespaceName(lexemes, ref pos);
+                       
+            return node;
+        }
 
         private ConstDeclarationNode ParseConstDeclaration(IList<Lexeme> lexemes, ref int pos)
         {
@@ -842,6 +881,29 @@ namespace Snowflake.Parsing
 
             pos++;
             return node;
+        }
+
+        private string ParseNamespaceName(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+
+            StringBuilder name = new StringBuilder(lexemes[pos].Value.Length);
+
+            while (lexemes[pos].Type == LexemeType.Identifier)
+            {
+                name.Append(lexemes[pos].Value);
+
+                pos++;
+                if (lexemes[pos].Type == LexemeType.Dot)
+                {
+                    name.Append(".");
+
+                    pos++;
+                    this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+                }
+            }
+
+            return name.ToString();
         }
 
         private TypeNameNode ParseTypeName(IList<Lexeme> lexemes, ref int pos)

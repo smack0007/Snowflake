@@ -24,6 +24,11 @@ namespace Snowflake.Lexing
 		/// </summary>
 		Identifier,
 
+        /// <summary>
+        /// using
+        /// </summary>
+        Using,
+
 		/// <summary>
 		/// func
 		/// </summary>

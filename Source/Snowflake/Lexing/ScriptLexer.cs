@@ -339,6 +339,10 @@ namespace Snowflake.Lexing
 					{
 						switch (value)
 						{
+                            case "using":
+                                lexemes.Add(new Lexeme(LexemeType.Using, null, curLine, curColumn));
+                                break;
+
                             case "const":
                                 lexemes.Add(new Lexeme(LexemeType.Const, null, curLine, curColumn));
                                 break;

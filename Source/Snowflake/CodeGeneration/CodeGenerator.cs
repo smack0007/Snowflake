@@ -194,7 +194,11 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateStatement(StatementNode node, DataContext data)
 		{
-            if (node is ConstDeclarationNode)
+            if (node is UsingDeclarationNode)
+            {
+                GenerateUsingDeclaration((UsingDeclarationNode)node, data);
+            }
+            else if (node is ConstDeclarationNode)
             {
                 GenerateConstDeclaration((ConstDeclarationNode)node, data);
             }
@@ -237,6 +241,11 @@ namespace Snowflake.CodeGeneration
 				ThrowUnableToGenerateException("Statement", node);
 			}
 		}
+
+        private static void GenerateUsingDeclaration(UsingDeclarationNode node, DataContext data)
+        {
+            WriteLine(data, "context.UsingNamespace(\"{0}\");", node.NamespaceName);
+        }
 
         private static void GenerateConstDeclaration(ConstDeclarationNode node, DataContext data)
         {

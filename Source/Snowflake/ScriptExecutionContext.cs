@@ -17,6 +17,11 @@ namespace Snowflake
             set { this.SetVariable(name, value); }
         }
 
+        private ScriptStackFrame CurrentStackFrame
+        {
+            get { return this.stack[this.stack.Count - 1]; }
+        }
+
         public ScriptExecutionContext()
         {
             this.globals = new ScriptNamespace("<global>");
@@ -48,6 +53,16 @@ namespace Snowflake
         public ScriptStackFrame[] GetStackFrames()
         {
             return this.stack.ToArray();
+        }
+
+        public void UsingNamespace(string name)
+        {
+            ScriptNamespace pointer = this.GetNamespace(name);
+
+            if (pointer == null)
+                throw new ScriptExecutionException(string.Format("Namespace \"{0}\" is not defined.", name));
+
+            this.CurrentStackFrame.UsingNamespaces.Add(pointer);
         }
 
         public void DeclareVariable(string name, dynamic value = null, bool isConst = false)
@@ -87,7 +102,20 @@ namespace Snowflake
             }
 
             if (this.globals.TryGetVariable(name, out variable))
+            {
                 return variable.Value;
+            }
+            else
+            {
+                for (int i = this.stack.Count - 1; i >= 0; i--)
+                {
+                    foreach (ScriptNamespace pointer in this.stack[i].UsingNamespaces)
+                    {
+                        if (pointer.TryGetVariable(name, out variable))
+                            return variable.Value;
+                    }
+                }
+            }
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
@@ -115,7 +143,42 @@ namespace Snowflake
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
         }
-  
+
+        private ScriptNamespace GetNamespace(string name)
+        {
+            string[] nameParts = name.Split('.');
+            return this.GetNamespace(nameParts, nameParts.Length);
+        }
+
+        private ScriptNamespace GetNamespace(string[] nameParts, int length)
+        {
+            ScriptNamespace pointer = this.globals;
+            ScriptVariable variable;
+                        
+            for (int i = 0; i < length; i++)
+            {
+                if (pointer.TryGetVariable(nameParts[i], out variable))
+                {
+                    if (variable.Value is ScriptNamespace)
+                    {
+                        pointer = variable.Value;
+                    }
+                    else
+                    {
+                        pointer = null;
+                        break;
+                    }
+                }
+                else
+                {
+                    pointer = null;
+                    break;
+                }
+            }
+
+            return pointer;
+        }
+
         public dynamic GetGlobalVariable(string name)
         {
             if (name == null)
@@ -127,28 +190,9 @@ namespace Snowflake
             {
                 string[] nameParts = name.Split('.');
 
-                ScriptNamespace pointer = this.globals;
+                ScriptNamespace pointer = this.GetNamespace(nameParts, nameParts.Length - 1);
 
-                for (int i = 0; i < nameParts.Length - 1; i++)
-                {
-                    if (pointer.TryGetVariable(nameParts[i], out variable))
-                    {
-                        if (variable.Value is ScriptNamespace)
-                        {
-                            pointer = variable.Value;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if (pointer.TryGetVariable(nameParts[nameParts.Length - 1], out variable))
+                if (pointer != null && pointer.TryGetVariable(nameParts[nameParts.Length - 1], out variable))
                     return variable.Value;
             }
             else

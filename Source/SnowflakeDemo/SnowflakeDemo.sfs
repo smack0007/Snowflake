@@ -1,6 +1,7 @@
 ﻿// Start with a comment
+using System;
 
-System.Console.WriteLine("Hello World!");
+Console.WriteLine("Hello World!");
 
 const MaxMultiplier = 10;
 

@@ -2,7 +2,8 @@ Script = <Statement>* EOF ;
 
 StatementBlock = "{" <Statement>* "}" ;
 
-Statement = <ConstDeclaration> ";" |
+Statement = <UsingDeclaration> ";" |
+            <ConstDeclaration> ";" |
             <VariableDeclaration> ";" |
             <FunctionDeclaration> |
 			<If> |
@@ -11,6 +12,8 @@ Statement = <ConstDeclaration> ";" |
 			<ForEach> |
 			<Return> |
 			<Expression> ";" ;
+
+UsingDeclaration = "using" <NamespaceName> ;
 
 ConstDeclaration = "const" <Identifier> "=" <Expression> ;
 
@@ -73,6 +76,8 @@ FunctionCall = <Expression> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 ConstructorCall = "new" <TypeName> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 
 TypeName = <Identifier> ( "." <Identifier> )* ( "<" <TypeName> ( "," <TypeName> )* ">" )? ;
+
+NamespaceName = <Identifier> ( "." <Identifier> )* ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 
