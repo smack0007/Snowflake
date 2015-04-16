@@ -54,11 +54,11 @@ return sum;
 		public void Native_List_Can_Be_Iterated()
 		{
 			AssertScriptReturnValue(
-				6,
-				(x) =>
+				(engine) =>
 				{
-					x.SetGlobalVariable("list", new List<int>() { 1, 2, 3 });
+					engine.SetGlobalVariable("list", new List<int>() { 1, 2, 3 });
 				},
+                6,
 @"
 var sum = 0;
 foreach (var x in list) {

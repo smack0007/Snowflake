@@ -16,15 +16,15 @@ namespace Snowflake.Tests
 		
 		public void AssertScriptReturnValue<T>(Action<T> assert, string script)
 		{
-			AssertScriptReturnValue(assert, (x) => { }, script);
+			AssertScriptReturnValue((x) => { }, assert, script);
 		}
 
-		public void AssertScriptReturnValue<T>(T expectedValue, Action<ScriptEngine> setup, string script)
+        public void AssertScriptReturnValue<T>(Action<ScriptEngine> setup, T expectedValue, string script)
 		{
-			AssertScriptReturnValue<T>((x) => Assert.Equal(expectedValue, x), setup, script);
+			AssertScriptReturnValue<T>(setup, (x) => Assert.Equal(expectedValue, x), script);
 		}
 
-		public void AssertScriptReturnValue<T>(Action<T> assert, Action<ScriptEngine> setup, string script)
+        public void AssertScriptReturnValue<T>(Action<ScriptEngine> setup, Action<T> assert, string script)
 		{
 			ScriptEngine engine = new ScriptEngine();
 			setup(engine);

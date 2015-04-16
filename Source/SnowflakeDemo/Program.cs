@@ -41,10 +41,10 @@ namespace SnowflakeDemo
             //engine.SetGlobalStaticObject("Console", typeof(Console));
 			engine.SetGlobalVariable("export", export);
             engine.RegisterType("Namespace.Person", typeof(Person));
-            //engine.RegisterType("System.TimeSpan", typeof(TimeSpan));
-            //engine.RegisterType("System.Tuple", typeof(Tuple<>));
-            //engine.RegisterType("System.Tuple", typeof(Tuple<,>));
-            engine.RegisterAllTypesInNamespace("System", "System");
+            engine.RegisterType("System.TimeSpan", typeof(TimeSpan));
+            engine.RegisterType("System.Tuple", typeof(Tuple<>));
+            engine.RegisterType("System.Tuple", typeof(Tuple<,>));
+            //engine.RegisterAllTypesInNamespace("System", "System");
             engine.SetGlobalFunction("GetTupleType", () => { return new ScriptType("System.Tuple", new ScriptType("int"), new ScriptType("string")); });
             engine.SetGlobalFunction("import", (Func<string, ScriptType>)((name) => { return ScriptUtilityFunctions.Import(engine, name); }));
                         

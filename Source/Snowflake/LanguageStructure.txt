@@ -1,4 +1,4 @@
-Script = <Statement>* EOF ;
+Script = ( <Statement> )* EOF ;
 
 StatementBlock = "{" <Statement>* "}" ;
 

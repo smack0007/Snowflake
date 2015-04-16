@@ -87,6 +87,7 @@
     <Compile Include="StringOperationsTests.cs" />
     <Compile Include="Types\Person.cs" />
     <Compile Include="Types\StaticClass.cs" />
+    <Compile Include="UsingNamespaceTests.cs" />
     <Compile Include="VariableDeclarationTests.cs" />
     <Compile Include="VariableOperationsTests.cs" />
     <Compile Include="WhileTests.cs" />

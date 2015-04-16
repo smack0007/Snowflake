@@ -8,8 +8,6 @@ namespace Snowflake
     {           
         ScriptNamespace globals;
         List<ScriptStackFrame> stack;
-
-        Dictionary<string, ScriptTypeSet> types;
         
         public dynamic this[string name]
         {
@@ -27,14 +25,11 @@ namespace Snowflake
             this.globals = new ScriptNamespace("<global>");
             this.stack = new List<ScriptStackFrame>();
 
-            this.types = new Dictionary<string, ScriptTypeSet>()
-            {
-                { "bool", new ScriptTypeSet(typeof(bool)) },
-                { "char", new ScriptTypeSet(typeof(char)) },
-                { "float", new ScriptTypeSet(typeof(float)) },
-                { "int", new ScriptTypeSet(typeof(int)) },
-                { "string", new ScriptTypeSet(typeof(string)) }
-            };
+            this.SetGlobalVariable("bool", new ScriptTypeSet(typeof(bool)));
+            this.SetGlobalVariable("char", new ScriptTypeSet(typeof(char)));
+            this.SetGlobalVariable("float", new ScriptTypeSet(typeof(float)));
+            this.SetGlobalVariable("int", new ScriptTypeSet(typeof(int)));
+            this.SetGlobalVariable("string", new ScriptTypeSet(typeof(string)));
         }
                 
         public void PushStackFrame(string function)
@@ -181,8 +176,22 @@ namespace Snowflake
 
         public dynamic GetGlobalVariable(string name)
         {
+            dynamic value;
+            if (this.TryGetGlobalVariable(name, out value))
+            {
+                return value;
+            }
+
+            throw new ScriptExecutionException("Global variable \"{0}\" is not defined.");
+        }
+
+        public bool TryGetGlobalVariable(string name, out dynamic value)
+        {
             if (name == null)
                 throw new ArgumentNullException("name");
+
+            value = null;
+            bool result = false;
 
             ScriptVariable variable;
 
@@ -193,15 +202,21 @@ namespace Snowflake
                 ScriptNamespace pointer = this.GetNamespace(nameParts, nameParts.Length - 1);
 
                 if (pointer != null && pointer.TryGetVariable(nameParts[nameParts.Length - 1], out variable))
-                    return variable.Value;
+                {
+                    value = variable.Value;
+                    result = true;
+                }
             }
             else
             {
                 if (this.globals.TryGetVariable(name, out variable))
-                    return variable.Value;
+                {
+                    value = variable.Value;
+                    result = true;
+                }
             }
 
-            throw new ScriptExecutionException("Global variable \"{0}\" is not defined.");
+            return result;
         }
 
         public void SetGlobalVariable(string name, dynamic value, bool isConst = false)
@@ -252,9 +267,15 @@ namespace Snowflake
                 throw new ArgumentNullException("type");
 
             ScriptTypeSet typeSet = null;
-
-            if (this.types.TryGetValue(name, out typeSet))
+            
+            dynamic value;
+            if (this.TryGetGlobalVariable(name, out value))
             {
+                if (!(value is ScriptTypeSet))
+                    throw new ScriptExecutionException(string.Format("\"{0}\" is already set and is not a ScriptTypeSet.", name));
+
+                typeSet = (ScriptTypeSet)value;
+
                 if (type.IsGenericType)
                 {
                     Type[] genericArgs = type.GetGenericArguments();
@@ -279,7 +300,7 @@ namespace Snowflake
             }
             else
             {
-                this.types[name] = new ScriptTypeSet(type);
+                this.SetGlobalVariable(name, new ScriptTypeSet(type), true);
             }
         }
 
@@ -291,21 +312,43 @@ namespace Snowflake
             if (genericArgCount < 0)
                 throw new ArgumentOutOfRangeException("genericArgCount", "genericArgCount must be >= 0.");
 
-            ScriptTypeSet typeSet;
+            ScriptTypeSet typeSet = null;
 
-            if (this.types.TryGetValue(name, out typeSet))
+            dynamic value;
+            if (this.TryGetGlobalVariable(name, out value))
             {
-                Type type;
+                if (!(value is ScriptTypeSet))
+                    throw new ScriptExecutionException(string.Format("\"{0}\" is not a ScriptTypeSet.", name));
 
-                if (!typeSet.TryGetValue(genericArgCount, out type))
+                typeSet = (ScriptTypeSet)value;
+            }
+            else
+            {
+                ScriptVariable variable;
+                for (int i = this.stack.Count - 1; i >= 0; i--)
                 {
-                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is registered but not with generic argument variation of {1}.", name, genericArgCount), this.stack.ToArray());
+                    foreach (ScriptNamespace pointer in this.stack[i].UsingNamespaces)
+                    {
+                        if (pointer.TryGetVariable(name, out variable) && variable.Value is ScriptTypeSet)
+                        {
+                            typeSet = (ScriptTypeSet)variable.Value;
+                            break;
+                        }
+                    }
                 }
-
-                return typeSet[genericArgCount];
             }
 
-            throw new ScriptExecutionException(string.Format("Type \"{0}\" is not registered.", name), this.stack.ToArray());
+            if (typeSet == null)
+                throw new ScriptExecutionException(string.Format("ScriptTypeSet \"{0}\" could not be found.", name), this.stack.ToArray());
+
+            Type type;
+
+            if (!typeSet.TryGetValue(genericArgCount, out type))
+            {
+                throw new ScriptExecutionException(string.Format("Type \"{0}\" is registered but not with generic argument variation of {1}.", name, genericArgCount), this.stack.ToArray());
+            }
+
+            return typeSet[genericArgCount];
         }
     }
 }

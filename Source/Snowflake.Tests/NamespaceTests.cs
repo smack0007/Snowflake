@@ -14,11 +14,11 @@ namespace Snowflake.Tests
 		public void Static_Class_Can_Be_Made_Available_Via_Namespace()
 		{
             AssertScriptReturnValue(
-                42,
                 (engine) =>
                 {
                     engine.SetGlobalStaticObject("Scripting.StaticClass", typeof(StaticClass));
                 },
+                42,
                 "return Scripting.StaticClass.Get42();");
         }
 
