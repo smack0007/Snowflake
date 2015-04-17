@@ -9,6 +9,12 @@ namespace Snowflake.Generated
 		{
 			try
 			{
+				context.DeclareVariable("timeSpanType", value: context["System"].TimeSpan);
+				context.DeclareVariable("timeSpan", value: Construct(context, context["timeSpanType"], new dynamic[] { 1, 2, 3 }));
+				context["System"].Console.WriteLine(context["timeSpan"]);
+				context.DeclareVariable("tupleType", value: new ScriptType(context, context["System"].Tuple, new ScriptType[] { new ScriptType("int") }));
+				context.DeclareVariable("tuple4", value: Construct(context, context["tupleType"], new dynamic[] { 42 }));
+				context["System"].Console.WriteLine(context["tuple4"]);
 				context.UsingNamespace("System");
 				context["Console"].WriteLine("Hello World!");
 				context.DeclareVariable("MaxMultiplier", isConst: true, value: 10);
@@ -51,17 +57,12 @@ namespace Snowflake.Generated
 					}
 				})));
 				Invoke(context, context["foo"]);
-				context.DeclareVariable("timeSpan", value: Construct(context, new ScriptType("System.TimeSpan"), new dynamic[] { 1, 2, 3 }));
-				context["Console"].WriteLine(context["timeSpan"]);
 				context.DeclareVariable("tuple1", value: Construct(context, new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int") }), new dynamic[] { 21 }));
 				context["Console"].WriteLine(context["tuple1"]);
 				context.DeclareVariable("tuple2", value: Construct(context, new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int"), new ScriptType("string") }), new dynamic[] { 42, "foo" }));
 				context["Console"].WriteLine(context["tuple2"]);
 				context.DeclareVariable("tuple3", value: Construct(context, new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int"), new ScriptType("string") }), new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int"), new ScriptType("string") }) }), new dynamic[] { Construct(context, new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int"), new ScriptType("string") }), new dynamic[] { 42, "foo" }), Construct(context, new ScriptType("System.Tuple", new ScriptType[] { new ScriptType("int"), new ScriptType("string") }), new dynamic[] { 21, "bar" }) }));
 				context["Console"].WriteLine(context["tuple3"]);
-				context.DeclareVariable("tupleType", value: Invoke(context, context["GetTupleType"]));
-				context.DeclareVariable("tuple4", value: Construct(context, context["tupleType"], new dynamic[] { 42, "foo" }));
-				context["Console"].WriteLine(context["tuple4"]);
 				context.DeclareVariable("person1", value: Construct(context, new ScriptType("Namespace.Person")));
 				context["person1"].FirstName = "Bob";
 				context["person1"].LastName = "Freeman";
@@ -71,15 +72,15 @@ namespace Snowflake.Generated
 				context["person1"].Friends.Add(context["person2"]);
 				context["Console"].WriteLine(context["person1"].Friends[0].FirstName);
 				context["Console"].WriteLine(context["person1"]);
-				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v17) => { 
+				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v18) => { 
 					context.PushStackFrame("buildMultiplier");
-					context.DeclareVariable("x", v17);
+					context.DeclareVariable("x", v18);
 					bool isError3 = false;
 					try {
-						return new ScriptFunction(new Func<dynamic, dynamic>((v18) => { 
+						return new ScriptFunction(new Func<dynamic, dynamic>((v19) => { 
 							context.PushStackFrame("<anonymous>");
-							context.DeclareVariable("y", v18);
-							context.DeclareVariable("x", v17);
+							context.DeclareVariable("y", v19);
+							context.DeclareVariable("x", v18);
 							bool isError4 = false;
 							try {
 								return (context["x"] * context["y"]);
@@ -107,8 +108,8 @@ namespace Snowflake.Generated
 				}
 				context.DeclareVariable("values", value: new ScriptList { 5, 4, 3, 2, 1 });
 				context.DeclareVariable("value");
-				foreach (dynamic v22 in context["values"]) {
-					context.SetVariable("value", v22);
+				foreach (dynamic v23 in context["values"]) {
+					context.SetVariable("value", v23);
 					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
 				}
 				context["export"].number = 42;

@@ -419,6 +419,10 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateElementAccess((ElementAccessNode)node, data);
 			}
+            else if (node is GenericTypeAccessNode)
+            {
+                GenerateGenericTypeAccess((GenericTypeAccessNode)node, data);
+            }
 			else if (node is PostfixOperationNode)
 			{
 				GeneratePostfixOperation((PostfixOperationNode)node, data);
@@ -749,6 +753,29 @@ namespace Snowflake.CodeGeneration
 
 			Append(data, " }}");
 		}
+
+        private static void GenerateGenericTypeAccess(GenericTypeAccessNode node, DataContext data)
+        {
+            Append(data, "new ScriptType(context, ");
+            GenerateExpression(node.SourceExpression, data);
+
+            if (node.GenericArgs.Count > 0)
+            {
+                Append(data, ", new ScriptType[] {{ ");
+
+                for (int i = 0; i < node.GenericArgs.Count; i++)
+                {
+                    if (i > 0)
+                        Append(data, ", ");
+
+                    GenerateTypeName(node.GenericArgs[i], data);
+                }
+
+                Append(data, " }}");
+            }
+
+            Append(data, ")");
+        }
 
 		private static void GeneratePostfixOperation(PostfixOperationNode node, DataContext data)
 		{

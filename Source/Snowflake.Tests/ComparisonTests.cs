@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Snowflake.CodeGeneration;
+using Snowflake.Parsing;
 using Xunit;
 
 namespace Snowflake.Tests
@@ -39,5 +40,11 @@ namespace Snowflake.Tests
 		{
 			AssertScriptIsException<CodeCompilationException>(@"return ""Hello"" > ""World"";");
 		}
+
+        [Fact]
+        public void Consecutive_Compares_Is_Syntax_Error()
+        {
+            AssertScriptIsException<SyntaxException>(@"return 1 < 2 < 3;");
+        }
 	}
 }

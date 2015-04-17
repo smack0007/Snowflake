@@ -43,7 +43,7 @@ ConditionalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
 
 EqualityExpression = <RelationalExpression> ( ( "==" | "!=" ) <RelationalExpression> )* ;
 
-RelationalExpression = <AdditiveExpression> ( ( "<" | "<=" | ">" | ">=" ) <AdditiveExpression> )* ;
+RelationalExpression = <AdditiveExpression> ( ( ( "<" | "<=" | ">" | ">=" ) <AdditiveExpression> ) | <GenericTypeAccess> )? ;
 
 AdditiveExpression = <MultiplicativeExpression> ( ( "+" | "-" ) <MultiplicativeExpression> )* ;
 
@@ -75,9 +75,13 @@ FunctionCall = <Expression> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 
 ConstructorCall = "new" <TypeName> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 
-TypeName = <Identifier> ( "." <Identifier> )* ( "<" <TypeName> ( "," <TypeName> )* ">" )? ;
+GenericTypeAccess = <Expression> <GenericArgsList> ;
 
 NamespaceName = <Identifier> ( "." <Identifier> )* ;
+
+TypeName = <Identifier> ( "." <Identifier> )* <GenericArgsList>? ;
+
+GenericArgsList = "<" <TypeName> ( "," <TypeName> )* ">" ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 

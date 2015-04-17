@@ -108,6 +108,7 @@
     <Compile Include="Parsing\ConstructorCallNode.cs" />
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
+    <Compile Include="Parsing\GenericTypeAccessNode.cs" />
     <Compile Include="Parsing\ListNode.cs" />
     <Compile Include="Parsing\DictionaryNode.cs" />
     <Compile Include="Parsing\DictionaryPairNode.cs" />

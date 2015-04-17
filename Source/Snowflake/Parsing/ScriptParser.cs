@@ -59,7 +59,21 @@ namespace Snowflake.Parsing
 		{
 			while (lexemes[pos].Type == LexemeType.EndStatement)
 				pos++;
-		}
+        }
+
+        private static int LookAheadUntilEndStatement(IList<Lexeme> lexemes, int pos, LexemeType searchFor)
+        {
+            for (int i = pos; i < lexemes.Count; i++)
+            {
+                if (lexemes[i].Type == searchFor)
+                    return pos;
+
+                if (lexemes[i].Type == LexemeType.EndStatement)
+                    return -1;
+            }
+
+            return -1;
+        }
 
 		public ScriptNode Parse(IList<Lexeme> lexemes)
 		{
@@ -507,8 +521,8 @@ namespace Snowflake.Parsing
 		{
 			ExpressionNode node = this.ParseAdditiveExpression(lexemes, ref pos);
 
-			while (lexemes[pos].Type == LexemeType.GreaterThan || lexemes[pos].Type == LexemeType.GreaterThanOrEqualTo ||
-				   lexemes[pos].Type == LexemeType.LessThan || lexemes[pos].Type == LexemeType.LessThanOrEqualTo)
+			if (lexemes[pos].Type == LexemeType.GreaterThan || lexemes[pos].Type == LexemeType.GreaterThanOrEqualTo ||
+				lexemes[pos].Type == LexemeType.LessThan || lexemes[pos].Type == LexemeType.LessThanOrEqualTo)
 			{
 				OperationType opType = default(OperationType);
 				
@@ -530,15 +544,26 @@ namespace Snowflake.Parsing
 						opType = OperationType.LessThanOrEqualTo;
 						break;
 				}
-				
-				pos++;
 
-				OperationNode opNode = Construct<OperationNode>(lexemes, pos);
-				opNode.Type = opType;
-				opNode.LeftHand = node;
-				opNode.RightHand = this.ParseAdditiveExpression(lexemes, ref pos);
+                if (opType == OperationType.LessThan && LookAheadUntilEndStatement(lexemes, pos, LexemeType.GreaterThan) > -1)
+                {
+                    GenericTypeAccessNode gtaNode = new GenericTypeAccessNode();
+                    gtaNode.SourceExpression = node;
+                    this.ParseGenericArgs(gtaNode.GenericArgs, lexemes, ref pos);                    
 
-				node = opNode;
+                    node = gtaNode;
+                }
+                else
+                {
+                    pos++;
+
+                    OperationNode opNode = Construct<OperationNode>(lexemes, pos);
+                    opNode.Type = opType;
+                    opNode.LeftHand = node;
+                    opNode.RightHand = this.ParseAdditiveExpression(lexemes, ref pos);
+
+                    node = opNode;
+                }
 			}
 
 			return node;
@@ -679,27 +704,35 @@ namespace Snowflake.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
-            while (lexemes[pos].Type == LexemeType.OpenParen ||
-				   lexemes[pos].Type == LexemeType.Dot ||
-				   lexemes[pos].Type == LexemeType.OpenBracket ||
-				   IsPostfixOperator(lexemes[pos].Type))
+            if (lexemes[pos + 1].Type == LexemeType.LessThan)
             {
-				if (lexemes[pos].Type == LexemeType.OpenParen)
-				{
-					node = this.ParseFunctionCall(node, lexemes, ref pos);
-				}
-				else if (lexemes[pos].Type == LexemeType.Dot)
-				{
-					node = this.ParseMemberAccess(node, lexemes, ref pos);
-				}
-				else if (lexemes[pos].Type == LexemeType.OpenBracket)
-				{
-					node = this.ParseElementAccess(node, lexemes, ref pos);
-				}
-				else if (IsPostfixOperator(lexemes[pos].Type))
-				{
-					node = this.ParsePostfixOperation(node, lexemes, ref pos);
-				}
+                Console.WriteLine("");
+
+            }
+            else
+            {
+                while (lexemes[pos].Type == LexemeType.OpenParen ||
+                       lexemes[pos].Type == LexemeType.Dot ||
+                       lexemes[pos].Type == LexemeType.OpenBracket ||
+                       IsPostfixOperator(lexemes[pos].Type))
+                {
+                    if (lexemes[pos].Type == LexemeType.OpenParen)
+                    {
+                        node = this.ParseFunctionCall(node, lexemes, ref pos);
+                    }
+                    else if (lexemes[pos].Type == LexemeType.Dot)
+                    {
+                        node = this.ParseMemberAccess(node, lexemes, ref pos);
+                    }
+                    else if (lexemes[pos].Type == LexemeType.OpenBracket)
+                    {
+                        node = this.ParseElementAccess(node, lexemes, ref pos);
+                    }
+                    else if (IsPostfixOperator(lexemes[pos].Type))
+                    {
+                        node = this.ParsePostfixOperation(node, lexemes, ref pos);
+                    }
+                }
             }
 
 			return node;
@@ -931,23 +964,27 @@ namespace Snowflake.Parsing
                 Name = name.ToString()
             };
 
-            if (lexemes[pos].Type == LexemeType.LessThan)
-            {
-                pos++;
-
-                node.GenericArgs.Add(this.ParseTypeName(lexemes, ref pos));
-                
-                while (lexemes[pos].Type == LexemeType.Comma)
-                {
-                    pos++;
-                    node.GenericArgs.Add(this.ParseTypeName(lexemes, ref pos));
-                }
-
-                this.EnsureLexemeType(lexemes, LexemeType.GreaterThan, pos);
-                pos++;
-            }
+            if (lexemes[pos].Type == LexemeType.LessThan)            
+                this.ParseGenericArgs(node.GenericArgs, lexemes, ref pos);
 
             return node;
+        }
+
+        private void ParseGenericArgs(SyntaxNodeCollection<TypeNameNode> args, IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.LessThan, pos);
+            pos++;
+
+            args.Add(this.ParseTypeName(lexemes, ref pos));
+
+            while (lexemes[pos].Type == LexemeType.Comma)
+            {
+                pos++;
+                args.Add(this.ParseTypeName(lexemes, ref pos));
+            }
+
+            this.EnsureLexemeType(lexemes, LexemeType.GreaterThan, pos);
+            pos++;
         }
 
 		private MemberAccessNode ParseMemberAccess(ExpressionNode sourceExpression, IList<Lexeme> lexemes, ref int pos)
