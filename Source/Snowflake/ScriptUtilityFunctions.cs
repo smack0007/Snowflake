@@ -21,7 +21,7 @@ namespace Snowflake
 
             string scriptTypeName = "__Imported." + dotNetType.FullName;
             context.RegisterType(scriptTypeName, dotNetType);
-            return new ScriptType(scriptTypeName);
+            return new ScriptType(dotNetType);
         }
     }
 }

@@ -8,10 +8,12 @@ namespace Snowflake.Parsing
 {
     public class TypeNameNode : SyntaxNode
     {
-        public string Name
+        ExpressionNode typeExpression;
+
+        public ExpressionNode TypeExpression
         {
-            get;
-            set;
+            get { return this.typeExpression; }
+            set { this.typeExpression = SetParent(this.typeExpression, value); }
         }
 
         public bool IsGeneric
@@ -35,6 +37,14 @@ namespace Snowflake.Parsing
             foreach (T node in base.Find<T>())
             {
                 yield return node;
+            }
+
+            if (this.TypeExpression != null)
+            {
+                foreach (T node in this.TypeExpression.Find<T>())
+                {
+                    yield return node;
+                }
             }
 
             foreach (T node in this.GenericArgs.Find<T>())

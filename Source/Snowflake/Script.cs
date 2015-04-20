@@ -20,22 +20,22 @@ namespace Snowflake
             return (T)Activator.CreateInstance(typeof(T), args);
         }
 
-        private static Type GetType(ScriptExecutionContext context, ScriptType scriptType)
-        {
-            Type type = null;
+        //private static Type GetType(ScriptExecutionContext context, ScriptType scriptType)
+        //{
+        //    Type type = null;
 
-            if (scriptType.GenericArgs != null && scriptType.GenericArgs.Length > 0)
-            {
-                type = context.GetType(scriptType.Name, scriptType.GenericArgs.Length);
-                type = type.MakeGenericType(scriptType.GenericArgs.Select(x => GetType(context, x)).ToArray());
-            }
-            else
-            {
-                type = context.GetType(scriptType.Name, 0);
-            }
+        //    if (scriptType.GenericArgs != null && scriptType.GenericArgs.Length > 0)
+        //    {
+        //        type = context.GetType(scriptType.Name, scriptType.GenericArgs.Length);
+        //        type = type.MakeGenericType(scriptType.GenericArgs.Select(x => GetType(context, x)).ToArray());
+        //    }
+        //    else
+        //    {
+        //        type = context.GetType(scriptType.Name, 0);
+        //    }
 
-            return type;
-        }
+        //    return type;
+        //}
 
         protected static dynamic Construct(ScriptExecutionContext context, ScriptTypeSet scriptTypeSet, params dynamic[] args)
         {
@@ -52,21 +52,10 @@ namespace Snowflake
         }
 
         protected static dynamic Construct(ScriptExecutionContext context, ScriptType scriptType, params dynamic[] args)
-        {
-            Type type = null;
-
-            if (scriptType.Type != null)
-            {
-                type = scriptType.Type;
-            }
-            else
-            {
-                type = GetType(context, scriptType);
-            }
-            
+        {                        
             dynamic instance = typeof(Script)
                 .GetMethod("ConstructObject", BindingFlags.Static | BindingFlags.NonPublic)
-                .MakeGenericMethod(type)
+                .MakeGenericMethod(scriptType.Type)
                 .Invoke(null, new object[] { args });
 
             return instance;

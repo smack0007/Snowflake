@@ -79,7 +79,7 @@ GenericTypeAccess = <Expression> <GenericArgsList> ;
 
 NamespaceName = <Identifier> ( "." <Identifier> )* ;
 
-TypeName = <Identifier> ( "." <Identifier> )* <GenericArgsList>? ;
+TypeName = ( "(" <Expression> ")" | <Identifier> ( "." <Identifier> )* ) <GenericArgsList>? ;
 
 GenericArgsList = "<" <TypeName> ( "," <TypeName> )* ">" ;
 

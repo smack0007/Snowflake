@@ -45,7 +45,7 @@ namespace SnowflakeDemo
             engine.RegisterType("System.Tuple", typeof(Tuple<>));
             engine.RegisterType("System.Tuple", typeof(Tuple<,>));
             //engine.RegisterAllTypesInNamespace("System", "System");
-            engine.SetGlobalFunction("GetTupleType", () => { return new ScriptType("System.Tuple", new ScriptType("int"), new ScriptType("string")); });
+            //engine.SetGlobalFunction("GetTupleType", () => { return new ScriptType(typeof(Tuple), new ScriptType("int"), new ScriptType("string")); });
             engine.SetGlobalFunction("import", (Func<string, ScriptType>)((name) => { return ScriptUtilityFunctions.Import(engine, name); }));
                            
             var result = engine.ExecuteFile("SnowflakeDemo.sfs");

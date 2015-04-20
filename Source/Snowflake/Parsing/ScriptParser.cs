@@ -893,7 +893,6 @@ namespace Snowflake.Parsing
             ConstructorCallNode node = Construct<ConstructorCallNode>(lexemes, pos);
 
             pos++;
-            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
             node.TypeName = this.ParseTypeName(lexemes, ref pos);
 
             this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
@@ -941,30 +940,28 @@ namespace Snowflake.Parsing
 
         private TypeNameNode ParseTypeName(IList<Lexeme> lexemes, ref int pos)
         {
-            this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+            TypeNameNode node = new TypeNameNode();
 
-            StringBuilder name = new StringBuilder(lexemes[pos].Value.Length);
-            
-            while (lexemes[pos].Type == LexemeType.Identifier)
+            if (lexemes[pos].Type == LexemeType.OpenParen)
             {
-                name.Append(lexemes[pos].Value);
-
                 pos++;
-                if (lexemes[pos].Type == LexemeType.Dot)
-                {
-                    name.Append(".");
-                    
-                    pos++;
-                    this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-                }
+
+                node.TypeExpression = this.ParsePrimaryExpression(lexemes, ref pos);
+
+                this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
+                pos++;
+            }
+            else
+            {
+                this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
+
+                node.TypeExpression = this.ParseVariableReference(lexemes, ref pos);
+
+                while (lexemes[pos].Type == LexemeType.Dot)
+                    node.TypeExpression = this.ParseMemberAccess(node.TypeExpression, lexemes, ref pos);
             }
 
-            TypeNameNode node = new TypeNameNode()
-            {
-                Name = name.ToString()
-            };
-
-            if (lexemes[pos].Type == LexemeType.LessThan)            
+            if (lexemes[pos].Type == LexemeType.LessThan)
                 this.ParseGenericArgs(node.GenericArgs, lexemes, ref pos);
 
             return node;

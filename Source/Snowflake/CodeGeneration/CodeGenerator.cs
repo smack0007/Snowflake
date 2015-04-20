@@ -619,14 +619,7 @@ namespace Snowflake.CodeGeneration
         {
             Append(data, "Construct(context, ");
 
-            if (!node.TypeName.IsGeneric && data.VariableMap.IsVariableDeclared(node.TypeName.Name))
-            {
-                Append(data, "context[\"{0}\"]", node.TypeName.Name);
-            }
-            else
-            {
-                GenerateTypeName(node.TypeName, data);            
-            }
+            GenerateTypeName(node.TypeName, data);
 
             if (node.Args.Count > 0)
             {
@@ -648,11 +641,13 @@ namespace Snowflake.CodeGeneration
 
         private static void GenerateTypeName(TypeNameNode node, DataContext data)
         {
-            Append(data, "new ScriptType(\"{0}\"", node.Name);
+            Append(data, "ScriptType.FromValue(");
+
+            GenerateExpression(node.TypeExpression, data);
 
             if (node.GenericArgs.Count > 0)
             {
-                Append(data, ", new ScriptType[] {{ ");
+                Append(data, ", ");
 
                 for (int i = 0; i < node.GenericArgs.Count; i++)
                 {
@@ -661,8 +656,6 @@ namespace Snowflake.CodeGeneration
 
                     GenerateTypeName(node.GenericArgs[i], data);
                 }
-
-                Append(data, " }}");
             }
 
             Append(data, ")");
@@ -756,12 +749,13 @@ namespace Snowflake.CodeGeneration
 
         private static void GenerateGenericTypeAccess(GenericTypeAccessNode node, DataContext data)
         {
-            Append(data, "new ScriptType(context, ");
+            Append(data, "ScriptType.FromValue(");
+            
             GenerateExpression(node.SourceExpression, data);
 
             if (node.GenericArgs.Count > 0)
             {
-                Append(data, ", new ScriptType[] {{ ");
+                Append(data, ", ");
 
                 for (int i = 0; i < node.GenericArgs.Count; i++)
                 {
@@ -770,8 +764,6 @@ namespace Snowflake.CodeGeneration
 
                     GenerateTypeName(node.GenericArgs[i], data);
                 }
-
-                Append(data, " }}");
             }
 
             Append(data, ")");

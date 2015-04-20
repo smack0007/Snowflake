@@ -1,12 +1,4 @@
 ﻿// Start with a comment
-var timeSpanType = System.TimeSpan;
-var timeSpan = new timeSpanType(1, 2, 3);
-System.Console.WriteLine(timeSpan);
-
-var tupleType = System.Tuple<int>;
-var tuple4 = new tupleType(42);
-System.Console.WriteLine(tuple4);
-
 using System;
 
 Console.WriteLine("Hello World!");
@@ -33,6 +25,10 @@ func bar() {
 
 foo();
 
+var timeSpanType = System.TimeSpan;
+var timeSpan = new timeSpanType(1, 2, 3);
+System.Console.WriteLine(timeSpan);
+
 var tuple1 = new System.Tuple<int>(21);
 Console.WriteLine(tuple1);
 
@@ -41,6 +37,13 @@ Console.WriteLine(tuple2);
 
 var tuple3 = new System.Tuple<System.Tuple<int, string>, System.Tuple<int, string>>(new System.Tuple<int, string>(42, "foo"), new System.Tuple<int, string>(21, "bar"));
 Console.WriteLine(tuple3);
+
+var tupleType = System.Tuple<int>;
+var tuple4 = new tupleType(42);
+System.Console.WriteLine(tuple4);
+
+var tuple5 = new ((func(){ return System.Tuple<string, int>; })())("Hello", 42);
+System.Console.WriteLine(tuple5);
 
 var person1 = new Namespace.Person();
 person1.FirstName = "Bob";

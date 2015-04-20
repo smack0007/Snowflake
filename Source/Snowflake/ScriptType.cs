@@ -10,63 +10,42 @@ namespace Snowflake
             get;
             private set;
         }
-
-        public string Name
+        
+        public ScriptType(Type type)
         {
-            get;
-            private set;
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            this.Type = type;
         }
         
-        public ScriptType[] GenericArgs
-        {
-            get;
-            private set;
-        }
-
-        public ScriptType(string name)
-            : this(name, null)
-        {
-        }
-
-        public ScriptType(string name, params ScriptType[] genericArgs)
-        {
-            this.Type = null;
-            this.Name = name;
-            this.GenericArgs = genericArgs;
-        }
-
-        public ScriptType(ScriptExecutionContext context, dynamic value, params ScriptType[] genericArgs)
-        {
-            if (value is ScriptTypeSet)
-            {
-                ScriptTypeSet typeSet = (ScriptTypeSet)value;
-
-                Type type;
-                typeSet.TryGetValue(genericArgs.Length, out type);
-
-                this.Type = type.MakeGenericType(genericArgs.Select(x => GetType(context, x)).ToArray());
-                this.Name = null;
-            }
-
-            this.GenericArgs = genericArgs;
-        }
-
-        // TODO: This is duplicated from the script class...
-        private static Type GetType(ScriptExecutionContext context, ScriptType scriptType)
+        public static ScriptType FromValue(dynamic value, params ScriptType[] genericArgs)
         {
             Type type = null;
 
-            if (scriptType.GenericArgs != null && scriptType.GenericArgs.Length > 0)
+            if (value is ScriptTypeSet)
             {
-                type = context.GetType(scriptType.Name, scriptType.GenericArgs.Length);
-                type = type.MakeGenericType(scriptType.GenericArgs.Select(x => GetType(context, x)).ToArray());
+                ScriptTypeSet typeSet = (ScriptTypeSet)value;
+                                
+                if (genericArgs != null && genericArgs.Length > 0)
+                {
+                    typeSet.TryGetValue(genericArgs.Length, out type);
+                    type = type.MakeGenericType(genericArgs.Select(x => x.Type).ToArray());
+                }
+                else
+                {
+                    typeSet.TryGetValue(0, out type);
+                }
             }
-            else
+            else if (value is ScriptType)
             {
-                type = context.GetType(scriptType.Name, 0);
+                type = ((ScriptType)value).Type;
             }
+            
+            if (type == null)
+                throw new ScriptExecutionException("Unable to create ScriptType from value.");
 
-            return type;
+            return new ScriptType(type);
         }
     }
 }
