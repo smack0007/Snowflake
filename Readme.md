@@ -89,13 +89,13 @@ be given to scripts if necessary by setting global variables inside the ScriptEn
 engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
 ```
 
-In order to allow objects to be created, you'll need to register the objects with the ScriptEngine:
+In order to allow objects to be available in your script, you'll need to register the objects with the ScriptEngine:
 
 ```csharp
 engine.RegisterType("MyApp.Person", typeof(Person));
 ```
 
-Once the ScriptEngine has access to the constructor, your scripts can create objects:
+Once the ScriptEngine has access to the type, your scripts can create objects like so:
 
 ```
 var person = new MyApp.Person();
@@ -104,16 +104,16 @@ person.LastName = "Freeman";
 person.Age = 42;
 ```
 
-Static objects can be made available via the SetGlobalStaticObject function:
+Static objects can also be accessed this way:
 
 ```csharp
-engine.SetGlobalStaticObject("Console", typeof(Console));
+engine.RegisterType("System.Console", typeof(Console));
 ```
 
-This makes the static methods of the Console object directly available in your script:
+In your script:
 
 ```
-Console.WriteLine("Hello World!");
+System.Console.WriteLine("Hello World!");
 ```
 
 

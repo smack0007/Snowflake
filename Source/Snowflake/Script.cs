@@ -40,7 +40,7 @@ namespace Snowflake
         protected static dynamic Construct(ScriptExecutionContext context, ScriptTypeSet scriptTypeSet, params dynamic[] args)
         {
             Type type;
-            if (!scriptTypeSet.TryGetValue(0, out type))
+            if (!scriptTypeSet.TryGetType(0, out type))
                 throw new ScriptExecutionException("ScriptTypeSet does not contain a type with 0 generic parameters.");
 
             dynamic instance = typeof(Script)

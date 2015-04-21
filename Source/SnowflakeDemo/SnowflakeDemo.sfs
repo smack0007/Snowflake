@@ -42,7 +42,7 @@ var tupleType = System.Tuple<int>;
 var tuple4 = new tupleType(42);
 System.Console.WriteLine(tuple4);
 
-var tuple5 = new ((func(){ return System.Tuple<string, int>; })())("Hello", 42);
+var tuple5 = new (func(){ return System.Tuple<string, int>; }())("Hello", 42);
 System.Console.WriteLine(tuple5);
 
 var person1 = new Namespace.Person();

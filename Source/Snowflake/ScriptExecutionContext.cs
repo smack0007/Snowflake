@@ -343,7 +343,7 @@ namespace Snowflake
 
             Type type;
 
-            if (!typeSet.TryGetValue(genericArgCount, out type))
+            if (!typeSet.TryGetType(genericArgCount, out type))
             {
                 throw new ScriptExecutionException(string.Format("Type \"{0}\" is registered but not with generic argument variation of {1}.", name, genericArgCount), this.stack.ToArray());
             }

@@ -174,12 +174,7 @@ namespace Snowflake
         {
             context.SetGlobalVariable(name, value);
         }
-
-        public static void SetGlobalStaticObject(this IScriptExecutionContext context, string name, Type type)
-        {
-            context.SetGlobalVariable(name, new ScriptStaticObjectProxy(type));
-        }
-
+                
         public static void RegisterAllTypesInNamespace(this IScriptExecutionContext context, string scriptNamespace, string dotNetNamespace)
         {
             var types = AppDomain.CurrentDomain.GetAssemblies()

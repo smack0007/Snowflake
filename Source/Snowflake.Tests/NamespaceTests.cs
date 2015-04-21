@@ -16,7 +16,7 @@ namespace Snowflake.Tests
             AssertScriptReturnValue(
                 (engine) =>
                 {
-                    engine.SetGlobalStaticObject("Scripting.StaticClass", typeof(StaticClass));
+                    engine.RegisterType("Scripting.StaticClass", typeof(StaticClass));
                 },
                 42,
                 "return Scripting.StaticClass.Get42();");
@@ -27,7 +27,7 @@ namespace Snowflake.Tests
         {
             ScriptEngine engine = new ScriptEngine();
             engine.SetGlobalVariable("Scripting.Foo", 42);
-            Assert.Throws<ScriptExecutionException>(() => engine.SetGlobalStaticObject("Scripting.Foo.StaticClass", typeof(StaticClass)));
+            Assert.Throws<ScriptExecutionException>(() => engine.RegisterType("Scripting.Foo.StaticClass", typeof(StaticClass)));
         }
     }
 }
