@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Snowflake
 {
-    public class ScriptNamespace : DynamicObject
+    public class ScriptNamespace : DynamicObject, IEnumerable<KeyValuePair<string, ScriptVariable>>
     {
         string name;
         Dictionary<string, ScriptVariable> variables;
@@ -36,6 +36,16 @@ namespace Snowflake
         public dynamic this[string index]
         {
             get { return this.variables[index]; }
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get { return this.variables.Keys; }
+        }
+
+        public IEnumerable<ScriptVariable> Values
+        {
+            get { return this.variables.Values; }
         }
 
         public ScriptNamespace(string name)
@@ -91,6 +101,16 @@ namespace Snowflake
         public void SetVariable(string name, ScriptVariable variable)
         {
             this.variables[name] = variable;
+        }
+
+        public IEnumerator<KeyValuePair<string, ScriptVariable>> GetEnumerator()
+        {
+            return this.variables.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

@@ -182,7 +182,7 @@ namespace Snowflake
                 return value;
             }
 
-            throw new ScriptExecutionException("Global variable \"{0}\" is not defined.");
+            throw new ScriptExecutionException(string.Format("Global variable \"{0}\" is not defined.", name));
         }
 
         public bool TryGetGlobalVariable(string name, out dynamic value)

@@ -130,7 +130,7 @@ namespace Snowflake.Generated
 					context.SetVariable("value", v24);
 					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
 				}
-				context["export"].number = 42;
+				Invoke(context, context["export"], "Script.Export.Number", 42);
 				return null;
 			}
 			catch (Exception ex)

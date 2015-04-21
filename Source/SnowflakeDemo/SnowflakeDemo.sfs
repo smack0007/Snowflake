@@ -76,7 +76,6 @@ foreach (var value in values) {
 	Console.WriteLine("5 * " + value + " = " + x5(value));
 }
 
-
-export.number = 42;
+export("Script.Export.Number", 42);
 
 // End with a comment
