@@ -10,113 +10,68 @@ namespace Snowflake
 {
     public class ScriptTypeSet : DynamicObject
     {
-        private readonly Dictionary<int, Type> types;
-        private MethodInfo[] staticMethods;
-
-        public Type this[int index]
+        private readonly Dictionary<int, ScriptType> types;
+        
+        public ScriptType this[int index]
         {
             get { return this.types[index]; }
-            set { this.types[index] = value; }
         }
+
+		public int Count
+		{
+			get { return this.types.Keys.Count; }
+		}
 
         public ScriptTypeSet()
         {
-            this.types = new Dictionary<int, Type>();
+            this.types = new Dictionary<int, ScriptType>();
         }
 
-        public ScriptTypeSet(Type type)
+        public ScriptTypeSet(ScriptType type)
             : this()
         {
-            if (type.IsGenericType)
-            {
-                Type[] genericArgs = type.GetGenericArguments();
-                this.types[genericArgs.Length] = type;
-            }
-            else
-            {
-                this.types[0] = type;
-            }
+			this.AddType(type);
         }
+
+		public void AddType(ScriptType type)
+		{
+			if (type == null)
+				throw new ArgumentNullException("type");
+
+			if (!type.IsGenericType || !type.IsGenericTypeDefinition)
+				throw new ScriptExecutionException("ScriptTypeSet may only contain generic types which are also generic type definitions.");
+
+			if (!this.types.ContainsKey(type.GenericArgumentCount))
+			{
+				this.types[type.GenericArgumentCount] = type;
+			}
+			else
+			{
+				throw new ScriptExecutionException(string.Format("Unable to add type \"{0}\" to ScriptTypeSet.", type.Type.Name));
+			}
+						
+			this.types[type.GenericArgumentCount] = type;
+		}
 
         public bool ContainsKey(int key)
         {
             return this.types.ContainsKey(key);
         }
 
-        public bool TryGetType(int key, out Type value)
+        public bool TryGetType(int key, out ScriptType value)
         {
             return this.types.TryGetValue(key, out value);
         }
-
-        private static bool MatchMethod(MethodInfo method, string name, object[] args, bool exactTypes)
-        {
-            if (method.Name != name)
-                return false;
-
-            ParameterInfo[] parameters = method.GetParameters();
-
-            if (parameters.Length != args.Length)
-                return false;
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                if (exactTypes)
-                {
-                    if (parameters[i].ParameterType != args[i].GetType())
-                        return false;
-                }
-                else
-                {
-                    if (!parameters[i].ParameterType.IsAssignableFrom(args[i].GetType()))
-                        return false;
-                }
-            }
-
-            return true;
-        }
-
+               
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             result = null;
 
-            Type type;
+            ScriptType type;
             if (this.types.TryGetValue(0, out type))
-            {
-                if (this.staticMethods == null)
-                {
-                    this.staticMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
-                }
+                return type.TryInvokeMember(binder, args, out result);
 
-                IEnumerable<MethodInfo> matchedMethods = this.staticMethods.Where(x => MatchMethod(x, binder.Name, args, true));
-                int count = matchedMethods.Count();
-
-                if (count != 1)
-                {
-                    matchedMethods = this.staticMethods.Where(x => MatchMethod(x, binder.Name, args, false));
-                    count = matchedMethods.Count();
-                }
-
-                if (count == 1)
-                {
-                    result = matchedMethods.First().Invoke(null, args);
-                    return true;
-                }
-                else
-                {
-                    matchedMethods = this.staticMethods.Where(x => x.Name == binder.Name);
-
-                    if (matchedMethods.Count() > 1)
-                    {
-                        throw new ScriptExecutionException(string.Format("More than 1 method named \"{0}\" exists for type \"{1}\". Unable to determine which method to invoke.", binder.Name, type));
-                    }
-                    else
-                    {
-                        throw new ScriptExecutionException(string.Format("No method named \"{0}\" exists for type \"{1}\".", binder.Name, type));
-                    }
-                }
-            }
-
-            return false;
+            return base.TryInvokeMember(binder, args, out result);
         }
     }
 }

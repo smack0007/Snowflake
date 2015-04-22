@@ -25,11 +25,11 @@ namespace Snowflake
             this.globals = new ScriptNamespace("<global>");
             this.stack = new List<ScriptStackFrame>();
 
-            this.SetGlobalVariable("bool", new ScriptTypeSet(typeof(bool)));
-            this.SetGlobalVariable("char", new ScriptTypeSet(typeof(char)));
-            this.SetGlobalVariable("float", new ScriptTypeSet(typeof(float)));
-            this.SetGlobalVariable("int", new ScriptTypeSet(typeof(int)));
-            this.SetGlobalVariable("string", new ScriptTypeSet(typeof(string)));
+            this.SetGlobalVariable("bool", new ScriptType(typeof(bool)));
+            this.SetGlobalVariable("char", new ScriptType(typeof(char)));
+            this.SetGlobalVariable("float", new ScriptType(typeof(float)));
+            this.SetGlobalVariable("int", new ScriptType(typeof(int)));
+            this.SetGlobalVariable("string", new ScriptType(typeof(string)));
         }
                 
         public void PushStackFrame(string function)
@@ -267,88 +267,30 @@ namespace Snowflake
                 throw new ArgumentNullException("type");
 
             ScriptTypeSet typeSet = null;
-            
+
             dynamic value;
             if (this.TryGetGlobalVariable(name, out value))
             {
-                if (!(value is ScriptTypeSet))
-                    throw new ScriptExecutionException(string.Format("\"{0}\" is already set and is not a ScriptTypeSet.", name));
-
-                typeSet = (ScriptTypeSet)value;
-
-                if (type.IsGenericType)
+                if (value is ScriptTypeSet)
                 {
-                    Type[] genericArgs = type.GetGenericArguments();
-
-                    if (!typeSet.ContainsKey(genericArgs.Length))
-                    {
-                        typeSet[genericArgs.Length] = type;
-                    }
-                    else
-                    {
-                        throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered with the given generic argument variation.", name));
-                    }
+                    typeSet = (ScriptTypeSet)value;   
                 }
-                else if (!typeSet.ContainsKey(0))
+                else if (value is ScriptType)
                 {
-                    typeSet[0] = type;
+                    typeSet = new ScriptTypeSet((ScriptType)value);
+                    this.SetGlobalVariable(name, typeSet, true);
                 }
                 else
                 {
-                    throw new ScriptExecutionException(string.Format("Type \"{0}\" is already registered and is not a generic argument variation on the existing type.", name));
+                    throw new ScriptExecutionException(string.Format("\"{0}\" is already set and is not a ScriptTypeSet or a ScriptType.", name));
                 }
+
+				typeSet.AddType(new ScriptType(type));
             }
             else
             {
-                this.SetGlobalVariable(name, new ScriptTypeSet(type), true);
+                this.SetGlobalVariable(name, new ScriptType(type), true);
             }
-        }
-
-        public Type GetType(string name, int genericArgCount)
-        {
-            if (name == null)
-                throw new ArgumentNullException("name");
-
-            if (genericArgCount < 0)
-                throw new ArgumentOutOfRangeException("genericArgCount", "genericArgCount must be >= 0.");
-
-            ScriptTypeSet typeSet = null;
-
-            dynamic value;
-            if (this.TryGetGlobalVariable(name, out value))
-            {
-                if (!(value is ScriptTypeSet))
-                    throw new ScriptExecutionException(string.Format("\"{0}\" is not a ScriptTypeSet.", name));
-
-                typeSet = (ScriptTypeSet)value;
-            }
-            else
-            {
-                ScriptVariable variable;
-                for (int i = this.stack.Count - 1; i >= 0; i--)
-                {
-                    foreach (ScriptNamespace pointer in this.stack[i].UsingNamespaces)
-                    {
-                        if (pointer.TryGetVariable(name, out variable) && variable.Value is ScriptTypeSet)
-                        {
-                            typeSet = (ScriptTypeSet)variable.Value;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (typeSet == null)
-                throw new ScriptExecutionException(string.Format("ScriptTypeSet \"{0}\" could not be found.", name), this.stack.ToArray());
-
-            Type type;
-
-            if (!typeSet.TryGetType(genericArgCount, out type))
-            {
-                throw new ScriptExecutionException(string.Format("Type \"{0}\" is registered but not with generic argument variation of {1}.", name, genericArgCount), this.stack.ToArray());
-            }
-
-            return typeSet[genericArgCount];
         }
     }
 }

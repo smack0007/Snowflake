@@ -39,13 +39,13 @@ namespace Snowflake
 
         protected static dynamic Construct(ScriptExecutionContext context, ScriptTypeSet scriptTypeSet, params dynamic[] args)
         {
-            Type type;
-            if (!scriptTypeSet.TryGetType(0, out type))
+            ScriptType scriptType;
+            if (!scriptTypeSet.TryGetType(0, out scriptType))
                 throw new ScriptExecutionException("ScriptTypeSet does not contain a type with 0 generic parameters.");
 
             dynamic instance = typeof(Script)
                 .GetMethod("ConstructObject", BindingFlags.Static | BindingFlags.NonPublic)
-                .MakeGenericMethod(type)
+                .MakeGenericMethod(scriptType.Type)
                 .Invoke(null, new object[] { args });
 
             return instance;

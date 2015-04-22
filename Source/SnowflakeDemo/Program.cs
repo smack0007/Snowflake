@@ -34,7 +34,7 @@ namespace SnowflakeDemo
             ScriptEngine engine = new ScriptEngine();
 
             File.WriteAllText(@"..\..\..\SnowflakeDemoOutput\Script1.cs", engine.GenerateCode(File.ReadAllText("SnowflakeDemo.sfs"), "Script1"));
-							
+
             engine.SetGlobalFunction<object>("print", (x) => Console.WriteLine(x));
             engine.RegisterType("Namespace.Person", typeof(Person));
             engine.RegisterType("System.Console", typeof(Console));

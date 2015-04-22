@@ -68,6 +68,7 @@
     <Compile Include="ForTests.cs" />
     <Compile Include="FunctionCallTests.cs" />
     <Compile Include="FunctionTests.cs" />
+    <Compile Include="GenericsTests.cs" />
     <Compile Include="IfTests.cs" />
     <Compile Include="IntegerOperationTests.cs" />
     <Compile Include="LanguageTestFixture.cs" />
