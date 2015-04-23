@@ -95,9 +95,14 @@ namespace Snowflake.Lexing
 		Integer,
 		
 		/// <summary>
-		/// Float value, i.e. "123.456".
+		/// Float value, i.e. "123.456f".
 		/// </summary>
 		Float,
+
+		/// <summary>
+		/// Float value, i.e. "123.456".
+		/// </summary>
+		Double,
 
 		/// <summary>
 		/// ;

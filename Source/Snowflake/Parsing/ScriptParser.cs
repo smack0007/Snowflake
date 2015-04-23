@@ -695,6 +695,7 @@ namespace Snowflake.Parsing
 					case LexemeType.Char:
 					case LexemeType.Integer:
 					case LexemeType.Float:
+					case LexemeType.Double:
                     case LexemeType.String:
                         node = this.ParseValue(lexemes, ref pos);
 						break;
@@ -1097,6 +1098,13 @@ namespace Snowflake.Parsing
                     node = floatNode;
                     pos++;
                     break;
+
+				case LexemeType.Double:
+					var doubleNode = Construct<DoubleValueNode>(lexemes, pos);
+					doubleNode.Value = double.Parse(lexemes[pos].Value, CultureInfo.InvariantCulture);
+					node = doubleNode;
+					pos++;
+					break;
             }
 
             if (node == null)

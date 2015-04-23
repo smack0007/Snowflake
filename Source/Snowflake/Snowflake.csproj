@@ -106,6 +106,7 @@
     <Compile Include="Parsing\ArrayNode.cs" />
     <Compile Include="Parsing\ConstDeclarationNode.cs" />
     <Compile Include="Parsing\ConstructorCallNode.cs" />
+    <Compile Include="Parsing\DoubleValueNode.cs" />
     <Compile Include="Parsing\ElementAccessNode.cs" />
     <Compile Include="Parsing\ForEachNode.cs" />
     <Compile Include="Parsing\GenericTypeAccessNode.cs" />

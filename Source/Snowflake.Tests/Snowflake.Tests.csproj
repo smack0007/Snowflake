@@ -64,6 +64,7 @@
     <Compile Include="ConstructorTests.cs" />
     <Compile Include="ConstTests.cs" />
     <Compile Include="ElementAccessTests.cs" />
+    <Compile Include="FloatTests.cs" />
     <Compile Include="ForEachTests.cs" />
     <Compile Include="ForTests.cs" />
     <Compile Include="FunctionCallTests.cs" />

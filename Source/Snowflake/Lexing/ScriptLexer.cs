@@ -20,7 +20,7 @@ namespace Snowflake.Lexing
 			bool output = false; // If true, write the lexeme.
 			string value = ""; // The current value of the lexeme.
 			LexemeType type = LexemeType.Unknown;
-			bool isFloat = false; // For parsing numbers
+			bool isFloatingPoint = false; // For parsing numbers
 
 			int line = 1, column = 1; // Current position of the lexeme being parsed.
 			int curLine = 1, curColumn = 1; // Current position of parsing.
@@ -323,7 +323,7 @@ namespace Snowflake.Lexing
 					}
 					else if (text[i] == '.')
 					{
-						isFloat = true;
+						isFloatingPoint = true;
 						value += text[i];
 					}
 					else
@@ -406,9 +406,17 @@ namespace Snowflake.Lexing
 					}
 					else if (type == LexemeType.Numeric)
 					{
-						if (isFloat)
+						if (isFloatingPoint)
 						{
-							type = LexemeType.Float;
+							if (i + 1 < text.Length && text[i + 1] == 'f')
+							{
+								type = LexemeType.Float;
+								i++;
+							}
+							else
+							{
+								type = LexemeType.Double;
+							}
 						}
 						else
 						{
@@ -436,7 +444,7 @@ namespace Snowflake.Lexing
 
 					output = false;
 					type = LexemeType.Unknown;
-					isFloat = false;
+					isFloatingPoint = false;
 					value = "";
 				}
 			}

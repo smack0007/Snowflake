@@ -9,6 +9,8 @@ namespace Snowflake.Generated
 		{
 			try
 			{
+				context.DeclareVariable("float1", value: 12.5);
+				context.DeclareVariable("float2", value: 12.5f);
 				context.UsingNamespace("System");
 				context["Console"].WriteLine("Hello World!");
 				context.DeclareVariable("MaxMultiplier", isConst: true, value: 10);
@@ -90,15 +92,15 @@ namespace Snowflake.Generated
 				context["person1"].Friends.Add(context["person2"]);
 				context["Console"].WriteLine(context["person1"].Friends[0].FirstName);
 				context["Console"].WriteLine(context["person1"]);
-				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v19) => { 
+				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v21) => { 
 					context.PushStackFrame("buildMultiplier");
-					context.DeclareVariable("x", v19);
+					context.DeclareVariable("x", v21);
 					bool isError4 = false;
 					try {
-						return new ScriptFunction(new Func<dynamic, dynamic>((v20) => { 
+						return new ScriptFunction(new Func<dynamic, dynamic>((v22) => { 
 							context.PushStackFrame("<anonymous>");
-							context.DeclareVariable("y", v20);
-							context.DeclareVariable("x", v19);
+							context.DeclareVariable("y", v22);
+							context.DeclareVariable("x", v21);
 							bool isError5 = false;
 							try {
 								return (context["x"] * context["y"]);
@@ -126,8 +128,8 @@ namespace Snowflake.Generated
 				}
 				context.DeclareVariable("values", value: new ScriptList { 5, 4, 3, 2, 1 });
 				context.DeclareVariable("value");
-				foreach (dynamic v24 in context["values"]) {
-					context.SetVariable("value", v24);
+				foreach (dynamic v26 in context["values"]) {
+					context.SetVariable("value", v26);
 					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
 				}
 				Invoke(context, context["export"], "Script.Export.Number", 42);

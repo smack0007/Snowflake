@@ -482,6 +482,11 @@ namespace Snowflake.CodeGeneration
 			else if (node is FloatValueNode)
 			{
 				Append(data, ((FloatValueNode)node).Value.ToString(CultureInfo.InvariantCulture));
+				Append(data, "f");
+			}
+			else if (node is DoubleValueNode)
+			{
+				Append(data, ((DoubleValueNode)node).Value.ToString(CultureInfo.InvariantCulture));
 			}
 			else
 			{

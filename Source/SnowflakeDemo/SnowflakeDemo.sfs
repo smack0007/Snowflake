@@ -1,4 +1,7 @@
 ﻿// Start with a comment
+var float1 = 12.5;
+var float2 = 12.5f;
+
 using System;
 
 Console.WriteLine("Hello World!");
