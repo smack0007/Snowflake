@@ -11,43 +11,50 @@ namespace Snowflake.CodeGeneration
 	{
 		public const string GeneratedCodeNamespace = "Snowflake.Generated";
 
+		class CodeBlock
+		{
+			public StringBuilder Code { get; set; }
+			public int Padding { get; set; }
+			public bool DisableNewLines { get; set; }
+
+			public CodeBlock()
+			{
+				this.Code = new StringBuilder();
+			}
+
+			public override string ToString()
+			{
+				return this.Code.ToString();
+			}
+		}
+
 		class DataContext
 		{
             int errorTrackerCount;
+					
+			Stack<CodeBlock> codeBlocksStack;
 
-			public StringBuilder Code
+			public CodeBlock CodeBlock
 			{
-				get;
-				private set;
+				get { return this.codeBlocksStack.Peek(); }
 			}
 
-			public int Padding
-			{
-				get;
-				set;
-			}
+			public Dictionary<string, CodeBlock> CodeBlocksMap { get; private set; }
+						
+            public VariableMap VariableMap { get; private set; }
 
-			public bool DisableNewLines
-			{
-				get;
-				set;
-			}
+			public int FunctionCount { get; private set; }
 
-			public int FunctionDepth
-			{
-				get;
-				set;
-			}
-
-            public VariableMap VariableMap
-            {
-                get;
-                set;
-            }
-                                    			
 			public DataContext()
 			{
-				this.Code = new StringBuilder();
+				var codeBlock = new CodeBlock();
+
+				this.CodeBlocksMap = new Dictionary<string, CodeBlock>();
+				this.CodeBlocksMap[string.Empty] = codeBlock;
+
+				this.codeBlocksStack = new Stack<CodeBlock>();
+				this.codeBlocksStack.Push(codeBlock);
+
                 this.VariableMap = new VariableMap();
 			}
 
@@ -55,6 +62,32 @@ namespace Snowflake.CodeGeneration
             {
                 return ++this.errorTrackerCount;
             }
+
+			public int GetNextFunctionIndex()
+			{
+				return ++this.FunctionCount;
+			}
+
+			public void PushCodeBlock(string name)
+			{
+				var codeBlock = new CodeBlock();
+				
+				this.CodeBlocksMap.Add(name, codeBlock);
+				this.codeBlocksStack.Push(codeBlock);
+			}
+
+			public void PopCodeBlock()
+			{
+				if (this.codeBlocksStack.Count == 1)
+					throw new InvalidOperationException("CodeBlock stack is empty.");
+
+				this.codeBlocksStack.Pop();
+			}
+
+			public void WriteCodeBlock(string name)
+			{
+				this.CodeBlock.Code.Append(this.CodeBlocksMap[name]);
+			}
 		}
 
 		public CodeGenerator()
@@ -68,18 +101,18 @@ namespace Snowflake.CodeGeneration
 
 		private static void StartLine(DataContext data, string format, params object[] args)
 		{
-			if (!data.DisableNewLines)
+			if (!data.CodeBlock.DisableNewLines)
 			{
-				for (int i = 0; i < data.Padding; i++)
-					data.Code.Append("\t");
+				for (int i = 0; i < data.CodeBlock.Padding; i++)
+					data.CodeBlock.Code.Append("\t");
 			}
 
-			data.Code.Append(string.Format(format, args));
+			data.CodeBlock.Code.Append(string.Format(format, args));
 		}
 
 		private static void Append(DataContext data, string format, params object[] args)
 		{
-			data.Code.Append(string.Format(format, args));
+			data.CodeBlock.Code.Append(string.Format(format, args));
 		}
 
 		private static void EndLine(DataContext data)
@@ -89,13 +122,13 @@ namespace Snowflake.CodeGeneration
 
 		private static void EndLine(DataContext data, string format, params object[] args)
 		{
-			if (!data.DisableNewLines)
+			if (!data.CodeBlock.DisableNewLines)
 			{
-				data.Code.AppendLine(string.Format(format, args));
+				data.CodeBlock.Code.AppendLine(string.Format(format, args));
 			}
 			else
 			{
-				data.Code.Append(string.Format(format, args));
+				data.CodeBlock.Code.Append(string.Format(format, args));
 			}
 		}
 
@@ -108,15 +141,15 @@ namespace Snowflake.CodeGeneration
 		{
 			StartLine(data, format, args);
 
-			if (!data.DisableNewLines)
+			if (!data.CodeBlock.DisableNewLines)
 			{
-				data.Code.AppendLine();
+				data.CodeBlock.Code.AppendLine();
 			}
 		}
 
 		private static void DeleteCharacters(DataContext data, int count)
 		{
-			data.Code.Remove(data.Code.Length - count, count);
+			data.CodeBlock.Code.Remove(data.CodeBlock.Code.Length - count, count);
 		}
 
 		public string Generate(ScriptNode syntaxTree, string className)
@@ -130,19 +163,19 @@ namespace Snowflake.CodeGeneration
 			WriteLine(data, "namespace {0}", GeneratedCodeNamespace);
 			WriteLine(data, "{{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			WriteLine(data, "public class {0} : Script", className);
 			WriteLine(data, "{{");
             
-			data.Padding++;
+			data.CodeBlock.Padding++;
             WriteLine(data, "public override dynamic Execute(ScriptExecutionContext context)");
 			WriteLine(data, "{{");
 									
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			WriteLine(data, "try");
 			WriteLine(data, "{{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			foreach (var statement in syntaxTree.Statements)
 			{
 				GenerateStatement(statement, data);
@@ -151,27 +184,34 @@ namespace Snowflake.CodeGeneration
 			if (!(syntaxTree.Statements.Last() is ReturnNode))
 				WriteLine(data, "return null;");
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 			WriteLine(data, "catch (Exception ex)");
 			WriteLine(data, "{{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			WriteLine(data, "throw new ScriptExecutionException(ex.Message, context.GetStackFrames(), ex);");
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 
-			data.Padding--;
+			for (int i = 1; i <= data.FunctionCount; i++)
+			{
+				WriteLine(data);
+				data.CodeBlock.Code.Append("\t\t");
+				data.CodeBlock.Code.Append(data.CodeBlocksMap["Function" + i].ToString());
+			}
+
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 
-			return data.Code.ToString();
+			return data.CodeBlock.ToString();
 		}
 
 		private static void ThrowUnableToGenerateException(string generationStage, SyntaxNode node)
@@ -292,19 +332,19 @@ namespace Snowflake.CodeGeneration
 
 			EndLine(data, ") {{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			GenerateStatementBlock(node.BodyStatementBlock, data);
 						
 			if (node.ElseStatementBlock != null)
 			{
-				data.Padding--;
+				data.CodeBlock.Padding--;
 				WriteLine(data, "}} else {{");
 
-				data.Padding++;
+				data.CodeBlock.Padding++;
 				GenerateStatementBlock(node.ElseStatementBlock, data);
 			}
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 		}
 
@@ -316,10 +356,10 @@ namespace Snowflake.CodeGeneration
 
 			EndLine(data, ") {{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			GenerateStatementBlock(node.BodyStatementBlock, data);
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 		}
 
@@ -327,7 +367,7 @@ namespace Snowflake.CodeGeneration
 		{
 			StartLine(data, "for (");
 
-			data.DisableNewLines = true;
+			data.CodeBlock.DisableNewLines = true;
 
 			if (node.InitializeSyntax is VariableDeclarationNode)
 			{
@@ -349,14 +389,14 @@ namespace Snowflake.CodeGeneration
 
 			GenerateExpression(node.IncrementExpression, data);
 
-			data.DisableNewLines = false;
+			data.CodeBlock.DisableNewLines = false;
 
 			EndLine(data, ") {{");
 
-			data.Padding++;
+			data.CodeBlock.Padding++;
 			GenerateStatementBlock(node.BodyStatementBlock, data);
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 		}
 
@@ -367,20 +407,20 @@ namespace Snowflake.CodeGeneration
             data.VariableMap.DeclareVariable(node.VariableDeclaration.VariableName, node.Line, node.Column);
 
             StartLine(data, "foreach (dynamic {0} in ", data.VariableMap.GetVariableName(node.VariableDeclaration.VariableName));
-            	                        
-            data.DisableNewLines = true;
+
+			data.CodeBlock.DisableNewLines = true;
 
 			GenerateExpression(node.SourceExpression, data);
-						
-			data.DisableNewLines = false;
+
+			data.CodeBlock.DisableNewLines = false;
 
 			EndLine(data, ") {{");
             
-			data.Padding++;
+			data.CodeBlock.Padding++;
             WriteLine(data, "context.SetVariable(\"{0}\", {1});", node.VariableDeclaration.VariableName, data.VariableMap.GetVariableName(node.VariableDeclaration.VariableName));
 			GenerateStatementBlock(node.BodyStatementBlock, data);
 
-			data.Padding--;
+			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
 		}
 
@@ -526,98 +566,146 @@ namespace Snowflake.CodeGeneration
 
 		private static void GenerateFunction(FunctionNode node, DataContext data)
 		{
-			Append(data, "new ScriptFunction(new Func<");
+			Append(data, "new ScriptFunction(new Func<ScriptExecutionContext, dynamic[]");
 
-			Append(data, string.Join(", ", Enumerable.Repeat("dynamic", node.Args.Count + 1)));
-					
-			Append(data, ">((");
-
-            data.VariableMap.PushFrame();
-            
-            foreach (var arg in node.Args)
-                data.VariableMap.DeclareVariable(arg.VariableName, node.Line, node.Column);
-                        
-			Append(data, string.Join(", ", node.Args.Select(x => data.VariableMap.GetVariableName(x.VariableName))));
-						
-			Append(data, ") => {{ ");
-			
-			EndLine(data);
-
-			data.Padding++;
-
-			WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
-
-            foreach (var arg in node.Args)
-                WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", arg.VariableName, data.VariableMap.GetVariableName(arg.VariableName));
-
-            var variableDeclarations = node.BodyStatementBlock.Find<VariableDeclarationNode>().Where(x => x.FindParent<FunctionNode>() == node).Select(x => x.VariableName);
-
-            foreach (var capturedVariable in node.BodyStatementBlock.Find<VariableReferenceNode>().Where(x => x.FindParent<FunctionNode>() == node && !variableDeclarations.Contains(x.VariableName)))
-            {
-                if (!data.VariableMap.IsVariableDeclaredInCurrentFrame(capturedVariable.VariableName))
-                {
-                    WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", capturedVariable.VariableName, data.VariableMap.GetVariableName(capturedVariable.VariableName));
-                }
-            }
-
-            int errorTracker = data.GetNextErrorTrackerIndex();
-            WriteLine(data, "bool isError{0} = false;", errorTracker);
-			
-            WriteLine(data, "try {{");
-
-			data.Padding++;
-
-			GenerateStatementBlock(node.BodyStatementBlock, data, pushStackFrame: false);
-			
-			if (!(node.BodyStatementBlock.Last() is ReturnNode))
-				WriteLine(data, "return null;");
-
-            data.Padding--;
-            WriteLine(data, "}} catch(Exception) {{");
-
-            data.Padding++;
-            WriteLine(data, "isError{0} = true;", errorTracker);
-            WriteLine(data, "throw;");
-            
-			data.Padding--;
-			WriteLine(data, "}} finally {{");
-
-            data.Padding++;
-            WriteLine(data, "if (!isError{0}) {{", errorTracker);
-
-			data.Padding++;
-            WriteLine(data, "context.PopStackFrame();");
-
-            data.Padding--;
-            WriteLine(data, "}}");
-
-			data.Padding--;
-			WriteLine(data, "}}");
-
-			data.Padding--;
-
-			StartLine(data, "}})");
-
-            data.VariableMap.PopFrame();
-
-			if (node.Args.Count != 0)
+			if (node.Args.Count > 0)
 			{
-				foreach (var arg in node.Args)
-				{
-					Append(data, ", ");
+				Append(data, ", ");
+				Append(data, string.Join(", ", Enumerable.Repeat("dynamic", node.Args.Count)));
+			}
 
-					if (arg.ValueExpression != null)
+			string functionName = "Function" + data.GetNextFunctionIndex();
+			Append(data, ", dynamic>({0})", functionName);
+
+			data.VariableMap.PushFrame();
+
+			Append(data, ", ");
+			if (node.Args.Count > 0)
+			{
+				Append(data, "new dynamic[] {{ ");
+
+				for (int i = 0; i < node.Args.Count; i++)
+				{
+					data.VariableMap.DeclareVariable(node.Args[i].VariableName, node.Line, node.Column);
+
+					if (i != 0)
+						Append(data, ", ");
+
+					if (node.Args[i].ValueExpression != null)
 					{
-						GenerateExpression(arg.ValueExpression, data);
+						GenerateExpression(node.Args[i].ValueExpression, data);
 					}
 					else
 					{
 						Append(data, "null");
 					}
 				}
+
+				Append(data, " }}");
+			}
+			else
+			{
+				Append(data, "null");
+			}
+
+			var variableDeclarations = node.BodyStatementBlock.Find<VariableDeclarationNode>().Where(x => x.FindParent<FunctionNode>() == node).Select(x => x.VariableName);
+
+			var capturedVariables = node.BodyStatementBlock.Find<VariableReferenceNode>()
+				.Where(x =>
+					x.FindParent<FunctionNode>() == node &&
+					!variableDeclarations.Contains(x.VariableName) &&
+					!data.VariableMap.IsVariableDeclaredInCurrentFrame(x.VariableName)
+				)
+				.ToArray();
+
+			Append(data, ", ");
+			if (capturedVariables.Length > 0)
+			{
+				Append(data, "new dynamic[] {{ ");
+
+				for (int i = 0; i < capturedVariables.Length; i++)
+				{
+					if (i != 0)
+						Append(data, ", ");
+
+					Append(data, "context[\"{0}\"]", capturedVariables[i].VariableName);
+				}
+
+				Append(data, " }}");
+			}
+			else
+			{
+				Append(data, "null");
 			}
 
 			Append(data, ")");
+
+			data.PushCodeBlock(functionName);
+			data.CodeBlock.Padding = 2;
+
+			Append(data, "private static dynamic {0}(ScriptExecutionContext context, dynamic[] captures", functionName);
+
+			if (node.Args.Count > 0)
+			{
+				Append(data, ", ");
+				Append(data, string.Join(", ", node.Args.Select(x => "dynamic " + data.VariableMap.GetVariableName(x.VariableName))));
+			}
+						
+			EndLine(data, ")");
+
+			WriteLine(data, "{{");
+
+			data.CodeBlock.Padding++;
+
+			WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
+
+            foreach (var arg in node.Args)
+                WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", arg.VariableName, data.VariableMap.GetVariableName(arg.VariableName));
+
+			for (int i = 0; i < capturedVariables.Length; i++)
+				WriteLine(data, "context.DeclareVariable(\"{0}\", captures[{1}]);", capturedVariables[i].VariableName, i);			
+
+            WriteLine(data, "bool isError = false;");
+			
+            WriteLine(data, "try {{");
+
+			data.CodeBlock.Padding++;
+
+			GenerateStatementBlock(node.BodyStatementBlock, data, pushStackFrame: false);
+			
+			if (!(node.BodyStatementBlock.Last() is ReturnNode))
+				WriteLine(data, "return null;");
+
+            data.CodeBlock.Padding--;
+            WriteLine(data, "}} catch(Exception) {{");
+
+            data.CodeBlock.Padding++;
+            WriteLine(data, "isError = true;");
+            WriteLine(data, "throw;");
+            
+			data.CodeBlock.Padding--;
+			WriteLine(data, "}} finally {{");
+
+            data.CodeBlock.Padding++;
+            WriteLine(data, "if (!isError) {{");
+
+			data.CodeBlock.Padding++;
+            WriteLine(data, "context.PopStackFrame();");
+
+            data.CodeBlock.Padding--;
+            WriteLine(data, "}}");
+
+			data.CodeBlock.Padding--;
+			WriteLine(data, "}}");
+			WriteLine(data, "return null;");
+
+			data.CodeBlock.Padding--;
+
+			WriteLine(data, "}}");
+
+			data.PopCodeBlock();
+
+			data.VariableMap.PopFrame();
 		}
 
         private static void GenerateConstructorCall(ConstructorCallNode node, DataContext data)

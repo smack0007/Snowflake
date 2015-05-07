@@ -6,14 +6,16 @@ namespace Snowflake
 	{
 		Delegate func;
 		dynamic[] defaults;
+		dynamic[] captures;
 
-		public ScriptFunction(Delegate func, params dynamic[] defaults)
+		public ScriptFunction(Delegate func, dynamic[] defaults, dynamic[] captures)
 		{
 			this.func = func;
 			this.defaults = defaults;
+			this.captures = captures;
 		}
 
-		public dynamic Invoke(params dynamic[] args)
+		public dynamic Invoke(ScriptExecutionContext context, params dynamic[] args)
 		{
 			if (this.defaults != null && args.Length < this.defaults.Length)
 			{
@@ -31,8 +33,15 @@ namespace Snowflake
 
 				args = newArgs;
 			}
+						
+			object[] invokeArgs = new object[args.Length + 2];
+			invokeArgs[0] = context;
+			invokeArgs[1] = this.captures;
 
-			return this.func.DynamicInvoke(args);
+			for (int i = 0; i < args.Length; i++)
+				invokeArgs[i + 2] = args[i];
+
+			return this.func.DynamicInvoke(invokeArgs);
 		}
 	}
 }

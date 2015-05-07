@@ -34,7 +34,7 @@ namespace Snowflake
 		{
 			if (func is ScriptFunction)
 			{
-				return ((ScriptFunction)func).Invoke(args);
+				return ((ScriptFunction)func).Invoke(context, args);
 			}
 			else
 			{

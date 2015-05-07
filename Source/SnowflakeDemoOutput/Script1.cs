@@ -22,36 +22,8 @@ namespace Snowflake.Generated
 				context["sb"].Append("Hello");
 				context["sb"].Append(" World!");
 				context["Console"].WriteLine(context["sb"]);
-				context.DeclareVariable("foo", isConst: true, value: new ScriptFunction(new Func<dynamic>(() => { 
-					context.PushStackFrame("foo");
-					bool isError1 = false;
-					try {
-						Invoke(context, context["bar"]);
-						return null;
-					} catch(Exception) {
-						isError1 = true;
-						throw;
-					} finally {
-						if (!isError1) {
-							context.PopStackFrame();
-						}
-					}
-				})));
-				context.DeclareVariable("bar", isConst: true, value: new ScriptFunction(new Func<dynamic>(() => { 
-					context.PushStackFrame("bar");
-					bool isError2 = false;
-					try {
-						context["Console"].WriteLine("bar");
-						return null;
-					} catch(Exception) {
-						isError2 = true;
-						throw;
-					} finally {
-						if (!isError2) {
-							context.PopStackFrame();
-						}
-					}
-				})));
+				context.DeclareVariable("foo", isConst: true, value: new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic>(Function1), null, null));
+				context.DeclareVariable("bar", isConst: true, value: new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic>(Function2), null, null));
 				Invoke(context, context["foo"]);
 				context.DeclareVariable("timeSpanType", value: context["System"].TimeSpan);
 				context.DeclareVariable("timeSpan", value: Construct(context, ScriptType.FromValue(context["timeSpanType"]), new dynamic[] { 1, 2, 3 }));
@@ -65,23 +37,7 @@ namespace Snowflake.Generated
 				context.DeclareVariable("tupleType", value: ScriptType.FromValue(context["System"].Tuple, ScriptType.FromValue(context["int"])));
 				context.DeclareVariable("tuple4", value: Construct(context, ScriptType.FromValue(context["tupleType"]), new dynamic[] { 42 }));
 				context["System"].Console.WriteLine(context["tuple4"]);
-				context.DeclareVariable("tuple5", value: Construct(context, ScriptType.FromValue(Invoke(context, new ScriptFunction(new Func<dynamic>(() => { 
-					context.PushStackFrame("<anonymous>");
-					context.DeclareVariable("System", context.GetGlobalVariable("System"));
-					context.DeclareVariable("string", context.GetGlobalVariable("string"));
-					context.DeclareVariable("int", context.GetGlobalVariable("int"));
-					bool isError3 = false;
-					try {
-						return ScriptType.FromValue(context["System"].Tuple, ScriptType.FromValue(context["string"]), ScriptType.FromValue(context["int"]));
-					} catch(Exception) {
-						isError3 = true;
-						throw;
-					} finally {
-						if (!isError3) {
-							context.PopStackFrame();
-						}
-					}
-				})))), new dynamic[] { "Hello", 42 }));
+				context.DeclareVariable("tuple5", value: Construct(context, ScriptType.FromValue(Invoke(context, new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic>(Function3), null, new dynamic[] { context["System"], context["string"], context["int"] }))), new dynamic[] { "Hello", 42 }));
 				context["System"].Console.WriteLine(context["tuple5"]);
 				context.DeclareVariable("person1", value: Construct(context, ScriptType.FromValue(context["Namespace"].Person)));
 				context["person1"].FirstName = "Bob";
@@ -92,36 +48,7 @@ namespace Snowflake.Generated
 				context["person1"].Friends.Add(context["person2"]);
 				context["Console"].WriteLine(context["person1"].Friends[0].FirstName);
 				context["Console"].WriteLine(context["person1"]);
-				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v21) => { 
-					context.PushStackFrame("buildMultiplier");
-					context.DeclareVariable("x", v21);
-					bool isError4 = false;
-					try {
-						return new ScriptFunction(new Func<dynamic, dynamic>((v22) => { 
-							context.PushStackFrame("<anonymous>");
-							context.DeclareVariable("y", v22);
-							context.DeclareVariable("x", v21);
-							bool isError5 = false;
-							try {
-								return (context["x"] * context["y"]);
-							} catch(Exception) {
-								isError5 = true;
-								throw;
-							} finally {
-								if (!isError5) {
-									context.PopStackFrame();
-								}
-							}
-						}), null);
-					} catch(Exception) {
-						isError4 = true;
-						throw;
-					} finally {
-						if (!isError4) {
-							context.PopStackFrame();
-						}
-					}
-				}), null));
+				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic, dynamic>(Function4), new dynamic[] { null }, null));
 				context.DeclareVariable("x5", value: Invoke(context, context["buildMultiplier"], 5));
 				for (context.DeclareVariable("i", value: 0); (context["i"] < context["MaxMultiplier"]); context["i"] += 1) {
 					context["Console"].WriteLine(((("5 * " + context["i"]) + " = ") + Invoke(context, context["x5"], context["i"])));
@@ -139,6 +66,99 @@ namespace Snowflake.Generated
 			{
 				throw new ScriptExecutionException(ex.Message, context.GetStackFrames(), ex);
 			}
+		}
+		
+		private static dynamic Function1(ScriptExecutionContext context, dynamic[] captures)
+		{
+			context.PushStackFrame("foo");
+			bool isError = false;
+			try {
+				Invoke(context, context["bar"]);
+				return null;
+			} catch(Exception) {
+				isError = true;
+				throw;
+			} finally {
+				if (!isError) {
+					context.PopStackFrame();
+				}
+			}
+			return null;
+		}
+		
+		private static dynamic Function2(ScriptExecutionContext context, dynamic[] captures)
+		{
+			context.PushStackFrame("bar");
+			bool isError = false;
+			try {
+				context["Console"].WriteLine("bar");
+				return null;
+			} catch(Exception) {
+				isError = true;
+				throw;
+			} finally {
+				if (!isError) {
+					context.PopStackFrame();
+				}
+			}
+			return null;
+		}
+		
+		private static dynamic Function3(ScriptExecutionContext context, dynamic[] captures)
+		{
+			context.PushStackFrame("<anonymous>");
+			context.DeclareVariable("System", captures[0]);
+			context.DeclareVariable("string", captures[1]);
+			context.DeclareVariable("int", captures[2]);
+			bool isError = false;
+			try {
+				return ScriptType.FromValue(context["System"].Tuple, ScriptType.FromValue(context["string"]), ScriptType.FromValue(context["int"]));
+			} catch(Exception) {
+				isError = true;
+				throw;
+			} finally {
+				if (!isError) {
+					context.PopStackFrame();
+				}
+			}
+			return null;
+		}
+		
+		private static dynamic Function4(ScriptExecutionContext context, dynamic[] captures, dynamic v21)
+		{
+			context.PushStackFrame("buildMultiplier");
+			context.DeclareVariable("x", v21);
+			bool isError = false;
+			try {
+				return new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic, dynamic>(Function5), new dynamic[] { null }, new dynamic[] { context["x"] });
+			} catch(Exception) {
+				isError = true;
+				throw;
+			} finally {
+				if (!isError) {
+					context.PopStackFrame();
+				}
+			}
+			return null;
+		}
+		
+		private static dynamic Function5(ScriptExecutionContext context, dynamic[] captures, dynamic v22)
+		{
+			context.PushStackFrame("<anonymous>");
+			context.DeclareVariable("y", v22);
+			context.DeclareVariable("x", captures[0]);
+			bool isError = false;
+			try {
+				return (context["x"] * context["y"]);
+			} catch(Exception) {
+				isError = true;
+				throw;
+			} finally {
+				if (!isError) {
+					context.PopStackFrame();
+				}
+			}
+			return null;
 		}
 	}
 }
