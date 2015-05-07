@@ -697,7 +697,6 @@ namespace Snowflake.CodeGeneration
 
 			data.CodeBlock.Padding--;
 			WriteLine(data, "}}");
-			WriteLine(data, "return null;");
 
 			data.CodeBlock.Padding--;
 

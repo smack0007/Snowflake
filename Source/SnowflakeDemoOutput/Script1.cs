@@ -83,7 +83,6 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
-			return null;
 		}
 		
 		private static dynamic Function2(ScriptExecutionContext context, dynamic[] captures)
@@ -101,7 +100,6 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
-			return null;
 		}
 		
 		private static dynamic Function3(ScriptExecutionContext context, dynamic[] captures)
@@ -121,7 +119,6 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
-			return null;
 		}
 		
 		private static dynamic Function4(ScriptExecutionContext context, dynamic[] captures, dynamic v21)
@@ -139,7 +136,6 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
-			return null;
 		}
 		
 		private static dynamic Function5(ScriptExecutionContext context, dynamic[] captures, dynamic v22)
@@ -158,7 +154,6 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
-			return null;
 		}
 	}
 }
