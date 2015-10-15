@@ -14,7 +14,9 @@ namespace Snowflake.CodeGeneration
 		class CodeBlock
 		{
 			public StringBuilder Code { get; set; }
+
 			public int Padding { get; set; }
+
 			public bool DisableNewLines { get; set; }
 
 			public CodeBlock()
@@ -270,7 +272,11 @@ namespace Snowflake.CodeGeneration
 			{
 				GenerateReturn((ReturnNode)node, data);
 			}
-			else if (node is ExpressionNode)
+            else if (node is YieldNode)
+            {
+                GenerateYield((YieldNode)node, data);
+            }
+            else if (node is ExpressionNode)
 			{
 				StartLine(data);
 				GenerateExpression((ExpressionNode)node, data);
@@ -433,7 +439,16 @@ namespace Snowflake.CodeGeneration
 			EndLine(data, ";");
 		}
 
-		private static void GenerateExpression(ExpressionNode node, DataContext data)
+        private static void GenerateYield(YieldNode node, DataContext data)
+        {
+            StartLine(data, "yield return ");
+
+            GenerateExpression(node.ValueExpression, data);
+
+            EndLine(data, ";");
+        }
+
+        private static void GenerateExpression(ExpressionNode node, DataContext data)
 		{		
 			if (node is AssignmentOpeartionNode)
 			{
@@ -643,7 +658,12 @@ namespace Snowflake.CodeGeneration
 			data.PushCodeBlock(functionName);
 			data.CodeBlock.Padding = 2;
 
-			Append(data, "private static dynamic {0}(ScriptExecutionContext context, dynamic[] captures", functionName);
+            string returnType = "dynamic";
+
+            if (node.IsGenerator)
+                returnType = "IEnumerable<dynamic>";
+
+            Append(data, "private static {0} {1}(ScriptExecutionContext context, dynamic[] captures", returnType, functionName);
 
 			if (node.Args.Count > 0)
 			{
@@ -657,49 +677,57 @@ namespace Snowflake.CodeGeneration
 
 			data.CodeBlock.Padding++;
 
-			WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
+            if (!node.IsGenerator)
+                WriteLine(data, "context.PushStackFrame(\"{0}\");", !node.IsAnonymous ? node.FunctionName : "<anonymous>");
 
             foreach (var arg in node.Args)
                 WriteLine(data, "context.DeclareVariable(\"{0}\", {1});", arg.VariableName, data.VariableMap.GetVariableName(arg.VariableName));
 
 			for (int i = 0; i < capturedVariables.Length; i++)
-				WriteLine(data, "context.DeclareVariable(\"{0}\", captures[{1}]);", capturedVariables[i].VariableName, i);			
+				WriteLine(data, "context.DeclareVariable(\"{0}\", captures[{1}]);", capturedVariables[i].VariableName, i);
 
-            WriteLine(data, "bool isError = false;");
-			
-            WriteLine(data, "try {{");
+            if (!node.IsGenerator)
+            {
+                WriteLine(data, "bool isError = false;");
 
-			data.CodeBlock.Padding++;
+                WriteLine(data, "try {{");
 
+                data.CodeBlock.Padding++;
+            }
+            		
 			GenerateStatementBlock(node.BodyStatementBlock, data, pushStackFrame: false);
-			
-			if (!(node.BodyStatementBlock.Last() is ReturnNode))
-				WriteLine(data, "return null;");
 
-            data.CodeBlock.Padding--;
-            WriteLine(data, "}} catch(Exception) {{");
+            if (!(node.BodyStatementBlock.Last() is ReturnNode) && !node.IsGenerator)
+            {                    
+                WriteLine(data, "return null;");
+            }
 
-            data.CodeBlock.Padding++;
-            WriteLine(data, "isError = true;");
-            WriteLine(data, "throw;");
-            
+            if (!node.IsGenerator)
+            {
+                data.CodeBlock.Padding--;
+                WriteLine(data, "}} catch(Exception) {{");
+
+                data.CodeBlock.Padding++;
+                WriteLine(data, "isError = true;");
+                WriteLine(data, "throw;");
+
+                data.CodeBlock.Padding--;
+                WriteLine(data, "}} finally {{");
+
+                data.CodeBlock.Padding++;
+                WriteLine(data, "if (!isError) {{");
+
+                data.CodeBlock.Padding++;
+                WriteLine(data, "context.PopStackFrame();");
+
+                data.CodeBlock.Padding--;
+                WriteLine(data, "}}");
+
+                data.CodeBlock.Padding--;
+                WriteLine(data, "}}");
+            }
+
 			data.CodeBlock.Padding--;
-			WriteLine(data, "}} finally {{");
-
-            data.CodeBlock.Padding++;
-            WriteLine(data, "if (!isError) {{");
-
-			data.CodeBlock.Padding++;
-            WriteLine(data, "context.PopStackFrame();");
-
-            data.CodeBlock.Padding--;
-            WriteLine(data, "}}");
-
-			data.CodeBlock.Padding--;
-			WriteLine(data, "}}");
-
-			data.CodeBlock.Padding--;
-
 			WriteLine(data, "}}");
 
 			data.PopCodeBlock();

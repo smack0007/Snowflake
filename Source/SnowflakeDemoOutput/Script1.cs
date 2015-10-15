@@ -59,6 +59,12 @@ namespace Snowflake.Generated
 					context.SetVariable("value", v26);
 					context["Console"].WriteLine(((("5 * " + context["value"]) + " = ") + Invoke(context, context["x5"], context["value"])));
 				}
+				context.DeclareVariable("valueGen", value: new ScriptFunction(new Func<ScriptExecutionContext, dynamic[], dynamic>(Function6), null, null));
+				context.DeclareVariable("value2");
+				foreach (dynamic v28 in Invoke(context, context["valueGen"])) {
+					context.SetVariable("value2", v28);
+					context["Console"].WriteLine(((("5 * " + context["value2"]) + " = ") + Invoke(context, context["x5"], context["value2"])));
+				}
 				Invoke(context, context["export"], "Script.Export.Number", 42);
 				return null;
 			}
@@ -154,6 +160,15 @@ namespace Snowflake.Generated
 					context.PopStackFrame();
 				}
 			}
+		}
+		
+		private static IEnumerable<dynamic> Function6(ScriptExecutionContext context, dynamic[] captures)
+		{
+			yield return 1;
+			yield return 2;
+			yield return 3;
+			yield return 4;
+			yield return 5;
 		}
 	}
 }

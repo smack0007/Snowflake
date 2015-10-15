@@ -39,10 +39,15 @@ namespace Snowflake.Lexing
 		/// </summary>
 		Return,
 
-		/// <summary>
-		/// if
+        /// <summary>
+		/// yield
 		/// </summary>
-		If,
+		Yield,
+
+        /// <summary>
+        /// if
+        /// </summary>
+        If,
 		
 		/// <summary>
 		/// else

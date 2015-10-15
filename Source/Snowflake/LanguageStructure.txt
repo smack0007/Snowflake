@@ -11,6 +11,7 @@ Statement = <UsingDeclaration> ";" |
 			<For> |
 			<ForEach> |
 			<Return> |
+            <Yield> |
 			<Expression> ";" ;
 
 UsingDeclaration = "using" <NamespaceName> ;
@@ -19,7 +20,7 @@ ConstDeclaration = "const" <Identifier> "=" <Expression> ;
 
 VariableDeclaration = "var" <Identifier> ( "=" <Expression> )? ;
 
-FunctionDeclaration = "func" <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
+FunctionDeclaration = "func" ( "*" ) <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
 
 FunctionParameters = <Identifier>? ( "," <Identifier> )* ;
 
@@ -32,6 +33,8 @@ For = "for" "(" ( <VariableDeclaration> | <Assignment> ) ";" <Expression> ";" <A
 ForEach = "foreach" "(" <VariableDeclaration> "in" <Expression>  ")" <StatementBlock> ;
 
 Return = "return" <Expression> ";" ;
+
+Yield = "yield" <Expression> ";" ;
 
 Expression = <AssignmentExpression> ;
 
@@ -69,7 +72,7 @@ AssignmentTarget = <Identifier> | <MemberAccess> ;
 
 AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
-AnonymousFunction = "func" "(" <FunctionParameters> ")" <StatementBlock> ;
+AnonymousFunction = "func" ( "*" ) "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 

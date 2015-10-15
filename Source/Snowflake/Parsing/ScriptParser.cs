@@ -158,7 +158,13 @@ namespace Snowflake.Parsing
 				    }
 				    break;
 
-			    default:
+                case LexemeType.Yield:
+                    {
+                        node = this.ParseYield(lexemes, ref pos);
+                    }
+                    break;
+
+                default:
 				    {
 					    node = this.ParseExpression(lexemes, ref pos);
 
@@ -252,6 +258,13 @@ namespace Snowflake.Parsing
 			FunctionNode node = Construct<FunctionNode>(lexemes, pos);
 
 			pos++;
+
+            if (lexemes[pos].Type == LexemeType.Multiply)
+            {
+                node.IsGenerator = true;
+                pos++;
+            }
+
 			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
 			node.FunctionName = lexemes[pos].Value;
 
@@ -409,7 +422,22 @@ namespace Snowflake.Parsing
 			return node;
 		}
 
-		private ExpressionNode ParseExpression(IList<Lexeme> lexemes, ref int pos)
+        private YieldNode ParseYield(IList<Lexeme> lexemes, ref int pos)
+        {
+            this.EnsureLexemeType(lexemes, LexemeType.Yield, pos);
+
+            YieldNode node = Construct<YieldNode>(lexemes, pos);
+
+            pos++;
+            node.ValueExpression = this.ParseExpression(lexemes, ref pos);
+
+            this.EnsureLexemeType(lexemes, LexemeType.EndStatement, pos);
+            pos++;
+
+            return node;
+        }
+
+        private ExpressionNode ParseExpression(IList<Lexeme> lexemes, ref int pos)
 		{
 			return this.ParseAssignmentExpression(lexemes, ref pos);
 		}
@@ -745,7 +773,14 @@ namespace Snowflake.Parsing
 
 			FunctionNode node = Construct<FunctionNode>(lexemes, pos);
 
-			pos++;
+            pos++;
+
+            if (lexemes[pos].Type == LexemeType.Multiply)
+            {
+                node.IsGenerator = true;
+                pos++;
+            }
+            
 			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
 
 			pos++;

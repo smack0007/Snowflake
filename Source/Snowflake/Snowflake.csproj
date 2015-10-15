@@ -121,6 +121,7 @@
     <Compile Include="Parsing\UnaryOperationType.cs" />
     <Compile Include="Parsing\UsingDeclarationNode.cs" />
     <Compile Include="Parsing\ValueNode.cs" />
+    <Compile Include="Parsing\YieldNode.cs" />
     <Compile Include="ScriptDictionary.cs" />
     <Compile Include="ScriptExecutionContext.cs" />
     <Compile Include="ScriptExecutionException.cs" />

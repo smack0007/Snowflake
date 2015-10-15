@@ -79,6 +79,18 @@ foreach (var value in values) {
 	Console.WriteLine("5 * " + value + " = " + x5(value));
 }
 
+var valueGen = func*() {
+    yield 1;
+    yield 2;
+    yield 3;
+    yield 4;
+    yield 5;
+};
+
+foreach (var value2 in valueGen()) {
+    Console.WriteLine("5 * " + value2 + " = " + x5(value2));
+}
+
 export("Script.Export.Number", 42);
 
 // End with a comment

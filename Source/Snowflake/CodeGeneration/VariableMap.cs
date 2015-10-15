@@ -59,7 +59,7 @@ namespace Snowflake.CodeGeneration
 		public string DeclareVariable(string realName, int line, int column)
 		{
 			if (this.CurrentFrame.ContainsKey(realName))
-				throw new CodeGenerationException(string.Format("Variable or const {0} declared more than once.", realName), line, column);
+				throw new CodeGenerationException(string.Format("Variable or const \"{0}\" declared more than once.", realName), line, column);
 
 			string anonymousName = this.GetNextVariableName();
 			this.CurrentFrame.Add(realName, anonymousName);

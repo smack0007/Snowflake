@@ -363,6 +363,10 @@ namespace Snowflake.Lexing
 								lexemes.Add(new Lexeme(LexemeType.Return, null, line, column));
 								break;
 
+                            case "yield":
+                                lexemes.Add(new Lexeme(LexemeType.Yield, null, line, column));
+                                break;
+
 							case "if":
 								lexemes.Add(new Lexeme(LexemeType.If, null, line, column));
 								break;
