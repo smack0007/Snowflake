@@ -1,0 +1,7 @@
+version: 0.1.{build}
+branches:
+  except:
+    - gh-pages
+build:
+  verbosity: minimal
+test: off
