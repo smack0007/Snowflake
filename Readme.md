@@ -1,3 +1,6 @@
+[![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+![Build Status](https://smack0007.visualstudio.com/_apis/public/build/definitions/3c2bd649-f280-4370-b4aa-e4a0a0b13fb8/6/badge)
+
 # Snowflake
 
 Snowflake is a scripting language which compiles to C#. The following is an example Snowflake script:
