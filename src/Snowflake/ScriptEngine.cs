@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Snowflake.Lexing;
 using Snowflake.Parsing;
-using Snowflake.CodeGeneration;
 
 namespace Snowflake
 {
@@ -11,9 +10,7 @@ namespace Snowflake
 	{
 		ScriptLexer lexer;
 		ScriptParser parser;
-		CodeGenerator codeGenerator;
-        CodeCompiler codeCompiler;
-
+		
         int scriptCount;
         ScriptExecutionContext executionContext;
                 
@@ -21,8 +18,6 @@ namespace Snowflake
 		{
 			this.lexer = new ScriptLexer();
 			this.parser = new ScriptParser();
-			this.codeGenerator = new CodeGenerator();
-            this.codeCompiler = new CodeCompiler();
 
             this.executionContext = new ScriptExecutionContext();
 		}
@@ -47,43 +42,14 @@ namespace Snowflake
 			return this.lexer.Lex(script);
 		}
 
-		public string GenerateCode(string script, string className)
-		{
-			var lexemes = this.lexer.Lex(script);
-			var syntaxTree = this.parser.Parse(lexemes);
-			return this.codeGenerator.Generate(syntaxTree, className);
-		}
-
-        private string GetNextScriptClassName()
-        {
-            this.scriptCount++;
-            return "Script" + this.scriptCount;
-        }
-
-        public Script Compile(string script)
-        {
-            return this.Compile(script, this.GetNextScriptClassName());
-        }
-
-        public Script Compile(string script, string className)
-        {
-            var lexemes = this.lexer.Lex(script);
-            var syntaxTree = this.parser.Parse(lexemes);
-            var code = this.codeGenerator.Generate(syntaxTree, className);
-            return this.codeCompiler.Compile(code, className);
-        }
-
         public dynamic Execute(string script)
         {
             var lexemes = this.lexer.Lex(script);
             var syntaxTree = this.parser.Parse(lexemes);
-
-            string className = this.GetNextScriptClassName();
-            var code = this.codeGenerator.Generate(syntaxTree, className);
-            var compiled = this.codeCompiler.Compile(code, className);
-
+            
             this.executionContext.PushStackFrame("<script>");
-            var result = compiled.Execute(this.executionContext);
+            dynamic result = null;
+            //var result = compiled.Execute(this.executionContext);
             this.executionContext.PopStackFrame();
 
             return result;
