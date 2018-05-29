@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Snowflake.Execution;
 using Snowflake.Lexing;
 using Snowflake.Parsing;
 
@@ -10,14 +11,21 @@ namespace Snowflake
 	{
 		ScriptLexer lexer;
 		ScriptParser parser;
+        ScriptExecuter executer;
 		
-        int scriptCount;
         ScriptExecutionContext executionContext;
-                
-		public ScriptEngine()
+
+        public dynamic this[string name]
+        {
+            get => this.executionContext[name];
+            set => this.executionContext[name] = value;
+        }
+
+        public ScriptEngine()
 		{
 			this.lexer = new ScriptLexer();
 			this.parser = new ScriptParser();
+            this.executer = new ScriptExecuter();
 
             this.executionContext = new ScriptExecutionContext();
 		}
@@ -47,10 +55,7 @@ namespace Snowflake
             var lexemes = this.lexer.Lex(script);
             var syntaxTree = this.parser.Parse(lexemes);
             
-            this.executionContext.PushStackFrame("<script>");
-            dynamic result = null;
-            //var result = compiled.Execute(this.executionContext);
-            this.executionContext.PopStackFrame();
+            var result = this.executer.Execute(syntaxTree, this.executionContext);
 
             return result;
         }
