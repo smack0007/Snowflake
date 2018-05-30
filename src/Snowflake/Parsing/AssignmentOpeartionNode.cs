@@ -6,6 +6,7 @@ namespace Snowflake.Parsing
 	public class AssignmentOpeartionNode : ExpressionNode
 	{
 		ExpressionNode targetExpression;
+		
 		ExpressionNode valueExpression;
 
 		public ExpressionNode TargetExpression

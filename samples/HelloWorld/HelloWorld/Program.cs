@@ -9,11 +9,14 @@ namespace HelloWorld
         {
             var engine = new ScriptEngine();
             engine.Execute("var x = 5;");
-            engine.Execute("const y = \"Hello World!\";");
+            engine.Execute("const y = 3;");
+            engine.Execute("var z = x + y;");
+            engine.Execute("z = z + 2;");
 
-            Console.WriteLine(engine["x"]);
-            Console.WriteLine(engine["y"]);
-            Console.ReadKey();
+            Console.WriteLine($"x: {engine["x"]}");
+            Console.WriteLine($"y: {engine["y"]}");
+            Console.WriteLine($"z: {engine["z"]}");
+            //Console.ReadKey();
         }
     }
 }

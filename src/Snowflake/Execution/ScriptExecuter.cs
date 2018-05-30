@@ -23,6 +23,10 @@ namespace Snowflake.Execution
         {
             switch (statement)
             {
+                case AssignmentOpeartionNode x:
+                    EvaluateAssignmentOperation(x, context);
+                    break;
+
                 case ConstDeclarationNode x:
                     ExecuteConstDeclaration(x, context);
                     break;
@@ -50,25 +54,77 @@ namespace Snowflake.Execution
         {
             switch (expression)
             {
-                case IntegerValueNode x:
-                    return EvaluateIntegerValue(x, context);
+                case BooleanValueNode x: return x.Value;
+                case CharacterValueNode x: return x.Value;
+                case DoubleValueNode x: return x.Value;
+                case FloatValueNode x: return x.Value;
+                case IntegerValueNode x: return x.Value;
+                case NullValueNode x: return null;
+                case StringValueNode x: return x.Value;
 
-                case StringValueNode x:
-                    return EvaluateStringValue(x, context);
+                case AssignmentOpeartionNode x: return EvaluateAssignmentOperation(x, context);
+                case OperationNode x: return EvaluateOperation(x, context);
+                case VariableReferenceNode x: return EvaluateVariableReference(x, context);
 
                 default:
                     throw new NotImplementedException($"{expression.GetType()} not implemented in {nameof(Evaluate)}.");
             }
         }
 
-        private static object EvaluateIntegerValue(IntegerValueNode expression, ScriptExecutionContext context)
+        private static object EvaluateAssignmentOperation(AssignmentOpeartionNode assignment, ScriptExecutionContext context)
         {
-            return expression.Value;
+            var value = Evaluate(assignment.ValueExpression, context);
+
+            if (assignment.TargetExpression is VariableReferenceNode variableReference)
+            {
+                switch (assignment.Type)
+                {
+                    case AssignmentOperationType.Gets:
+                        context.SetVariable(variableReference.VariableName, value);
+                        break;
+
+                    default:
+                        throw new NotImplementedException($"{assignment.Type} not implemented in {nameof(EvaluateAssignmentOperation)} for {nameof(VariableReferenceNode)}.");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException($"{nameof(assignment)}.{nameof(assignment.TargetExpression)} not implemented in {nameof(EvaluateAssignmentOperation)}.");
+            }
+
+            return value;
         }
 
-        private static object EvaluateStringValue(StringValueNode expression, ScriptExecutionContext context)
+        private static object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)
         {
-            return expression.Value;
+            var lhs = Evaluate(operation.LeftHand, context);
+            var rhs = Evaluate(operation.RightHand, context);
+
+            switch (operation.Type)
+            {
+                case OperationType.Add: return EvaluateAddOperation(lhs, rhs, context);
+
+                default:
+                    throw new NotImplementedException($"{operation.Type} not implemented in {nameof(EvaluateOperation)}.");
+            }
+        }
+
+        private static object EvaluateAddOperation(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is int lhsInt)
+            {
+                if (rhs is int rhsInt)
+                {
+                    return lhsInt + rhsInt;
+                }
+            }
+
+            throw new NotImplementedException($"Add not implemented for {lhs.GetType()} and {rhs.GetType()} in {nameof(EvaluateAddOperation)}.");
+        }
+
+        private static object EvaluateVariableReference(VariableReferenceNode variableReference, ScriptExecutionContext context)
+        {
+            return context.GetVariable(variableReference.VariableName);
         }
     }
 }
