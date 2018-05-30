@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
 	public class ScriptExecutionException : ScriptException
 	{

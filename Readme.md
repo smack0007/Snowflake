@@ -3,7 +3,7 @@
 
 # Snowflake
 
-Snowflake is a scripting language which compiles to C#. The following is an example Snowflake script:
+Snowflake is a scripting language implemented in C#. The following is an example Snowflake script:
 
 ```
 func buildMultiplier(x) {
@@ -20,67 +20,6 @@ for (var i = 0; i < 10; i += 1) {
 
 var values = [ 1, 2, 3, 4, 5 ];
 print(values.Count);
-```
-
-This script compiles to the following C# code:
-
-```csharp
-using System;
-using System.Collections.Generic;
-
-namespace Snowflake.Generated
-{
-	public class Script1 : Script
-	{
-		public override dynamic Execute(ScriptExecutionContext context)
-		{
-			try
-			{
-				context.DeclareVariable("buildMultiplier", isConst: true, value: new ScriptFunction(new Func<dynamic, dynamic>((v2) => { 
-					context.PushStackFrame("buildMultiplier");
-					context.DeclareVariable("x", v2);
-					bool isError1 = false;
-					try {
-						return new ScriptFunction(new Func<dynamic, dynamic>((v3) => { 
-							context.PushStackFrame("<anonymous>");
-							context.DeclareVariable("y", v3);
-							context.DeclareVariable("x", v2);
-							bool isError2 = false;
-							try {
-								return (context["x"] * context["y"]);
-							} catch(Exception) {
-								isError2 = true;
-								throw;
-							} finally {
-								if (!isError2) {
-									context.PopStackFrame();
-								}
-							}
-						}), null);
-					} catch(Exception) {
-						isError1 = true;
-						throw;
-					} finally {
-						if (!isError1) {
-							context.PopStackFrame();
-						}
-					}
-				}), null));
-				context.DeclareVariable("x5", value: Invoke(context, context["buildMultiplier"], 5));
-				for (context.DeclareVariable("i", value: 0); (context["i"] < 10); context["i"] += 1) {
-					Invoke(context, context["print"], ((("5 * " + context["i"]) + " = ") + Invoke(context, context["x5"], context["i"])));
-				}
-				context.DeclareVariable("values", value: new ScriptList { 1, 2, 3, 4, 5 });
-				Invoke(context, context["print"], context["values"].Count);
-				return null;
-			}
-			catch (Exception ex)
-			{
-				throw new ScriptExecutionException(ex.Message, context.GetStackFrames(), ex);
-			}
-		}
-	}
-}
 ```
 
 ## Interop

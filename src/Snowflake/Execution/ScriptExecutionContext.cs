@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptExecutionContext : IScriptExecutionContext
     {           

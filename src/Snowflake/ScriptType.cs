@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+using Snowflake.Execution;
 
 namespace Snowflake
 {
@@ -138,8 +139,6 @@ namespace Snowflake
                     throw new ScriptExecutionException(string.Format("No method named \"{0}\" exists for type \"{1}\".", binder.Name, this.Type));
                 }
             }
-
-            return base.TryInvokeMember(binder, args, out result);
         }
     }
 }
