@@ -12,7 +12,7 @@ namespace Snowflake.Execution
         public dynamic this[string name]
         {
             get { return this.GetVariable(name); }
-            set { this.SetVariable(name, value); }
+            set { this.SetOrDeclareVariable(name, value); }
         }
 
         private ScriptStackFrame CurrentStackFrame
@@ -137,6 +137,31 @@ namespace Snowflake.Execution
             }
 
             throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
+        }
+
+        public dynamic SetOrDeclareVariable(string name, dynamic value)
+        {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
+            for (int i = this.stack.Count - 1; i >= 0; i--)
+            {
+                if (this.stack[i].Variables.ContainsKey(name))
+                {
+                    this.stack[i].Variables[name].Value = value;
+                    return value;
+                }
+            }
+
+            ScriptVariable variable;
+            if (this.globals.TryGetVariable(name, out variable))
+            {
+                variable.Value = value;
+                return value;
+            }
+
+            this.DeclareVariable(name, value);
+            return value;
         }
 
         private ScriptNamespace GetNamespace(string name)

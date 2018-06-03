@@ -31,6 +31,10 @@ namespace Snowflake.Execution
                     ExecuteConstDeclaration(x, context);
                     break;
 
+                case FunctionCallNode x:
+                    EvaluateFunctionCall(x, context);
+                    break;
+
                 case VariableDeclarationNode x:
                     ExecuteVariableDeclaration(x, context);
                     break;
@@ -63,6 +67,7 @@ namespace Snowflake.Execution
                 case StringValueNode x: return x.Value;
 
                 case AssignmentOpeartionNode x: return EvaluateAssignmentOperation(x, context);
+                case FunctionCallNode x: return EvaluateFunctionCall(x, context);
                 case OperationNode x: return EvaluateOperation(x, context);
                 case VariableReferenceNode x: return EvaluateVariableReference(x, context);
 
@@ -93,6 +98,27 @@ namespace Snowflake.Execution
             }
 
             return value;
+        }
+
+        private static object EvaluateFunctionCall(FunctionCallNode functionCall, ScriptExecutionContext context)
+        {
+            var function = Evaluate(functionCall.FunctionExpression, context);
+
+            bool canBeCalled = function is Delegate;
+
+            if (!canBeCalled)
+                throw new ScriptExecutionException($"Unable to execute function call on type '{function.GetType()}'.");
+
+            var args = new object[functionCall.Args.Count];
+            for (int i = 0; i < args.Length; i++)
+                args[i] = Evaluate(functionCall.Args[i], context);
+
+            if (function is Delegate d)
+            {
+                return d.DynamicInvoke(args);
+            }
+
+            throw new NotImplementedException($"Function call on type '{function.GetType()}' not implemented.");
         }
 
         private static object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)
