@@ -67,6 +67,7 @@ namespace Snowflake.Execution
                 case StringValueNode x: return x.Value;
 
                 case AssignmentOpeartionNode x: return EvaluateAssignmentOperation(x, context);
+                case FunctionNode x: return EvaluateFunction(x, context);
                 case FunctionCallNode x: return EvaluateFunctionCall(x, context);
                 case OperationNode x: return EvaluateOperation(x, context);
                 case VariableReferenceNode x: return EvaluateVariableReference(x, context);
@@ -98,6 +99,11 @@ namespace Snowflake.Execution
             }
 
             return value;
+        }
+
+        private static object EvaluateFunction(FunctionNode functionCall, ScriptExecutionContext context)
+        {
+            return null;
         }
 
         private static object EvaluateFunctionCall(FunctionCallNode functionCall, ScriptExecutionContext context)

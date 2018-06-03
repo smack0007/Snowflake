@@ -733,7 +733,7 @@ namespace Snowflake.Parsing
 			if (node == null)
 				this.ThrowUnableToParseException("PrimaryExpression", lexemes, pos);
 
-            if (lexemes[pos + 1].Type == LexemeType.LessThan)
+            if (pos < lexemes.Count - 1 && lexemes[pos + 1].Type == LexemeType.LessThan)
             {
                 Console.WriteLine("");
 
