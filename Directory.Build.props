@@ -4,5 +4,6 @@
         <RepositoryRootDirectory>$(MSBuildThisFileDirectory)</RepositoryRootDirectory>
         <BinDirectory>$(RepositoryRootDirectory)bin\</BinDirectory>
         <OutputPath>$([System.IO.Path]::GetFullPath('$(BinDirectory)$(Configuration)'))\$(MSBuildProjectName)</OutputPath>
+        <LangVersion>7.3</LangVersion>
     </PropertyGroup>
 </Project>
