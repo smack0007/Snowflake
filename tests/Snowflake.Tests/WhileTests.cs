@@ -18,10 +18,10 @@ return x;
 ");
 		}
 
-		[Fact]
-		public void While_Exits_Correctly()
-		{
-			AssertScriptReturnValue(10, @"
+        [Fact]
+        public void While_Exits_Correctly()
+        {
+            AssertScriptReturnValue(10, @"
 var x = 0;
 
 while (x != 10) {
@@ -30,6 +30,36 @@ while (x != 10) {
 
 return x;
 ");
-		}
+        }
+
+
+        [Fact]
+        public void While_Can_Contain_Return()
+        {
+            AssertScriptReturnValue(10, @"
+var x = 0;
+
+while (x != 10) {
+	return 10;
+}
+
+return x;
+");
+        }
+
+        [Fact]
+        public void While_Can_Shadow_Variables()
+        {
+            AssertScriptReturnValue(42, @"
+var x = 10;
+
+while (true) {
+	const x = 42;
+    return x;
+}
+
+return x;
+");
+        }
     }
 }

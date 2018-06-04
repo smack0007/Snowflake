@@ -7,18 +7,12 @@ namespace Snowflake.Execution
     {
         public object Execute(ScriptNode script, ScriptExecutionContext context)
         {
-            return ExecuteStatements(script.Statements, context);
-        }
-
-        public object Execute(StatementBlockNode statementBlock, ScriptExecutionContext context)
-        {
-            return ExecuteStatements(statementBlock.Statements, context);
-        }
-
-        private object ExecuteStatements(SyntaxNodeCollection<StatementNode> statements, ScriptExecutionContext context)
-        {
             bool shouldReturn = false;
+            return ExecuteStatements(script.Statements, context, ref shouldReturn);
+        }
 
+        private object ExecuteStatements(SyntaxNodeCollection<StatementNode> statements, ScriptExecutionContext context, ref bool shouldReturn)
+        {
             foreach (var statement in statements)
             {
                 object result = ExecuteStatement(statement, context, ref shouldReturn);
@@ -28,6 +22,23 @@ namespace Snowflake.Execution
             }
 
             return null;
+        }
+
+        public object Execute(StatementBlockNode statementBlock, ScriptExecutionContext context)
+        {
+            bool shouldReturn = false;
+            return this.ExecuteStatementBlock(statementBlock, context, ref shouldReturn);
+        }
+
+        private object ExecuteStatementBlock(StatementBlockNode statementBlock, ScriptExecutionContext context, ref bool shouldReturn)
+        {
+            context.PushStackFrame("<scope>");
+
+            object result = this.ExecuteStatements(statementBlock.Statements, context, ref shouldReturn);
+
+            context.PopStackFrame();
+
+            return result;
         }
 
         private object ExecuteStatement(StatementNode statement, ScriptExecutionContext context, ref bool shouldReturn)
@@ -57,6 +68,10 @@ namespace Snowflake.Execution
                     ExecuteVariableDeclaration(x, context);
                     break;
 
+                case WhileNode x:
+                    result = ExecuteWhile(x, context, ref shouldReturn);
+                    break;
+
                 default:
                     throw new NotImplementedException($"{statement.GetType()} not implemented in {nameof(ExecuteStatement)}.");
             }
@@ -77,6 +92,33 @@ namespace Snowflake.Execution
                 value = Evaluate(node.ValueExpression, context);
 
             context.DeclareVariable(node.VariableName, value);
+        }
+
+        private object ExecuteWhile(WhileNode node, ScriptExecutionContext context, ref bool shouldReturn)
+        {
+            object result = null;
+
+            while (true)
+            {
+                object shouldExecute = this.Evaluate(node.EvaluateExpression, context);
+
+                if (!(shouldExecute is bool shouldExecuteBool))
+                    throw new ScriptExecutionException("Evaluate expression of while loop resulted in non boolean type value.", context.GetStackFrames());
+                
+                if (shouldExecuteBool)
+                {
+                    result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn);
+
+                    if (shouldReturn)
+                        return result;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return result;
         }
 
         private object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
