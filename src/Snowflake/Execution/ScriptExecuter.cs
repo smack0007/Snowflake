@@ -11,16 +11,31 @@ namespace Snowflake.Execution
             return null;
         }
 
-        private static void ExecuteStatements(SyntaxNodeCollection<StatementNode> statements, ScriptExecutionContext context)
+        public object Execute(StatementBlockNode statementBlock, ScriptExecutionContext context)
         {
-            foreach (var statement in statements)
-            {
-                ExecuteStatement(statement, context);
-            }
+            ExecuteStatements(statementBlock.Statements, context);
+            return null;
         }
 
-        private static void ExecuteStatement(StatementNode statement, ScriptExecutionContext context)
+        private object ExecuteStatements(SyntaxNodeCollection<StatementNode> statements, ScriptExecutionContext context)
         {
+            bool shouldReturn = false;
+
+            foreach (var statement in statements)
+            {
+                object result = ExecuteStatement(statement, context, ref shouldReturn);
+
+                if (shouldReturn)
+                    return result;
+            }
+
+            return null;
+        }
+
+        private object ExecuteStatement(StatementNode statement, ScriptExecutionContext context, ref bool shouldReturn)
+        {
+            object result = null;
+
             switch (statement)
             {
                 case AssignmentOpeartionNode x:
@@ -35,6 +50,11 @@ namespace Snowflake.Execution
                     EvaluateFunctionCall(x, context);
                     break;
 
+                case ReturnNode x:
+                    result = Evaluate(x.ValueExpression, context);
+                    shouldReturn = true;
+                    break;
+
                 case VariableDeclarationNode x:
                     ExecuteVariableDeclaration(x, context);
                     break;
@@ -42,19 +62,21 @@ namespace Snowflake.Execution
                 default:
                     throw new NotImplementedException($"{statement.GetType()} not implemented in {nameof(ExecuteStatement)}.");
             }
+
+            return result;
         }
 
-        private static void ExecuteConstDeclaration(ConstDeclarationNode node, ScriptExecutionContext context)
+        private void ExecuteConstDeclaration(ConstDeclarationNode node, ScriptExecutionContext context)
         {
             context.DeclareVariable(node.ConstName, Evaluate(node.ValueExpression, context), true);
         }
 
-        private static void ExecuteVariableDeclaration(VariableDeclarationNode node, ScriptExecutionContext context)
+        private void ExecuteVariableDeclaration(VariableDeclarationNode node, ScriptExecutionContext context)
         {
             context.DeclareVariable(node.VariableName, Evaluate(node.ValueExpression, context));
         }
 
-        private static object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
+        private object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
         {
             switch (expression)
             {
@@ -77,7 +99,7 @@ namespace Snowflake.Execution
             }
         }
 
-        private static object EvaluateAssignmentOperation(AssignmentOpeartionNode assignment, ScriptExecutionContext context)
+        private object EvaluateAssignmentOperation(AssignmentOpeartionNode assignment, ScriptExecutionContext context)
         {
             var value = Evaluate(assignment.ValueExpression, context);
 
@@ -101,16 +123,16 @@ namespace Snowflake.Execution
             return value;
         }
 
-        private static object EvaluateFunction(FunctionNode functionCall, ScriptExecutionContext context)
+        private object EvaluateFunction(FunctionNode function, ScriptExecutionContext context)
         {
-            return null;
+            return new ScriptFunction(this, function.Args, function.BodyStatementBlock);
         }
 
-        private static object EvaluateFunctionCall(FunctionCallNode functionCall, ScriptExecutionContext context)
+        private object EvaluateFunctionCall(FunctionCallNode functionCall, ScriptExecutionContext context)
         {
             var function = Evaluate(functionCall.FunctionExpression, context);
 
-            bool canBeCalled = function is Delegate;
+            bool canBeCalled = function is ScriptFunction || function is Delegate;
 
             if (!canBeCalled)
                 throw new ScriptExecutionException($"Unable to execute function call on type '{function.GetType()}'.");
@@ -119,7 +141,18 @@ namespace Snowflake.Execution
             for (int i = 0; i < args.Length; i++)
                 args[i] = Evaluate(functionCall.Args[i], context);
 
-            if (function is Delegate d)
+            if (function is ScriptFunction sf)
+            {
+                string stackFrameName = "<anonymous>";
+
+                if (functionCall.FunctionExpression is VariableReferenceNode vr)
+                {
+                    stackFrameName = vr.VariableName;
+                }
+
+                return sf.Invoke(context, stackFrameName, args);
+            }
+            else if (function is Delegate d)
             {
                 return d.DynamicInvoke(args);
             }
@@ -127,7 +160,7 @@ namespace Snowflake.Execution
             throw new NotImplementedException($"Function call on type '{function.GetType()}' not implemented.");
         }
 
-        private static object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)
+        private object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)
         {
             var lhs = Evaluate(operation.LeftHand, context);
             var rhs = Evaluate(operation.RightHand, context);
@@ -141,7 +174,7 @@ namespace Snowflake.Execution
             }
         }
 
-        private static object EvaluateAddOperation(object lhs, object rhs, ScriptExecutionContext context)
+        private object EvaluateAddOperation(object lhs, object rhs, ScriptExecutionContext context)
         {
             if (lhs is int lhsInt)
             {
@@ -149,12 +182,27 @@ namespace Snowflake.Execution
                 {
                     return lhsInt + rhsInt;
                 }
+                else if (rhs is float || rhs is double)
+                {
+                    return lhsInt + (int)rhs;
+                }
+            }
+            else if (lhs is string lhsString)
+            {
+                if (rhs is string rhsString)
+                {
+                    return lhsString + rhsString;
+                }
+                else
+                {
+                    return lhsString + rhs.ToString();
+                }
             }
 
             throw new NotImplementedException($"Add not implemented for {lhs.GetType()} and {rhs.GetType()} in {nameof(EvaluateAddOperation)}.");
         }
 
-        private static object EvaluateVariableReference(VariableReferenceNode variableReference, ScriptExecutionContext context)
+        private object EvaluateVariableReference(VariableReferenceNode variableReference, ScriptExecutionContext context)
         {
             return context.GetVariable(variableReference.VariableName);
         }

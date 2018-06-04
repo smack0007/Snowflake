@@ -27,17 +27,5 @@ namespace Snowflake
 
             return instance;
         }
-
-		protected static dynamic Invoke(ScriptExecutionContext context, dynamic func, params dynamic[] args)
-		{
-			if (func is ScriptFunction)
-			{
-				return ((ScriptFunction)func).Invoke(context, args);
-			}
-			else
-			{
-				return func.DynamicInvoke(args);
-			}
-		}
 	}
 }

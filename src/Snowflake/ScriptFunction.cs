@@ -1,48 +1,39 @@
 ﻿using System;
 using Snowflake.Execution;
+using Snowflake.Parsing;
 
 namespace Snowflake
 {
 	public sealed class ScriptFunction
 	{
-		Delegate func;
-		dynamic[] defaults;
-		dynamic[] captures;
+		private readonly ScriptExecuter executor;
 
-		public ScriptFunction(Delegate func, dynamic[] defaults, dynamic[] captures)
+		private readonly StatementBlockNode body;
+		
+		public SyntaxNodeCollection<VariableDeclarationNode> Args { get; private set; }
+
+		internal ScriptFunction(ScriptExecuter executor, SyntaxNodeCollection<VariableDeclarationNode> args, StatementBlockNode body)
 		{
-			this.func = func;
-			this.defaults = defaults;
-			this.captures = captures;
+			this.executor = executor;
+			this.Args = args;
+			this.body = body;
 		}
 
-		public dynamic Invoke(ScriptExecutionContext context, params dynamic[] args)
+		internal object Invoke(ScriptExecutionContext context, string stackFrameName, object[] args)
 		{
-			if (this.defaults != null && args.Length < this.defaults.Length)
-			{
-				dynamic[] newArgs = new dynamic[this.defaults.Length];
+			if (args.Length != this.Args.Count)
+				throw new ScriptExecutionException("The number of args must match.");
 
-				for (int i = 0; i < args.Length; i++)
-				{
-					newArgs[i] = args[i];
-				}
+			context.PushStackFrame(stackFrameName);
+			
+			for (var i = 0; i < this.Args.Count; i++)
+				context.DeclareVariable(this.Args[i].VariableName, args[i]);
 
-				for (int i = args.Length; i < this.defaults.Length; i++)
-				{
-					newArgs[i] = this.defaults[i];
-				}
+			this.executor.Execute(this.body, context);
 
-				args = newArgs;
-			}
-						
-			object[] invokeArgs = new object[args.Length + 2];
-			invokeArgs[0] = context;
-			invokeArgs[1] = this.captures;
+			context.PopStackFrame();
 
-			for (int i = 0; i < args.Length; i++)
-				invokeArgs[i + 2] = args[i];
-
-			return this.func.DynamicInvoke(invokeArgs);
+			return null;
 		}
 	}
 }

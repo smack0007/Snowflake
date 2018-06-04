@@ -3,9 +3,9 @@ using Snowflake;
 
 namespace HelloWorld
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var engine = new ScriptEngine();
             engine["print"] = new Action<object>((x) => Console.WriteLine(x));
@@ -19,12 +19,28 @@ namespace HelloWorld
             engine.Execute("var z = x + y;");
             engine.Execute("z = z + 2;");
             engine.Execute("sayHello(\"Joe\");");
+            engine.Execute("sayHello(\"Bob\");");
 
             Console.WriteLine();
             Console.WriteLine($"x: {engine["x"]}");
             Console.WriteLine($"y: {engine["y"]}");
             Console.WriteLine($"z: {engine["z"]}");
-            Console.ReadKey();
+            
+            if (IsConsolePresent())
+                Console.ReadKey();
+        }
+
+        private static bool IsConsolePresent()
+        {
+            try
+            {
+                int WindowHeight = Console.WindowHeight;
+                return WindowHeight >= 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
