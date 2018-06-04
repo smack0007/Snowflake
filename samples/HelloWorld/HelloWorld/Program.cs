@@ -25,9 +25,12 @@ namespace HelloWorld
             Console.WriteLine($"x: {engine["x"]}");
             Console.WriteLine($"y: {engine["y"]}");
             Console.WriteLine($"z: {engine["z"]}");
-            
+
             if (IsConsolePresent())
+            {
+                Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
+            }
         }
 
         private static bool IsConsolePresent()

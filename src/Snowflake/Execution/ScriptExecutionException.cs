@@ -5,14 +5,16 @@ namespace Snowflake.Execution
 {
 	public class ScriptExecutionException : ScriptException
 	{
-        public ScriptStackFrame[] ScriptStack
-		{
-			get;
-			private set;
-		}
+        public ScriptStackFrame[] ScriptStack { get; }
 
         public ScriptExecutionException(string message)
             : base(message)
+        {
+            this.ScriptStack = null;
+        }
+
+        public ScriptExecutionException(string message, Exception innerException)
+            : base(message, innerException)
         {
             this.ScriptStack = null;
         }

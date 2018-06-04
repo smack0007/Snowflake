@@ -11,11 +11,11 @@ namespace Snowflake
 	{
 		ScriptLexer lexer;
 		ScriptParser parser;
-        ScriptExecuter executer;
+        ScriptExecutor executer;
 		
         ScriptExecutionContext executionContext;
 
-        public dynamic this[string name]
+        public object this[string name]
         {
             get => this.executionContext[name];
             set => this.executionContext[name] = value;
@@ -25,7 +25,7 @@ namespace Snowflake
 		{
 			this.lexer = new ScriptLexer();
 			this.parser = new ScriptParser();
-            this.executer = new ScriptExecuter();
+            this.executer = new ScriptExecutor();
 
             this.executionContext = new ScriptExecutionContext();
 		}
@@ -50,7 +50,7 @@ namespace Snowflake
 			return this.lexer.Lex(script);
 		}
 
-        public dynamic Execute(string script)
+        public object Execute(string script)
         {
             var lexemes = this.lexer.Lex(script);
             var syntaxTree = this.parser.Parse(lexemes);
@@ -60,13 +60,13 @@ namespace Snowflake
             return result;
         }
 
-        public dynamic ExecuteFile(string fileName)
+        public object ExecuteFile(string fileName)
 		{
 			string script = File.ReadAllText(fileName);
 			return this.Execute(script);
 		}
 
-        public dynamic Execute(Script script)
+        public object Execute(Script script)
         {
             if (script == null)
                 throw new ArgumentNullException("script");

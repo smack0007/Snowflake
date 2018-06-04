@@ -1,11 +1,9 @@
-﻿using System;
-using Snowflake;
-using Snowflake.Lexing;
+﻿using Snowflake.Lexing;
 using Xunit;
 
 namespace Snowflake.Tests.Lexing
 {
-	public class ScriptLexerTests
+    public class ScriptLexerTests
 	{
 		private void ParseScript(string script)
 		{

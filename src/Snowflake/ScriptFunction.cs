@@ -6,13 +6,13 @@ namespace Snowflake
 {
 	public sealed class ScriptFunction
 	{
-		private readonly ScriptExecuter executor;
+		private readonly ScriptExecutor executor;
 
 		private readonly StatementBlockNode body;
 		
 		public SyntaxNodeCollection<VariableDeclarationNode> Args { get; private set; }
 
-		internal ScriptFunction(ScriptExecuter executor, SyntaxNodeCollection<VariableDeclarationNode> args, StatementBlockNode body)
+		internal ScriptFunction(ScriptExecutor executor, SyntaxNodeCollection<VariableDeclarationNode> args, StatementBlockNode body)
 		{
 			this.executor = executor;
 			this.Args = args;
@@ -29,11 +29,11 @@ namespace Snowflake
 			for (var i = 0; i < this.Args.Count; i++)
 				context.DeclareVariable(this.Args[i].VariableName, args[i]);
 
-			this.executor.Execute(this.body, context);
+            object result = this.executor.Execute(this.body, context);
 
 			context.PopStackFrame();
 
-			return null;
+			return result;
 		}
 	}
 }
