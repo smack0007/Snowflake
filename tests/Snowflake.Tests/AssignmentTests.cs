@@ -66,7 +66,7 @@ return x == y;");
 			AssertScriptReturnValue<Person>(
 				assert: (x) =>
 				{
-					Assert.IsType(typeof(Person), x);
+					Assert.IsType<Person>(x);
 					Assert.Equal("Bob", ((Person)x).FirstName);
 					Assert.Equal("Freeman", ((Person)x).LastName);
 					Assert.Equal(42, ((Person)x).Age);

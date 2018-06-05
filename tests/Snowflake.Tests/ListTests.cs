@@ -10,7 +10,7 @@ namespace Snowflake.Tests
 			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
-					Assert.Equal(0, x.Count);
+					Assert.Empty(x);
 				},
 				"return [];");
 		}
@@ -21,7 +21,7 @@ namespace Snowflake.Tests
 			AssertScriptReturnValue<ScriptList>(
 				(x) =>
 				{
-					Assert.Equal(1, x.Count);
+					Assert.Single(x);
 					Assert.Equal(1, x[0]);
 				},
 				"return [ 1 ];");

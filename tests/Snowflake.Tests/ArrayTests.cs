@@ -10,7 +10,7 @@ namespace Snowflake.Tests
 			AssertScriptReturnValue<dynamic[]>(
 				(x) =>
 				{
-					Assert.Equal(0, x.Length);
+					Assert.Empty(x);
 				},
 				"return [||];");
 		}
@@ -21,7 +21,7 @@ namespace Snowflake.Tests
 			AssertScriptReturnValue<dynamic[]>(
 				(x) =>
 				{
-					Assert.Equal(1, x.Length);
+					Assert.Single(x);
 					Assert.Equal(1, x[0]);
 				},
 				"return [| 1 |];");
@@ -33,7 +33,7 @@ namespace Snowflake.Tests
 			AssertScriptReturnValue<dynamic[]>(
 				(x) =>
 				{
-					Assert.Equal(1, x.Length);
+					Assert.Single(x);
 					Assert.Equal("|", x[0]);
 				},
 				"return [| \"|\" |];");
