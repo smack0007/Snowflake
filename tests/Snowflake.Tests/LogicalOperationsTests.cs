@@ -75,5 +75,47 @@ namespace Snowflake.Tests
 		{
 			AssertScriptReturnValue(false, "return !true;");
 		}
+
+        [Fact]
+        public void And_Shortcircuts()
+        {
+            AssertScriptReturnValue(1, @"
+var result = 0;
+
+const foo = func() {
+    result = 1;
+    return false;
+};
+
+const bar = func() {
+    result = 2;
+    return true;
+};
+
+const test = foo() && bar();
+return result;
+");
+        }
+
+        [Fact]
+        public void Or_Shortcircuts()
+        {
+            AssertScriptReturnValue(1, @"
+var result = 0;
+
+const foo = func() {
+    result = 1;
+    return true;
+};
+
+const bar = func() {
+    result = 2;
+    return false;
+};
+
+const test = foo() || bar();
+return result;
+");
+        }
 	}
 }

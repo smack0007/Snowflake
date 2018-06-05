@@ -24,8 +24,8 @@ namespace Snowflake.Parsing
 
 		Divide,
 
-		ConditionalOr,
+		LogicalOr,
 
-		ConditionalAnd
+		LogicalAnd
 	}
 }

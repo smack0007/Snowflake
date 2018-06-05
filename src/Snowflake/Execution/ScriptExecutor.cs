@@ -248,15 +248,49 @@ namespace Snowflake.Execution
         private object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)
         {
             var lhs = Evaluate(operation.LeftHand, context);
+            
+            // LogicalAnd and LogicalOr need shortcircuting support.
+            switch (operation.Type)
+            {
+                case OperationType.LogicalAnd:
+                    {
+                        if (lhs is bool lhsBool)
+                        {
+                            if (!lhsBool)
+                                return false;
+                        }
+                        else
+                        {
+                            throw new ScriptExecutionException($"Only booleans can be logically anded.", context.GetStackFrames());
+                        }
+                    }
+                    break;
+
+
+                case OperationType.LogicalOr:
+                    {
+                        if (lhs is bool lhsBool)
+                        {
+                            if (lhsBool)
+                                return true;
+                        }
+                        else
+                        {
+                            throw new ScriptExecutionException($"Only booleans can be logically ored.", context.GetStackFrames());
+                        }
+                    }
+                    break;
+            }
+            
             var rhs = Evaluate(operation.RightHand, context);
 
             switch (operation.Type)
             {
                 case OperationType.Add: return this.Add(lhs, rhs, context);
-                case OperationType.ConditionalAnd: return this.ConditionalAnd(lhs, rhs, context);
-                case OperationType.ConditionalOr: return this.ConditionalOr(lhs, rhs, context);
                 case OperationType.Divide: return this.Divide(lhs, rhs, context);
                 case OperationType.Equals: return lhs.Equals(rhs);
+                case OperationType.LogicalAnd: return this.LogicalAnd(lhs, rhs, context);
+                case OperationType.LogicalOr: return this.LogicalOr(lhs, rhs, context);
                 case OperationType.Multiply: return this.Multiply(lhs, rhs, context);
                 case OperationType.NotEquals: return !lhs.Equals(rhs);
                 case OperationType.Subtract: return this.Subtract(lhs, rhs, context);
@@ -294,24 +328,24 @@ namespace Snowflake.Execution
             throw new NotImplementedException($"{nameof(Add)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
         }
 
-        private object ConditionalAnd(object lhs, object rhs, ScriptExecutionContext context)
+        private object LogicalAnd(object lhs, object rhs, ScriptExecutionContext context)
         {
             if (lhs is bool lhsBool && rhs is bool rhsBool)
             {
                 return lhsBool && rhsBool;
             }
             
-            throw new ScriptExecutionException($"Only booleans can be conditionally anded.", context.GetStackFrames());
+            throw new ScriptExecutionException($"Only booleans can be logically anded.", context.GetStackFrames());
         }
 
-        private object ConditionalOr(object lhs, object rhs, ScriptExecutionContext context)
+        private object LogicalOr(object lhs, object rhs, ScriptExecutionContext context)
         {
             if (lhs is bool lhsBool && rhs is bool rhsBool)
             {
                 return lhsBool || rhsBool;
             }
             
-            throw new ScriptExecutionException($"Only booleans can be conditionally ored.", context.GetStackFrames());
+            throw new ScriptExecutionException($"Only booleans can be logically ored.", context.GetStackFrames());
         }
 
         private object Divide(object lhs, object rhs, ScriptExecutionContext context)

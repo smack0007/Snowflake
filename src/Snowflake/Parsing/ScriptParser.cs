@@ -496,7 +496,7 @@ namespace Snowflake.Parsing
 				pos++;
 
 				OperationNode opNode = Construct<OperationNode>(lexemes, pos);
-                opNode.Type = OperationType.ConditionalOr;
+                opNode.Type = OperationType.LogicalOr;
                 opNode.LeftHand = node;
                 opNode.RightHand = this.ParseConditionalAndExpression(lexemes, ref pos);
 
@@ -515,7 +515,7 @@ namespace Snowflake.Parsing
 				pos++;
 
                 OperationNode opNode = Construct<OperationNode>(lexemes, pos);
-                opNode.Type = OperationType.ConditionalAnd;
+                opNode.Type = OperationType.LogicalAnd;
                 opNode.LeftHand = node;
                 opNode.RightHand = this.ParseEqualityExpression(lexemes, ref pos);
                 
