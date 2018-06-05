@@ -253,6 +253,8 @@ namespace Snowflake.Execution
             switch (operation.Type)
             {
                 case OperationType.Add: return this.Add(lhs, rhs, context);
+                case OperationType.ConditionalAnd: return this.ConditionalAnd(lhs, rhs, context);
+                case OperationType.ConditionalOr: return this.ConditionalOr(lhs, rhs, context);
                 case OperationType.Divide: return this.Divide(lhs, rhs, context);
                 case OperationType.Equals: return lhs.Equals(rhs);
                 case OperationType.Multiply: return this.Multiply(lhs, rhs, context);
@@ -290,6 +292,26 @@ namespace Snowflake.Execution
             }
 
             throw new NotImplementedException($"{nameof(Add)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
+        }
+
+        private object ConditionalAnd(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is bool lhsBool && rhs is bool rhsBool)
+            {
+                return lhsBool && rhsBool;
+            }
+            
+            throw new ScriptExecutionException($"Only booleans can be conditionally anded.", context.GetStackFrames());
+        }
+
+        private object ConditionalOr(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is bool lhsBool && rhs is bool rhsBool)
+            {
+                return lhsBool || rhsBool;
+            }
+            
+            throw new ScriptExecutionException($"Only booleans can be conditionally ored.", context.GetStackFrames());
         }
 
         private object Divide(object lhs, object rhs, ScriptExecutionContext context)
@@ -377,7 +399,7 @@ namespace Snowflake.Execution
 
                     if (operation.ValueExpression is VariableReferenceNode vr)
                         context.SetVariable(vr.VariableName, result);
-                        
+
                     return result;
                 }
             
