@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-
 namespace Snowflake.Lexing
 {
-	public class Lexeme
+    public class Lexeme
 	{
 		public LexemeType Type
 		{

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class MemberAccessNode : ExpressionNode
+    public class MemberAccessNode : ExpressionNode
 	{
 		ExpressionNode sourceExpression;
 		

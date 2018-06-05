@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public enum AssignmentOperationType
+    public enum AssignmentOperationType
 	{
 		Gets,
 

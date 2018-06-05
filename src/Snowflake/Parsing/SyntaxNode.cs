@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Snowflake.Parsing
 {
-	public abstract class SyntaxNode
+    public abstract class SyntaxNode
 	{
         public ScriptNode Script
         {

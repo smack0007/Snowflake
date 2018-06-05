@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using Snowflake.Execution;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptNamespace : DynamicObject, IEnumerable<KeyValuePair<string, ScriptVariable>>
     {

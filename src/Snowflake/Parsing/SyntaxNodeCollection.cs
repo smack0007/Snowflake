@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Snowflake.Parsing
 {
-	public class SyntaxNodeCollection<T> : IEnumerable<T>
+    public class SyntaxNodeCollection<T> : IEnumerable<T>
 		where T : SyntaxNode
 	{
 		SyntaxNode parent;

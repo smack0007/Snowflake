@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public class VariableReferenceNode : ExpressionNode
+    public class VariableReferenceNode : ExpressionNode
 	{
 		public string VariableName
 		{

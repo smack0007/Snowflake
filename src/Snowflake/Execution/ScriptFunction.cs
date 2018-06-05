@@ -1,10 +1,8 @@
-﻿using System;
-using Snowflake.Execution;
-using Snowflake.Parsing;
+﻿using Snowflake.Parsing;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
-	public sealed class ScriptFunction
+    public sealed class ScriptFunction
 	{
 		private readonly ScriptExecutor executor;
 

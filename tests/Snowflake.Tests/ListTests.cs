@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Snowflake.Execution;
+using Xunit;
 
 namespace Snowflake.Tests
 {

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public class ExpressionNode : StatementNode
+    public class ExpressionNode : StatementNode
 	{
 		public ExpressionNode()
 			: base()

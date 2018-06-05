@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Snowflake.Execution
 {
-	public class ScriptExecutionException : ScriptException
+    public class ScriptExecutionException : ScriptException
 	{
         public ScriptStackFrame[] ScriptStack { get; }
 

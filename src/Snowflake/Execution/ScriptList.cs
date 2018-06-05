@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptList : List<dynamic>
     {

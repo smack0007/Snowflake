@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Snowflake.Execution;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptTypeSet : DynamicObject
     {

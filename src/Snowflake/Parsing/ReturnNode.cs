@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class ReturnNode : ExpressionNode
+    public class ReturnNode : ExpressionNode
 	{
 		ExpressionNode expression;
 

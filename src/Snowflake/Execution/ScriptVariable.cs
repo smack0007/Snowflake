@@ -1,6 +1,6 @@
 ﻿using Snowflake.Execution;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptVariable
     {

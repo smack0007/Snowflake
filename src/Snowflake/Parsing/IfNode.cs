@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class IfNode : StatementNode
+    public class IfNode : StatementNode
 	{
 		ExpressionNode evaluateExpression;
 		StatementBlockNode bodyStatementBlock;

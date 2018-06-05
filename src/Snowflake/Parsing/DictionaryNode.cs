@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class DictionaryNode : ExpressionNode, IEnumerable<DictionaryPairNode>
+    public class DictionaryNode : ExpressionNode, IEnumerable<DictionaryPairNode>
 	{
 		public SyntaxNodeCollection<DictionaryPairNode> Pairs
 		{

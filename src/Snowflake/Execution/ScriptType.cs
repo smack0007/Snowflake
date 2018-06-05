@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Snowflake.Execution;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptType : DynamicObject
     {

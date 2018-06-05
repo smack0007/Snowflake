@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Lexing
+﻿namespace Snowflake.Lexing
 {
-	public enum LexemeType
+    public enum LexemeType
 	{
 		/// <summary>
 		/// Used internally to indicate we're currently looking for a lexeme.

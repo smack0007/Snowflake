@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public enum UnaryOperationType
+    public enum UnaryOperationType
 	{
 		Negate,
 

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class ForEachNode : StatementNode
+    public class ForEachNode : StatementNode
 	{
 		VariableDeclarationNode variableDeclaration;
 		ExpressionNode sourceExpression;

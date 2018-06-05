@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public class SyntaxException : ScriptException
+    public class SyntaxException : ScriptException
 	{
 		public SyntaxException(string message)
 			: base(message)

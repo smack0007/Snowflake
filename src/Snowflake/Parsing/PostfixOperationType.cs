@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public enum PostfixOperationType
+    public enum PostfixOperationType
 	{
 		Increment,
 

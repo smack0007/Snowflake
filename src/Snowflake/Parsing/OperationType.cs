@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Snowflake.Parsing
+﻿namespace Snowflake.Parsing
 {
-	public enum OperationType
+    public enum OperationType
 	{
         Equals,
 

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Snowflake
+namespace Snowflake.Execution
 {
     public class ScriptDictionary : DynamicObject, IDictionary<object, object>
     {

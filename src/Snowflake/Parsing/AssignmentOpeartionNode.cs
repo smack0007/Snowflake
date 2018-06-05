@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class AssignmentOpeartionNode : ExpressionNode
+    public class AssignmentOpeartionNode : ExpressionNode
 	{
 		ExpressionNode targetExpression;
 		

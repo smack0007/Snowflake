@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowflake.Parsing
 {
-	public class StatementBlockNode : SyntaxNode, IEnumerable<StatementNode>
+    public class StatementBlockNode : SyntaxNode, IEnumerable<StatementNode>
 	{
 		public SyntaxNodeCollection<StatementNode> Statements
 		{
