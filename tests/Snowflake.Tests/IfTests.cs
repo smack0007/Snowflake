@@ -64,9 +64,9 @@ return result;
 		public void If_Expression_With_Variable_Which_Evaluates_To_True_Is_Executed()
 		{
 			AssertScriptReturnValue(42, @"
-var test = true;
+var test = 42;
 
-if (test) {
+if (test == 42) {
 	return 42;
 }
 
@@ -78,13 +78,40 @@ return 0;
 		public void If_Expression_With_Variable_Which_Evaluates_To_False_Is_Not_Executed()
 		{
 			AssertScriptReturnValue(0, @"
-var test = false;
+var test = 21;
 
-if (test) {
+if (test == 42) {
 	return 42;
 }
 
 return 0;
+");
+		}
+
+        [Fact]
+		public void If_Can_Shadow_Variables()
+		{
+			AssertScriptReturnValue(42, @"
+var test = 21;
+
+if (true) {
+    var test = 42;
+	return test;
+}
+
+return test;
+");
+		}
+
+        [Fact]
+		public void If_Can_Return()
+		{
+			AssertScriptReturnValue(42, @"
+if (true) {
+	return 42;
+}
+
+return 21;
 ");
 		}
 	}

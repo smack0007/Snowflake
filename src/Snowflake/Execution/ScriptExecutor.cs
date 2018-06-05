@@ -59,6 +59,10 @@ namespace Snowflake.Execution
                     EvaluateFunctionCall(x, context);
                     break;
 
+                case IfNode x:
+                    result = ExecuteIf(x, context, ref shouldReturn);
+                    break;
+
                 case ReturnNode x:
                     result = Evaluate(x.ValueExpression, context);
                     shouldReturn = true;
@@ -94,20 +98,43 @@ namespace Snowflake.Execution
             context.DeclareVariable(node.VariableName, value);
         }
 
+        private object ExecuteIf(IfNode node, ScriptExecutionContext context, ref bool shouldReturn)
+        {
+            object evaluateResult = this.Evaluate(node.EvaluateExpression, context);
+
+            if (!(evaluateResult is bool shouldExecute))
+                throw new ScriptExecutionException("Evaluate expression of if resulted in non boolean type value.", context.GetStackFrames());
+
+            if (shouldExecute)
+            {
+                var result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn);
+
+                if (shouldReturn)
+                    return result;
+            }
+            else if (node.ElseStatementBlock != null)
+            {
+                var result = this.ExecuteStatementBlock(node.ElseStatementBlock, context, ref shouldReturn);
+
+                if (shouldReturn)
+                    return result;
+            }
+
+            return null;
+        }
+
         private object ExecuteWhile(WhileNode node, ScriptExecutionContext context, ref bool shouldReturn)
         {
-            object result = null;
-
             while (true)
             {
-                object shouldExecute = this.Evaluate(node.EvaluateExpression, context);
+                object evaluateResult = this.Evaluate(node.EvaluateExpression, context);
 
-                if (!(shouldExecute is bool shouldExecuteBool))
+                if (!(evaluateResult is bool shouldExecute))
                     throw new ScriptExecutionException("Evaluate expression of while loop resulted in non boolean type value.", context.GetStackFrames());
                 
-                if (shouldExecuteBool)
+                if (shouldExecute)
                 {
-                    result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn);
+                    var result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn);
 
                     if (shouldReturn)
                         return result;
@@ -118,7 +145,7 @@ namespace Snowflake.Execution
                 }
             }
 
-            return result;
+            return null;
         }
 
         private object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
