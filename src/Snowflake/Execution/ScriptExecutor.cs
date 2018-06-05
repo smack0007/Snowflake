@@ -164,7 +164,8 @@ namespace Snowflake.Execution
                 case FunctionNode x: return this.EvaluateFunction(x, context);
                 case FunctionCallNode x: return this.EvaluateFunctionCall(x, context);
                 case OperationNode x: return this.EvaluateOperation(x, context);
-                case VariableReferenceNode x: return this.EvaluateVariableReference(x, context);
+                case UnaryOperationNode x: return this.EvaluateUnaryOperation(x, context);
+                case VariableReferenceNode x: return context.GetVariable(x.VariableName);
 
                 default:
                     throw new NotImplementedException($"{expression.GetType()} not implemented in {nameof(Evaluate)}.");
@@ -252,9 +253,11 @@ namespace Snowflake.Execution
             switch (operation.Type)
             {
                 case OperationType.Add: return this.Add(lhs, rhs, context);
+                case OperationType.Divide: return this.Divide(lhs, rhs, context);
                 case OperationType.Equals: return lhs.Equals(rhs);
                 case OperationType.Multiply: return this.Multiply(lhs, rhs, context);
                 case OperationType.NotEquals: return !lhs.Equals(rhs);
+                case OperationType.Subtract: return this.Subtract(lhs, rhs, context);
 
                 default:
                     throw new NotImplementedException($"{operation.Type} not implemented in {nameof(EvaluateOperation)}.");
@@ -286,7 +289,28 @@ namespace Snowflake.Execution
                 }
             }
 
-            throw new NotImplementedException($"Add not implemented for {lhs.GetType()} and {rhs.GetType()} in {nameof(Add)}.");
+            throw new NotImplementedException($"{nameof(Add)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
+        }
+
+        private object Divide(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is int lhsInt)
+            {
+                if (rhs is int rhsInt)
+                {
+                    return lhsInt / rhsInt;
+                }
+                else if (rhs is float || rhs is double)
+                {
+                    return lhsInt / (int)rhs;
+                }
+            }
+            else if (lhs is string lhsString)
+            {
+                throw new ScriptExecutionException("Strings cannot be divided.", context.GetStackFrames());
+            }
+
+            throw new NotImplementedException($"{nameof(Divide)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
         }
 
         private object Multiply(object lhs, object rhs, ScriptExecutionContext context)
@@ -307,12 +331,118 @@ namespace Snowflake.Execution
                 throw new ScriptExecutionException("Strings cannot be multiplied.", context.GetStackFrames());
             }
 
-            throw new NotImplementedException($"Add not implemented for {lhs.GetType()} and {rhs.GetType()} in {nameof(Add)}.");
+            throw new NotImplementedException($"{nameof(Multiply)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
         }
 
-        private object EvaluateVariableReference(VariableReferenceNode variableReference, ScriptExecutionContext context)
+        private object Subtract(object lhs, object rhs, ScriptExecutionContext context)
         {
-            return context.GetVariable(variableReference.VariableName);
+            if (lhs is int lhsInt)
+            {
+                if (rhs is int rhsInt)
+                {
+                    return lhsInt - rhsInt;
+                }
+                else if (rhs is float || rhs is double)
+                {
+                    return lhsInt - (int)rhs;
+                }
+            }
+            else if (lhs is string lhsString)
+            {
+                throw new ScriptExecutionException("Strings cannot be subtracted.", context.GetStackFrames());
+            }
+
+            throw new NotImplementedException($"{nameof(Subtract)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
+        }
+
+        private object EvaluateUnaryOperation(UnaryOperationNode operation, ScriptExecutionContext context)
+        {
+            var value = Evaluate(operation.ValueExpression, context);
+
+            switch (operation.Type)
+            {
+                case UnaryOperationType.Decrement:
+                {
+                    var result = this.Decrement(value, context);
+
+                    if (operation.ValueExpression is VariableReferenceNode vr)
+                        context.SetVariable(vr.VariableName, result);
+
+                    return result;
+                }
+                
+                case UnaryOperationType.Increment:
+                {
+                    var result = this.Increment(value, context);
+
+                    if (operation.ValueExpression is VariableReferenceNode vr)
+                        context.SetVariable(vr.VariableName, result);
+                        
+                    return result;
+                }
+            
+                case UnaryOperationType.LogicalNegate: return this.LogicalNegate(value, context);
+                case UnaryOperationType.Negate: return this.Negate(value, context);
+
+                default:
+                    throw new NotImplementedException($"{operation.Type} not implemented in {nameof(EvaluateUnaryOperation)}.");
+            }
+        }
+        
+        private object Decrement(object value, ScriptExecutionContext context)
+        {
+            if (value is int valueInt)
+            {
+                return --valueInt;
+            }
+            
+            throw new ScriptExecutionException("Only integers can be decremented.", context.GetStackFrames());
+        }
+
+        private object Increment(object value, ScriptExecutionContext context)
+        {
+            if (value is int valueInt)
+            {
+                return ++valueInt;
+            }
+            
+            throw new ScriptExecutionException("Only integers can be incremented.", context.GetStackFrames());
+        }
+
+        private object LogicalNegate(object value, ScriptExecutionContext context)
+        {
+            if (value is bool valueBool)
+            {
+                return !valueBool;
+            }
+            
+            throw new ScriptExecutionException("Only booleans can be logically negated.", context.GetStackFrames());
+        }
+
+        private object Negate(object value, ScriptExecutionContext context)
+        {
+            if (value is bool valueBool)
+            {
+                throw new ScriptExecutionException("Booleans cannot be negated.", context.GetStackFrames());
+            }
+            else if (value is int valueInt)
+            {
+                return -valueInt;
+            }
+            else if (value is int valueDouble)
+            {
+                return -valueDouble;
+            }
+            else if (value is int valueFloat)
+            {
+                return -valueFloat;
+            }
+            else if (value is string valueString)
+            {
+                throw new ScriptExecutionException("Strings cannot be negated.", context.GetStackFrames());
+            }
+
+            throw new NotImplementedException($"{nameof(Negate)} not implemented for {value.GetType()}.");
         }
     }
 }
