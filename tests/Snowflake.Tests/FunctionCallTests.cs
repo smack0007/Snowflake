@@ -82,7 +82,20 @@ return func(x) {
 }(3)(2);");
         }
 
-		[Fact]
+        [Fact]
+        public void Function_Returned_From_Function_Returned_From_Function_Can_Capture_Variables()
+        {
+            AssertScriptReturnValue(6, @"
+return func(x) {
+	return func(y) {
+        return func(z) {
+            return x + y + z;
+        };
+    };
+}(3)(2)(1);");
+        }
+
+        [Fact]
         public void Function_Wrapped_In_Parens_Can_Be_Directly_Invoked()
         {
             AssertScriptReturnValue(42, @"
@@ -99,7 +112,7 @@ const foo = func(x) {
     return x * 4 + bar(x);
 };
 
-func bar(x) {
+const bar = func(x) {
     return x * 2;
 };
 

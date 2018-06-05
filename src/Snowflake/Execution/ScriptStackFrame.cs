@@ -6,29 +6,18 @@ namespace Snowflake.Execution
     [Serializable]
     public class ScriptStackFrame
 	{
-		public string FunctionName
-		{
-			get;
-			private set;
-		}
+		public string Name { get; }
 
-        public Dictionary<string, ScriptVariable> Variables
-        {
-            get;
-            private set;
-        }
+        public Dictionary<string, ScriptVariable> CapturedVariables { get; }
 
-        public List<ScriptNamespace> UsingNamespaces
-        {
-            get;
-            private set;
-        }
-                
-		public ScriptStackFrame(string function)
+        public Dictionary<string, ScriptVariable> Variables { get; } = new Dictionary<string, ScriptVariable>();
+
+        public List<ScriptNamespace> UsingNamespaces { get; } = new List<ScriptNamespace>();
+
+        internal ScriptStackFrame(string name, Dictionary<string, ScriptVariable> capturedVariables)
 		{
-			this.FunctionName = function;
-            this.Variables = new Dictionary<string, ScriptVariable>();
-            this.UsingNamespaces = new List<ScriptNamespace>();
+			this.Name = name;
+            this.CapturedVariables = capturedVariables;
 		}
 	}
 }

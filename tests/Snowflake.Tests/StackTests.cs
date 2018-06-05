@@ -15,7 +15,7 @@ foo();
             {
                 var ex = (ScriptExecutionException)x;
                 Assert.Single(ex.ScriptStack);
-                Assert.Equal("<script>", ex.ScriptStack[0].FunctionName);
+                Assert.Equal("<script>", ex.ScriptStack[0].Name);
             });
         }
 
@@ -33,8 +33,8 @@ isException();
             {
                 var ex = (ScriptExecutionException)x;
                 Assert.Equal(2, ex.ScriptStack.Length);
-                Assert.Equal("<script>", ex.ScriptStack[0].FunctionName);
-                Assert.Equal("isException", ex.ScriptStack[1].FunctionName);
+                Assert.Equal("<script>", ex.ScriptStack[0].Name);
+                Assert.Equal("isException", ex.ScriptStack[1].Name);
             });
         }
     }

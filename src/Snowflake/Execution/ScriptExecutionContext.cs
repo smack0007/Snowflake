@@ -9,9 +9,9 @@ namespace Snowflake.Execution
         ScriptNamespace globals;
         List<ScriptStackFrame> stack;
         
-        public dynamic this[string name]
+        public object this[string name]
         {
-            get { return this.GetVariable(name); }
+            get { return this.GetVariableValue(name); }
             set { this.SetOrDeclareVariable(name, value); }
         }
 
@@ -32,12 +32,15 @@ namespace Snowflake.Execution
             this.SetGlobalVariable("string", new ScriptType(typeof(string)));
         }
                 
-        public void PushStackFrame(string function)
+        public void PushStackFrame(string frameName, Dictionary<string, ScriptVariable> capturedVariables = null)
         {
-            if (function == null)
-                throw new ArgumentNullException("function");
+            if (frameName == null)
+                throw new ArgumentNullException(nameof(frameName));
 
-            this.stack.Add(new ScriptStackFrame(function));
+            if (capturedVariables == null)
+                capturedVariables = new Dictionary<string, ScriptVariable>();
+
+            this.stack.Add(new ScriptStackFrame(frameName, capturedVariables));
         }
 
         public void PopStackFrame()
@@ -60,7 +63,7 @@ namespace Snowflake.Execution
             this.CurrentStackFrame.UsingNamespaces.Add(pointer);
         }
 
-        public void DeclareVariable(string name, dynamic value = null, bool isConst = false)
+        public void DeclareVariable(string name, object value = null, bool isConst = false)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
@@ -83,22 +86,25 @@ namespace Snowflake.Execution
             }
         }
 
-        public dynamic GetVariable(string name)
+        public ScriptVariable GetVariable(string name)
         {
             if (name == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             ScriptVariable variable = null;
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
                 if (this.stack[i].Variables.TryGetValue(name, out variable))
-                    return variable.Value;
+                    return variable;
+
+                if (this.stack[i].CapturedVariables.TryGetValue(name, out variable))
+                    return variable;
             }
 
             if (this.globals.TryGetVariable(name, out variable))
             {
-                return variable.Value;
+                return variable;
             }
             else
             {
@@ -107,18 +113,23 @@ namespace Snowflake.Execution
                     foreach (ScriptNamespace pointer in this.stack[i].UsingNamespaces)
                     {
                         if (pointer.TryGetVariable(name, out variable))
-                            return variable.Value;
+                            return variable;
                     }
                 }
             }
 
-            throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
+            throw new ScriptExecutionException($"Variable \"{name}\" is not defined.", this.stack.ToArray());
         }
 
-        public dynamic SetVariable(string name, dynamic value)
+        public object GetVariableValue(string name)
+        {
+            return this.GetVariable(name).Value;
+        }
+
+        public object SetVariable(string name, object value)
         {
             if (name == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
@@ -136,13 +147,13 @@ namespace Snowflake.Execution
                 return value;
             }
 
-            throw new ScriptExecutionException(string.Format("Variable \"{0}\" is not defined.", name), this.stack.ToArray());
+            throw new ScriptExecutionException($"Variable \"{name}\" is not defined.", this.stack.ToArray());
         }
 
-        public dynamic SetOrDeclareVariable(string name, dynamic value)
+        public object SetOrDeclareVariable(string name, object value)
         {
             if (name == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
@@ -199,9 +210,9 @@ namespace Snowflake.Execution
             return pointer;
         }
 
-        public dynamic GetGlobalVariable(string name)
+        public object GetGlobalVariable(string name)
         {
-            dynamic value;
+            object value;
             if (this.TryGetGlobalVariable(name, out value))
             {
                 return value;
@@ -210,7 +221,7 @@ namespace Snowflake.Execution
             throw new ScriptExecutionException(string.Format("Global variable \"{0}\" is not defined.", name));
         }
 
-        public bool TryGetGlobalVariable(string name, out dynamic value)
+        public bool TryGetGlobalVariable(string name, out object value)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
@@ -244,7 +255,7 @@ namespace Snowflake.Execution
             return result;
         }
 
-        public void SetGlobalVariable(string name, dynamic value, bool isConst = false)
+        public void SetGlobalVariable(string name, object value, bool isConst = false)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
@@ -293,7 +304,7 @@ namespace Snowflake.Execution
 
             ScriptTypeSet typeSet = null;
 
-            dynamic value;
+            object value;
             if (this.TryGetGlobalVariable(name, out value))
             {
                 if (value is ScriptTypeSet)

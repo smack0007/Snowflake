@@ -166,7 +166,7 @@ namespace Snowflake.Execution
                 case FunctionCallNode x: return this.EvaluateFunctionCall(x, context);
                 case OperationNode x: return this.EvaluateOperation(x, context);
                 case UnaryOperationNode x: return this.EvaluateUnaryOperation(x, context);
-                case VariableReferenceNode x: return context.GetVariable(x.VariableName);
+                case VariableReferenceNode x: return context.GetVariableValue(x.VariableName);
 
                 default:
                     throw new NotImplementedException($"{expression.GetType()} not implemented in {nameof(Evaluate)}.");
@@ -186,7 +186,7 @@ namespace Snowflake.Execution
                         break;
 
                     case AssignmentOperationType.AddGets:
-                        object currentValue = context.GetVariable(variableReference.VariableName);
+                        object currentValue = context.GetVariableValue(variableReference.VariableName);
                         context.SetVariable(variableReference.VariableName, this.Add(currentValue, value, context));
                         break;
 
@@ -208,9 +208,10 @@ namespace Snowflake.Execution
             
             var capturedVariables = function.BodyStatementBlock
                 .FindChildren<VariableReferenceNode>()
-                .Where(x => x.FindParent<FunctionNode>() == function && !argumentNames.Contains(x.VariableName));
+                .Where(x => x.FindParent<FunctionNode>() == function && !argumentNames.Contains(x.VariableName))
+                .ToDictionary(x => x.VariableName, x => context.GetVariable(x.VariableName));
 
-            return new ScriptFunction(this, function.Args, function.BodyStatementBlock);
+            return new ScriptFunction(this, function.Args, function.BodyStatementBlock, capturedVariables);
         }
 
         private object EvaluateFunctionCall(FunctionCallNode functionCall, ScriptExecutionContext context)
