@@ -50,7 +50,7 @@ return doubleIt();");
 		}
 
 		[Fact]
-        public void Anonymous_Function_Can_Be_Directly_Invoked()
+        public void Function_Can_Be_Directly_Invoked()
         {
             AssertScriptReturnValue(42, @"
 return func(x) {
@@ -58,8 +58,21 @@ return func(x) {
 }(21);");
         }
 
+        [Fact]
+		public void Function_Returned_From_Function_Can_Be_Directly_Invoked()
+		{
+			AssertScriptReturnValue(42, @"
+const foo = func() {
+	return func() {
+		return 42;
+	};
+};
+
+return foo()();");
+		}
+
 		[Fact]
-        public void Anonymous_Function_Returned_From_Anonymous_Function_Can_Be_Directly_Invoked()
+        public void Function_Returned_From_Function_Can_Capture_Variables()
         {
             AssertScriptReturnValue(5, @"
 return func(x) {
@@ -70,7 +83,7 @@ return func(x) {
         }
 
 		[Fact]
-        public void Anonymous_Function_Wrapped_In_Parens_Can_Be_Directly_Invoked()
+        public void Function_Wrapped_In_Parens_Can_Be_Directly_Invoked()
         {
             AssertScriptReturnValue(42, @"
 return (func(x) {
@@ -78,32 +91,11 @@ return (func(x) {
 })(21);");
         }
 
-		[Fact]
-		public void Function_Returned_From_Function_Can_Be_Directly_Invoked()
-		{
-			AssertScriptReturnValue(42, @"
-func foo() {
-	return func() {
-		return 42;
-	};
-}
-
-return foo()();");
-		}
-
-		[Fact]
-		public void EndStatement_Optional_When_Declaring_Named_Function()
-		{
-			AssertScriptReturnValue(5, @"
-func foo() { return 5; };;;
-return foo();");
-		}
-
         [Fact]
         public void Global_Function_Can_Call_Other_Global_Function()
         {
             AssertScriptReturnValue(42, @"
-func foo(x) {
+const foo = func(x) {
     return x * 4 + bar(x);
 };
 

@@ -12,7 +12,10 @@ namespace Snowflake
 		
 		public SyntaxNodeCollection<VariableDeclarationNode> Args { get; private set; }
 
-		internal ScriptFunction(ScriptExecutor executor, SyntaxNodeCollection<VariableDeclarationNode> args, StatementBlockNode body)
+		internal ScriptFunction(
+            ScriptExecutor executor,
+            SyntaxNodeCollection<VariableDeclarationNode> args,
+            StatementBlockNode body)
 		{
 			this.executor = executor;
 			this.Args = args;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Snowflake.Parsing;
 
 namespace Snowflake.Execution
@@ -203,6 +204,12 @@ namespace Snowflake.Execution
 
         private object EvaluateFunction(FunctionNode function, ScriptExecutionContext context)
         {
+            var argumentNames = function.Args.Select(x => x.VariableName);
+            
+            var capturedVariables = function.BodyStatementBlock
+                .FindChildren<VariableReferenceNode>()
+                .Where(x => x.FindParent<FunctionNode>() == function && !argumentNames.Contains(x.VariableName));
+
             return new ScriptFunction(this, function.Args, function.BodyStatementBlock);
         }
 
