@@ -5,71 +5,49 @@ namespace Snowflake.Tests
 {
     public class FunctionTests : LanguageTestFixture
 	{
-		[Fact]
-		public void Variable_Cannot_Be_Declared_With_Same_Name_As_Function()
+        [Fact]
+		public void Function_Equality_Implemented()
 		{
-			AssertScriptIsException<ScriptExecutionException>(@"
-func foo() {
+			AssertScriptReturnValue(true, @"
+const foo = func() {
 	return 42;
-}
+};
 
-var foo = 12;");
+const bar = foo;
+
+return bar == foo;
+");
 		}
 
         [Fact]
-        public void Function_Name_Cannot_Be_Reassigned()
-        {
-            AssertScriptIsException<ScriptExecutionException>(@"
-func foo() {
+		public void Function_Inequality_Implemented()
+		{
+			AssertScriptReturnValue(true, @"
+const foo = func() {
 	return 42;
-}
+};
 
-foo = func() {
+const bar = func() {
     return 21;
-};");
-        }
+};
 
-		[Fact]
-		public void Function_Declaration_Cannnot_Overwrite_Variable()
-		{
-			AssertScriptIsException<ScriptExecutionException>(@"
-var foo = 12;
-
-func foo() {
-	return 42;
-}
+return bar != foo;
 ");
 		}
 
-		[Fact]
-		public void Named_Function_Can_Be_Assigned_To_Varaible()
+        [Fact]
+		public void Functions_Declared_With_Same_Body_Are_Not_Equal()
 		{
-			AssertScriptReturnValue(42, @"
-func foo() {
+			AssertScriptReturnValue(false, @"
+const foo = func() {
 	return 42;
-}
+};
 
-var bar = foo;
+const bar = func() {
+    return 42;
+};
 
-return bar();
-");
-		}
-
-		[Fact]
-		public void Named_Function_Can_Still_Be_Called_After_Changing_Variable_Value()
-		{
-			AssertScriptReturnValue(42, @"
-func foo() {
-	return 42;
-}
-
-var bar = foo;
-
-var result = bar();
-
-bar = 12;
-
-return foo();
+return bar == foo;
 ");
 		}
 	}
