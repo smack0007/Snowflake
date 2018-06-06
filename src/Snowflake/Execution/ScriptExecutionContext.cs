@@ -63,35 +63,9 @@ namespace Snowflake.Execution
             this.CurrentStackFrame.UsingNamespaces.Add(pointer);
         }
 
-        public void DeclareVariable(string name, object value = null, bool isConst = false)
+        private ScriptVariable GetVariableIntern(string name)
         {
-            if (name == null)
-                throw new ArgumentNullException("name");
-
-            ScriptVariable variable = new ScriptVariable(value, isConst);
-            
-            if (this.stack.Count > 0)
-            {
-                if (this.stack[this.stack.Count - 1].Variables.ContainsKey(name))
-                    throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
-
-                this.stack[this.stack.Count - 1].Variables[name] = variable;
-            }
-            else
-            {
-                if (this.globals.ContainsVariable(name))
-                    throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
-
-                this.globals.SetVariable(name, variable);
-            }
-        }
-
-        public ScriptVariable GetVariable(string name)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            ScriptVariable variable = null;
+            ScriptVariable variable;
 
             for (int i = this.stack.Count - 1; i >= 0; i--)
             {
@@ -118,12 +92,64 @@ namespace Snowflake.Execution
                 }
             }
 
-            throw new ScriptExecutionException($"Variable \"{name}\" is not defined.", this.stack.ToArray());
+            return null;
+        }
+
+        public bool IsVariableDeclared(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            return this.GetVariableIntern(name) != null;
+        }
+
+        public void DeclareVariable(string name, object value = null, bool isConst = false)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            
+            if (this.stack.Count > 0)
+            {
+                if (this.stack[this.stack.Count - 1].Variables.ContainsKey(name))
+                    throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
+
+                this.stack[this.stack.Count - 1].Variables[name] = new ScriptVariable(value, isGlobal: false, isConst);
+            }
+            else
+            {
+                if (this.globals.ContainsVariable(name))
+                    throw new ScriptExecutionException(string.Format("Variable \"{0}\" declared more than once in the same stack frame.", name), this.stack.ToArray());
+
+                this.globals.SetVariable(name, new ScriptVariable(value, isGlobal: true, isConst));
+            }
+        }
+
+        public ScriptVariable GetVariable(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            var variable = this.GetVariableIntern(name);
+
+            if (variable == null)
+                throw new ScriptExecutionException($"Variable \"{name}\" is not defined.", this.stack.ToArray());
+            
+            return variable;
         }
 
         public object GetVariableValue(string name)
         {
             return this.GetVariable(name).Value;
+        }
+
+        public bool TryGetVariable(string name, out ScriptVariable variable)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            variable = this.GetVariableIntern(name);
+
+            return variable != null;
         }
 
         public object SetVariable(string name, object value)
@@ -190,9 +216,9 @@ namespace Snowflake.Execution
             {
                 if (pointer.TryGetVariable(nameParts[i], out variable))
                 {
-                    if (variable.Value is ScriptNamespace)
+                    if (variable.Value is ScriptNamespace ns)
                     {
-                        pointer = variable.Value;
+                        pointer = ns;
                     }
                     else
                     {
@@ -271,9 +297,9 @@ namespace Snowflake.Execution
                     ScriptVariable variable;
                     if (pointer.TryGetVariable(nameParts[i], out variable))
                     {
-                        if (variable.Value is ScriptNamespace)
+                        if (variable.Value is ScriptNamespace ns)
                         {
-                            pointer = variable.Value;
+                            pointer = ns;
                         }
                         else
                         {
@@ -286,11 +312,11 @@ namespace Snowflake.Execution
                     }
                 }
 
-                pointer.SetVariable(nameParts[nameParts.Length - 1], new ScriptVariable(value, isConst));
+                pointer.SetVariable(nameParts[nameParts.Length - 1], new ScriptVariable(value, isGlobal: true, isConst));
             }
             else
             {
-                this.globals.SetVariable(name, new ScriptVariable(value, isConst));
+                this.globals.SetVariable(name, new ScriptVariable(value, isGlobal: true, isConst));
             }
         }
 

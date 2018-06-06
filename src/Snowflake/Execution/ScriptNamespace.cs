@@ -81,7 +81,7 @@ namespace Snowflake.Execution
                 throw new ScriptExecutionException(string.Format("Cannot create sub namespace \"{0}\" because the name is already in use in the namespace \"{1}\".", namespaceName, this.Name));
 
             ScriptNamespace subNamespace = new ScriptNamespace(namespaceName, this);
-            this.variables[namespaceName] = new ScriptVariable(subNamespace, true);
+            this.variables[namespaceName] = new ScriptVariable(subNamespace, isGlobal: false, isConst: true);
 
             return subNamespace;
         }

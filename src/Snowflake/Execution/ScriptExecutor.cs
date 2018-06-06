@@ -208,7 +208,11 @@ namespace Snowflake.Execution
             
             var capturedVariables = function.BodyStatementBlock
                 .FindChildren<VariableReferenceNode>()
-                .Where(x => x.FindParent<FunctionNode>() == function && !argumentNames.Contains(x.VariableName))
+                .Where(x =>
+                    !argumentNames.Contains(x.VariableName) &&
+                    context.TryGetVariable(x.VariableName, out var variable) &&
+                    !variable.IsGlobal
+                )
                 .ToDictionary(x => x.VariableName, x => context.GetVariable(x.VariableName));
 
             return new ScriptFunction(this, function.Args, function.BodyStatementBlock, capturedVariables);

@@ -2,11 +2,11 @@
 
 namespace Snowflake.Execution
 {
-    public class ScriptVariable
+    public sealed class ScriptVariable
     {
-        dynamic value;
+        private object value;
 
-        public dynamic Value
+        public object Value
         {
             get { return this.value; }
             
@@ -19,11 +19,14 @@ namespace Snowflake.Execution
             }
         }
 
-        public bool IsConst { get; private set; }
+        public bool IsGlobal { get; }
 
-        public ScriptVariable(dynamic value, bool isConst)
+        public bool IsConst { get; }
+
+        internal ScriptVariable(object value, bool isGlobal, bool isConst)
         {
             this.value = value;
+            this.IsGlobal = isGlobal;
             this.IsConst = isConst;
         }
     }
