@@ -5,7 +5,6 @@ StatementBlock = "{" <Statement>* "}" ;
 Statement = <UsingDeclaration> ";" |
             <ConstDeclaration> ";" |
             <VariableDeclaration> ";" |
-            <FunctionDeclaration> |
 			<If> |
 			<While> |
 			<For> |
@@ -19,8 +18,6 @@ UsingDeclaration = "using" <NamespaceName> ;
 ConstDeclaration = "const" <Identifier> "=" <Expression> ;
 
 VariableDeclaration = "var" <Identifier> ( "=" <Expression> )? ;
-
-FunctionDeclaration = "func" ( "*" ) <Identifier> "(" <FunctionParameters>  ")" <StatementBlock> ;
 
 FunctionParameters = <Identifier>? ( "," <Identifier> )* ;
 
@@ -38,11 +35,11 @@ Yield = "yield" <Expression> ";" ;
 
 Expression = <AssignmentExpression> ;
 
-AssignmentExpression = <ConditionalOrExpression> | <Assignment> ;
+AssignmentExpression = <LogicalOrExpression> | <Assignment> ;
 
-ConditionalOrExpression = <ConditionalAndExpression> ( "||" <ConditionalAndExpression> )* ;
+LogicalOrExpression = <LogicalAndExpression> ( "||" <LogicalAndExpression> )* ;
 
-ConditionalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
+LogicalAndExpression = <EqualityExpression> ( "&&" <EqualityExpression> )* ;
 
 EqualityExpression = <RelationalExpression> ( ( "==" | "!=" ) <RelationalExpression> )* ;
 
@@ -55,7 +52,7 @@ MultiplicativeExpression = <UnaryExpression> ( ( "*" | "/" ) <UnaryExpression> )
 UnaryExpression = ( ( "-" | "!" ) <UnaryExpression> )* | <PrimaryExpression> ;
 
 PrimaryExpression = "(" <Expression> ")" |
-					<AnonymousFunction> |
+					<Function> |
 					<ConstructorCall> |
 					<FunctionCall> |
 					<List> |
@@ -72,7 +69,7 @@ AssignmentTarget = <Identifier> | <MemberAccess> ;
 
 AssignmentOperation = "=" | "+=" | "-=" | "*=" | "/=" ;
 
-AnonymousFunction = "func" ( "*" ) "(" <FunctionParameters> ")" <StatementBlock> ;
+Function = "func" ( "*" ) "(" <FunctionParameters> ")" <StatementBlock> ;
 
 FunctionCall = <Expression> "(" ( <Expression> ("," <Expression>)* )? ")" ;
 

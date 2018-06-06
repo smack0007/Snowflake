@@ -124,17 +124,12 @@ namespace Snowflake.Parsing
 				    }
 				    break;
 
-			    case LexemeType.Func:
-				    {
-					    node = this.ParseNamedFunctionDeclaration(lexemes, ref pos);
-				    }
-				    break;
-
 			    case LexemeType.If:
 				    {
 					    node = this.ParseIf(lexemes, ref pos);
 				    }
 				    break;
+
                 case LexemeType.While:
 				    {
 					    node = this.ParseWhile(lexemes, ref pos);
@@ -146,6 +141,7 @@ namespace Snowflake.Parsing
 					    node = this.ParseFor(lexemes, ref pos);
 				    }
 				    break;
+
                 case LexemeType.ForEach:
 				    {
 					    node = this.ParseForEach(lexemes, ref pos);
@@ -247,48 +243,6 @@ namespace Snowflake.Parsing
 				pos++;
 				node.ValueExpression = this.ParseExpression(lexemes, ref pos);
 			}
-
-			return node;
-		}
-
-		private FunctionNode ParseNamedFunctionDeclaration(IList<Lexeme> lexemes, ref int pos)
-		{
-			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
-
-			FunctionNode node = Construct<FunctionNode>(lexemes, pos);
-
-			pos++;
-
-            if (lexemes[pos].Type == LexemeType.Multiply)
-            {
-                node.IsGenerator = true;
-                pos++;
-            }
-
-			this.EnsureLexemeType(lexemes, LexemeType.Identifier, pos);
-			node.FunctionName = lexemes[pos].Value;
-
-			pos++;
-			this.EnsureLexemeType(lexemes, LexemeType.OpenParen, pos);
-
-			pos++;
-			while (lexemes[pos].Type != LexemeType.CloseParen && lexemes[pos].Type != LexemeType.EOF)
-			{
-				node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
-
-				while (lexemes[pos].Type == LexemeType.Comma)
-				{
-					pos++;
-					node.Args.Add(this.ParseVariableDeclaration(lexemes, ref pos, varKeyword: false));
-				}
-			}
-
-			this.EnsureLexemeType(lexemes, LexemeType.CloseParen, pos);
-
-			pos++;
-			node.BodyStatementBlock = this.ParseStatementBlock(lexemes, ref pos);
-
-			SkipWhileEndStatement(lexemes, ref pos);
 
 			return node;
 		}
@@ -694,7 +648,7 @@ namespace Snowflake.Parsing
 				switch (lexemes[pos].Type)
 				{
 					case LexemeType.Func:
-						node = this.ParseAnonymousFunction(lexemes, ref pos);
+						node = this.ParseFunction(lexemes, ref pos);
 						break;
 
                     case LexemeType.New:
@@ -767,7 +721,7 @@ namespace Snowflake.Parsing
 			return node;
 		}
                
-		private FunctionNode ParseAnonymousFunction(IList<Lexeme> lexemes, ref int pos)
+		private FunctionNode ParseFunction(IList<Lexeme> lexemes, ref int pos)
 		{
 			this.EnsureLexemeType(lexemes, LexemeType.Func, pos);
 

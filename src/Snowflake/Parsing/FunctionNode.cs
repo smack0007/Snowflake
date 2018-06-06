@@ -8,13 +8,6 @@ namespace Snowflake.Parsing
 
         public bool IsGenerator { get; set; }
 
-		public string FunctionName { get; set; }
-
-		public bool IsAnonymous
-		{
-			get { return string.IsNullOrEmpty(this.FunctionName); }
-		}
-
 		public SyntaxNodeCollection<VariableDeclarationNode> Args { get; private set; }
 
 		public StatementBlockNode BodyStatementBlock
