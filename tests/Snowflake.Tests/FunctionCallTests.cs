@@ -49,6 +49,30 @@ var doubleIt = func(x = 21) {
 return doubleIt();");
 		}
 
+        [Fact]
+		public void Error_When_Argument_Not_Provided_And_No_Default_Value_Specified()
+		{
+			AssertScriptIsException<ScriptExecutionException>(@"
+var add = func(x = 1, y) {
+	return x + y;
+};
+
+return add(2);");
+		}
+
+        [Fact]
+		public void Default_Value_Can_Be_Variable()
+		{
+			AssertScriptReturnValue(42, @"
+var doubleIt = func(x = y) {
+	return x + x;
+};
+
+var y = 21;
+
+return doubleIt();");
+		}
+
 		[Fact]
         public void Function_Can_Be_Directly_Invoked()
         {

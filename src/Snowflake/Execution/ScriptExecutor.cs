@@ -149,7 +149,7 @@ namespace Snowflake.Execution
             return null;
         }
 
-        private object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
+        public object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
         {
             switch (expression)
             {
