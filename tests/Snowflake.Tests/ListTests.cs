@@ -48,12 +48,12 @@ namespace Snowflake.Tests
 				(x) =>
 				{
 					Assert.Equal(2, x.Count);
-					Assert.Equal(2, x[0].Count);
-					Assert.Equal(1, x[0][0]);
-					Assert.Equal(2, x[0][1]);
-					Assert.Equal(2, x[1].Count);
-					Assert.Equal(3, x[1][0]);
-					Assert.Equal(4, x[1][1]);
+					Assert.Equal(2, x.ElementAt<ScriptList>(0).Count);
+					Assert.Equal(1, x.ElementAt<ScriptList>(0)[0]);
+					Assert.Equal(2, x.ElementAt<ScriptList>(0)[1]);
+					Assert.Equal(2, x.ElementAt<ScriptList>(1).Count);
+					Assert.Equal(3, x.ElementAt<ScriptList>(1)[0]);
+					Assert.Equal(4, x.ElementAt<ScriptList>(1)[1]);
 				},
 				"return [ [1, 2], [3, 4] ];");
 		}
@@ -65,12 +65,12 @@ namespace Snowflake.Tests
 				(x) =>
 				{
 					Assert.Equal(2, x.Count);
-					Assert.Equal(2, x[0].Length);
-					Assert.Equal(1, x[0][0]);
-					Assert.Equal(2, x[0][1]);
-					Assert.Equal(2, x[1].Length);
-					Assert.Equal(3, x[1][0]);
-					Assert.Equal(4, x[1][1]);
+					Assert.Equal(2, ((object[])x[0]).Length);
+					Assert.Equal(1, ((object[])x[0])[0]);
+					Assert.Equal(2, ((object[])x[0])[1]);
+					Assert.Equal(2, ((object[])x[1]).Length);
+					Assert.Equal(3, ((object[])x[1])[0]);
+					Assert.Equal(4, ((object[])x[1])[1]);
 				},
 				"return [ [| 1, 2 |], [| 3, 4 |] ];");
 		}

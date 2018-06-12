@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Snowflake.Parsing;
 
@@ -161,9 +162,12 @@ namespace Snowflake.Execution
                 case NullValueNode x: return null;
                 case StringValueNode x: return x.Value;
 
+                case ArrayNode x: return this.EvaluateArray(x, context);
                 case AssignmentOpeartionNode x: return this.EvaluateAssignmentOperation(x, context);
+                case ElementAccessNode x: return this.EvaluateElementAccess(x, context);
                 case FunctionNode x: return this.EvaluateFunction(x, context);
                 case FunctionCallNode x: return this.EvaluateFunctionCall(x, context);
+                case ListNode x: return this.EvaluateList(x, context);
                 case OperationNode x: return this.EvaluateOperation(x, context);
                 case UnaryOperationNode x: return this.EvaluateUnaryOperation(x, context);
                 case VariableReferenceNode x: return context.GetVariableValue(x.VariableName);
@@ -171,6 +175,16 @@ namespace Snowflake.Execution
                 default:
                     throw new NotImplementedException($"{expression.GetType()} not implemented in {nameof(Evaluate)}.");
             }
+        }
+
+        private object[] EvaluateArray(ArrayNode array, ScriptExecutionContext context)
+        {
+            var value = new object[array.ValueExpressions.Count];
+
+            for (int i = 0; i < array.ValueExpressions.Count; i++)
+                value[i] = this.Evaluate(array.ValueExpressions[i], context);
+
+            return value;
         }
 
         private object EvaluateAssignmentOperation(AssignmentOpeartionNode assignment, ScriptExecutionContext context)
@@ -202,7 +216,36 @@ namespace Snowflake.Execution
             return value;
         }
 
-        private object EvaluateFunction(FunctionNode function, ScriptExecutionContext context)
+        private object EvaluateElementAccess(ElementAccessNode elementAccess, ScriptExecutionContext context)
+        {
+            var source = this.Evaluate(elementAccess.SourceExpression, context);
+            var element = this.Evaluate(elementAccess.ElementExpression, context);
+
+            object value = null;
+
+            if (source is Array array)
+            {
+                if (!(element is int index))
+                    throw new ScriptExecutionException("Arrays can only be accessed via integers.", context.GetStackFrames());
+
+                value = array.GetValue(index);
+            }
+            else if (source is ScriptList list)
+            {
+                if (!(element is int index))
+                    throw new ScriptExecutionException("Lists can only be accessed via integers.", context.GetStackFrames());
+
+                value = list[index];
+            }
+            else
+            {
+                throw new NotImplementedException($"Sources of type {source.GetType()} not implemented in {nameof(EvaluateElementAccess)}.");
+            }
+
+            return value;
+        }
+
+        private ScriptFunction EvaluateFunction(FunctionNode function, ScriptExecutionContext context)
         {
             var argumentNames = function.Args.Select(x => x.VariableName);
             
@@ -255,6 +298,16 @@ namespace Snowflake.Execution
             }
 
             throw new NotImplementedException($"Function call on type '{function.GetType()}' not implemented.");
+        }
+
+        private ScriptList EvaluateList(ListNode list, ScriptExecutionContext context)
+        {
+            ScriptList value = new ScriptList(list.ValueExpressions.Count);
+
+            for (int i = 0; i < list.ValueExpressions.Count; i++)
+                value.Add(this.Evaluate(list.ValueExpressions[i], context));
+
+            return value;
         }
 
         private object EvaluateOperation(OperationNode operation, ScriptExecutionContext context)

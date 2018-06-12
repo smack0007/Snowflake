@@ -3,13 +3,18 @@ using System.Text;
 
 namespace Snowflake.Execution
 {
-    public class ScriptList : List<dynamic>
+    public sealed class ScriptList : List<object>
     {
         public ScriptList()
         {
         }
 
-        public ScriptList(IEnumerable<dynamic> collection)
+        public ScriptList(int capacity)
+            : base(capacity > 4 ? capacity : 4)
+        {
+        }
+
+        public ScriptList(IEnumerable<object> collection)
             : base(collection)
         {
         }
@@ -30,6 +35,11 @@ namespace Snowflake.Execution
             sb.Append("]");
 
             return sb.ToString();
+        }
+
+        public T ElementAt<T>(int index)
+        {
+            return (T)this[index];
         }
     }
 }
