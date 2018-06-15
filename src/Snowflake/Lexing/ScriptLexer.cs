@@ -73,17 +73,9 @@ namespace Snowflake.Lexing
 					{
 						lexemes.Add(new Lexeme(LexemeType.CloseParen, null, curLine, curColumn));
 					}
-					else if (text[i] == '[') // OpenBracket or OpenPipeBracket
+					else if (text[i] == '[') // OpenBracket
 					{
-						if (i + 1 < text.Length && text[i + 1] == '|')
-						{
-							lexemes.Add(new Lexeme(LexemeType.OpenPipeBracket, null, curLine, curColumn));
-							i++;
-						}
-						else
-						{
-							lexemes.Add(new Lexeme(LexemeType.OpenBracket, null, curLine, curColumn));
-						}
+						lexemes.Add(new Lexeme(LexemeType.OpenBracket, null, curLine, curColumn));
 					}
 					else if (text[i] == ']') // CloseBracket
 					{
@@ -253,11 +245,6 @@ namespace Snowflake.Lexing
 							if (text[i + 1] == '|')
 							{
 								lexemes.Add(new Lexeme(LexemeType.ConditionalOr, null, curLine, curColumn));
-								i++;
-							}
-							else if (text[i + 1] == ']')
-							{
-								lexemes.Add(new Lexeme(LexemeType.ClosePipeBracket, null, curLine, curColumn));
 								i++;
 							}
 						}

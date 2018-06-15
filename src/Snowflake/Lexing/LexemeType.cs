@@ -168,16 +168,6 @@
 		CloseBrace,
 
 		/// <summary>
-		/// [|
-		/// </summary>
-		OpenPipeBracket,
-
-		/// <summary>
-		/// |]
-		/// </summary>
-		ClosePipeBracket,
-
-		/// <summary>
 		/// :
 		/// </summary>
 		Colon,

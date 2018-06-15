@@ -59,23 +59,6 @@ namespace Snowflake.Tests
 		}
 
 		[Fact]
-		public void List_With_Array_Elements_Is_Correct()
-		{
-			AssertScriptReturnValue<ScriptList>(
-				(x) =>
-				{
-					Assert.Equal(2, x.Count);
-					Assert.Equal(2, ((object[])x[0]).Length);
-					Assert.Equal(1, ((object[])x[0])[0]);
-					Assert.Equal(2, ((object[])x[0])[1]);
-					Assert.Equal(2, ((object[])x[1]).Length);
-					Assert.Equal(3, ((object[])x[1])[0]);
-					Assert.Equal(4, ((object[])x[1])[1]);
-				},
-				"return [ [| 1, 2 |], [| 3, 4 |] ];");
-		}
-
-		[Fact]
 		public void List_Element_Access_Is_Correct()
 		{
 			AssertScriptReturnValue(

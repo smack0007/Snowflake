@@ -162,7 +162,6 @@ namespace Snowflake.Execution
                 case NullValueNode x: return null;
                 case StringValueNode x: return x.Value;
 
-                case ArrayNode x: return this.EvaluateArray(x, context);
                 case AssignmentOpeartionNode x: return this.EvaluateAssignmentOperation(x, context);
                 case ElementAccessNode x: return this.EvaluateElementAccess(x, context);
                 case FunctionNode x: return this.EvaluateFunction(x, context);
@@ -175,16 +174,6 @@ namespace Snowflake.Execution
                 default:
                     throw new NotImplementedException($"{expression.GetType()} not implemented in {nameof(Evaluate)}.");
             }
-        }
-
-        private object[] EvaluateArray(ArrayNode array, ScriptExecutionContext context)
-        {
-            var value = new object[array.ValueExpressions.Count];
-
-            for (int i = 0; i < array.ValueExpressions.Count; i++)
-                value[i] = this.Evaluate(array.ValueExpressions[i], context);
-
-            return value;
         }
 
         private object EvaluateAssignmentOperation(AssignmentOpeartionNode assignment, ScriptExecutionContext context)
