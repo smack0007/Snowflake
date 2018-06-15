@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Snowflake.Parsing;
@@ -59,6 +60,10 @@ namespace Snowflake.Execution
                     ExecuteConstDeclaration(x, context);
                     break;
 
+                case ForEachNode x:
+                    result = ExecuteForEach(x, context, ref shouldReturn);
+                    break;
+
                 case ForNode x:
                     result = ExecuteFor(x, context, ref shouldReturn);
                     break;
@@ -94,6 +99,42 @@ namespace Snowflake.Execution
         private void ExecuteConstDeclaration(ConstDeclarationNode node, ScriptExecutionContext context)
         {
             context.DeclareVariable(node.ConstName, Evaluate(node.ValueExpression, context), true);
+        }
+
+        private object ExecuteForEach(ForEachNode node, ScriptExecutionContext context, ref bool shouldReturn)
+        {   
+            context.PushStackFrame("ForEach");
+
+            try
+            {
+                object source = this.Evaluate(node.SourceExpression, context);
+
+                if (!(source is IEnumerable enumerable))
+                {
+                    throw new ScriptExecutionException($"Source of foreach must implement {nameof(IEnumerable)}.");
+                }
+
+                context.DeclareVariable(node.VariableDeclaration.VariableName);
+                var variable = context.GetVariable(node.VariableDeclaration.VariableName);
+
+                var enumerator = enumerable.GetEnumerator();
+
+                while (enumerator.MoveNext())
+                {
+                    variable.Value = enumerator.Current;
+
+                    object result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn, pushStackFrame: false);
+
+                    if (shouldReturn)
+                        return result;
+                }
+            }
+            finally
+            {
+                context.PopStackFrame();
+            }
+
+            return null;
         }
 
         private object ExecuteFor(ForNode node, ScriptExecutionContext context, ref bool shouldReturn)
