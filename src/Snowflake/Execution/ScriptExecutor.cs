@@ -32,13 +32,15 @@ namespace Snowflake.Execution
             return this.ExecuteStatementBlock(statementBlock, context, ref shouldReturn);
         }
 
-        private object ExecuteStatementBlock(StatementBlockNode statementBlock, ScriptExecutionContext context, ref bool shouldReturn)
+        private object ExecuteStatementBlock(StatementBlockNode statementBlock, ScriptExecutionContext context, ref bool shouldReturn, bool pushStackFrame = true)
         {
-            context.PushStackFrame("<scope>");
+            if (pushStackFrame)
+                context.PushStackFrame("<scope>");
 
             object result = this.ExecuteStatements(statementBlock.Statements, context, ref shouldReturn);
 
-            context.PopStackFrame();
+            if (pushStackFrame)
+                context.PopStackFrame();
 
             return result;
         }
@@ -55,6 +57,10 @@ namespace Snowflake.Execution
 
                 case ConstDeclarationNode x:
                     ExecuteConstDeclaration(x, context);
+                    break;
+
+                case ForNode x:
+                    result = ExecuteFor(x, context, ref shouldReturn);
                     break;
 
                 case FunctionCallNode x:
@@ -90,14 +96,49 @@ namespace Snowflake.Execution
             context.DeclareVariable(node.ConstName, Evaluate(node.ValueExpression, context), true);
         }
 
-        private void ExecuteVariableDeclaration(VariableDeclarationNode node, ScriptExecutionContext context)
+        private object ExecuteFor(ForNode node, ScriptExecutionContext context, ref bool shouldReturn)
         {
-            object value = null;
+            context.PushStackFrame("For");
 
-            if (node.ValueExpression != null)
-                value = Evaluate(node.ValueExpression, context);
+            try
+            {
+                if (node.InitializeSyntax is VariableDeclarationNode variableDeclaration)
+                {
+                    this.ExecuteVariableDeclaration(variableDeclaration, context);
+                }
+                else
+                {
+                    throw new NotImplementedException($"{nameof(ForNode.InitializeSyntax)} of type {node.InitializeSyntax.GetType()} not implemented in {nameof(ExecuteFor)}.");
+                }
 
-            context.DeclareVariable(node.VariableName, value);
+                while (true)
+                {
+                    object evaluateResult = this.Evaluate(node.EvaluateExpression, context);
+
+                    if (!(evaluateResult is bool shouldExecute))
+                        throw new ScriptExecutionException("Evaluate expression of for loop resulted in non boolean type value.", context.GetStackFrames());
+                    
+                    if (shouldExecute)
+                    {
+                        var result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn, pushStackFrame: false);
+
+                        if (shouldReturn)
+                            return result;
+
+                        this.Evaluate(node.IncrementExpression, context);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                return null;
+            }
+            finally
+            {
+                context.PopStackFrame();
+            }
         }
 
         private object ExecuteIf(IfNode node, ScriptExecutionContext context, ref bool shouldReturn)
@@ -125,29 +166,48 @@ namespace Snowflake.Execution
             return null;
         }
 
+        private void ExecuteVariableDeclaration(VariableDeclarationNode node, ScriptExecutionContext context)
+        {
+            object value = null;
+
+            if (node.ValueExpression != null)
+                value = Evaluate(node.ValueExpression, context);
+
+            context.DeclareVariable(node.VariableName, value);
+        }
+
         private object ExecuteWhile(WhileNode node, ScriptExecutionContext context, ref bool shouldReturn)
         {
-            while (true)
+            context.PushStackFrame("while");
+
+            try
             {
-                object evaluateResult = this.Evaluate(node.EvaluateExpression, context);
-
-                if (!(evaluateResult is bool shouldExecute))
-                    throw new ScriptExecutionException("Evaluate expression of while loop resulted in non boolean type value.", context.GetStackFrames());
-                
-                if (shouldExecute)
+                while (true)
                 {
-                    var result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn);
+                    object evaluateResult = this.Evaluate(node.EvaluateExpression, context);
 
-                    if (shouldReturn)
-                        return result;
+                    if (!(evaluateResult is bool shouldExecute))
+                        throw new ScriptExecutionException("Evaluate expression of while loop resulted in non boolean type value.", context.GetStackFrames());
+                    
+                    if (shouldExecute)
+                    {
+                        var result = this.ExecuteStatementBlock(node.BodyStatementBlock, context, ref shouldReturn, pushStackFrame: false);
+
+                        if (shouldReturn)
+                            return result;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
+
+                return null;
             }
-
-            return null;
+            finally
+            {
+                context.PopStackFrame();
+            }
         }
 
         public object Evaluate(ExpressionNode expression, ScriptExecutionContext context)
@@ -168,6 +228,7 @@ namespace Snowflake.Execution
                 case FunctionCallNode x: return this.EvaluateFunctionCall(x, context);
                 case ListNode x: return this.EvaluateList(x, context);
                 case OperationNode x: return this.EvaluateOperation(x, context);
+                case PostfixOperationNode x: return this.EvaluatePostfixOperation(x, context);
                 case UnaryOperationNode x: return this.EvaluateUnaryOperation(x, context);
                 case VariableReferenceNode x: return context.GetVariableValue(x.VariableName);
 
@@ -343,6 +404,10 @@ namespace Snowflake.Execution
                 case OperationType.Add: return this.Add(lhs, rhs, context);
                 case OperationType.Divide: return this.Divide(lhs, rhs, context);
                 case OperationType.Equals: return lhs.Equals(rhs);
+                case OperationType.GreaterThan: return this.GreaterThan(lhs, rhs, context);
+                case OperationType.GreaterThanOrEqualTo: return lhs.Equals(rhs) || this.GreaterThan(lhs, rhs, context);
+                case OperationType.LessThan: return this.LessThan(lhs, rhs, context);
+                case OperationType.LessThanOrEqualTo: return lhs.Equals(rhs) || this.LessThan(lhs, rhs, context);
                 case OperationType.LogicalAnd: return this.LogicalAnd(lhs, rhs, context);
                 case OperationType.LogicalOr: return this.LogicalOr(lhs, rhs, context);
                 case OperationType.Multiply: return this.Multiply(lhs, rhs, context);
@@ -352,6 +417,38 @@ namespace Snowflake.Execution
                 default:
                     throw new NotImplementedException($"{operation.Type} not implemented in {nameof(EvaluateOperation)}.");
             }
+        }
+
+        private object EvaluatePostfixOperation(PostfixOperationNode operation, ScriptExecutionContext context)
+        {
+            ScriptVariable variable = null;
+
+            if (operation.SourceExpression is VariableReferenceNode variableReference)
+            {
+                variable = context.GetVariable(variableReference.VariableName);
+            }
+            else
+            {
+                throw new ScriptExecutionException($"Source of postfix operation must be a variable reference.");
+            }
+
+            object result = variable.Value;
+
+            switch (operation.Type)
+            {
+                case PostfixOperationType.Increment:
+                    variable.Value = this.Increment(variable.Value, context);
+                    break;
+
+                case PostfixOperationType.Decrement:
+                    variable.Value = this.Decrement(variable.Value, context);
+                    break;
+
+                default:
+                    throw new NotImplementedException($"{operation.Type} not implemented in {nameof(EvaluatePostfixOperation)}.");
+            }
+
+            return result;
         }
 
         private object Add(object lhs, object rhs, ScriptExecutionContext context)
@@ -380,6 +477,40 @@ namespace Snowflake.Execution
             }
 
             throw new NotImplementedException($"{nameof(Add)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
+        }
+
+        private bool GreaterThan(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is int lhsInt)
+            {
+                if (rhs is int rhsInt)
+                {
+                    return lhsInt > rhsInt;
+                }
+                else if (rhs is float || rhs is double)
+                {
+                    return lhsInt > (int)rhs;
+                }
+            }
+            
+            throw new NotImplementedException($"{nameof(GreaterThan)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
+        }
+
+        private bool LessThan(object lhs, object rhs, ScriptExecutionContext context)
+        {
+            if (lhs is int lhsInt)
+            {
+                if (rhs is int rhsInt)
+                {
+                    return lhsInt < rhsInt;
+                }
+                else if (rhs is float || rhs is double)
+                {
+                    return lhsInt < (int)rhs;
+                }
+            }
+            
+            throw new NotImplementedException($"{nameof(LessThan)} not implemented for {lhs.GetType()} and {rhs.GetType()}.");
         }
 
         private object LogicalAnd(object lhs, object rhs, ScriptExecutionContext context)
