@@ -4,11 +4,7 @@ namespace Snowflake.Parsing
 {
     public class DictionaryNode : ExpressionNode, IEnumerable<DictionaryPairNode>
 	{
-		public SyntaxNodeCollection<DictionaryPairNode> Pairs
-		{
-			get;
-			private set;
-		}
+		public SyntaxNodeCollection<DictionaryPairNode> Pairs { get; }
 
 		public DictionaryNode()
 			: base()

@@ -3,7 +3,7 @@ using System.Dynamic;
 
 namespace Snowflake.Execution
 {
-    public class ScriptDictionary : DynamicObject, IDictionary<object, object>
+    public class ScriptDictionary : IDictionary<object, object>
     {
         Dictionary<object, object> data;
 
@@ -93,23 +93,9 @@ namespace Snowflake.Execution
             return this.data.GetEnumerator();
         }
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        public T Element<T>(object key)
         {
-            result = null;
-
-            if (this.data.ContainsKey(binder.Name))
-            {
-                result = this.data[binder.Name];
-                return true;
-            }
-
-            return false;
-        }
-
-        public override bool TrySetMember(SetMemberBinder binder, object value)
-        {
-            this.data[binder.Name] = value;
-            return true;
+            return (T)this[key];
         }
     }
 }

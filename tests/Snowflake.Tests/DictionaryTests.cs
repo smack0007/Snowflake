@@ -60,10 +60,9 @@ namespace Snowflake.Tests
             AssertScriptReturnValue<ScriptDictionary>(
                 (x) =>
                 {
-                    dynamic obj = x;
-                    Assert.Equal(1, obj.Count);
-                    Assert.IsType<ScriptDictionary>(obj.foo);
-                    Assert.Equal(42, obj.foo.bar);
+                    Assert.Single(x);
+                    Assert.IsType<ScriptDictionary>(x["foo"]);
+                    Assert.Equal(42, x.Element<ScriptDictionary>("foo")["bar"]);
                 },
                 "return { foo: { bar: 42 } };");
         }
@@ -74,11 +73,10 @@ namespace Snowflake.Tests
             AssertScriptReturnValue<ScriptDictionary>(
                 (x) =>
                 {
-                    dynamic obj = x;
-                    Assert.Equal(1, obj.Count);
-                    Assert.IsType<ScriptDictionary>(obj.foo);
-                    Assert.IsType<ScriptDictionary>(obj.foo.bar);
-                    Assert.Equal(42, obj.foo.bar.baz);
+                    Assert.Single(x);
+                    Assert.IsType<ScriptDictionary>(x["foo"]);
+                    Assert.IsType<ScriptDictionary>(x.Element<ScriptDictionary>("foo")["bar"]);
+                    Assert.Equal(42, x.Element<ScriptDictionary>("foo").Element<ScriptDictionary>("bar")["baz"]);
                 },
                 "return { foo: { bar: { baz: 42 } } };");
         }

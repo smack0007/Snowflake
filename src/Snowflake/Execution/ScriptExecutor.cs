@@ -264,10 +264,12 @@ namespace Snowflake.Execution
                 case StringValueNode x: return x.Value;
 
                 case AssignmentOpeartionNode x: return this.EvaluateAssignmentOperation(x, context);
+                case DictionaryNode x: return this.EvaluateDictionary(x, context);
                 case ElementAccessNode x: return this.EvaluateElementAccess(x, context);
                 case FunctionNode x: return this.EvaluateFunction(x, context);
                 case FunctionCallNode x: return this.EvaluateFunctionCall(x, context);
                 case ListNode x: return this.EvaluateList(x, context);
+                case MemberAccessNode x: return this.EvaluateMemberAccess(x, context);
                 case OperationNode x: return this.EvaluateOperation(x, context);
                 case PostfixOperationNode x: return this.EvaluatePostfixOperation(x, context);
                 case UnaryOperationNode x: return this.EvaluateUnaryOperation(x, context);
@@ -307,6 +309,21 @@ namespace Snowflake.Execution
             return value;
         }
 
+        private ScriptDictionary EvaluateDictionary(DictionaryNode dictionary, ScriptExecutionContext context)
+        {
+            var result = new ScriptDictionary();
+
+            foreach (var pair in dictionary)
+            {
+                var key = this.Evaluate(pair.KeyExpression, context);
+                var value = this.Evaluate(pair.ValueExpression, context);
+
+                result[key] = value;
+            }
+
+            return result;
+        }
+
         private object EvaluateElementAccess(ElementAccessNode elementAccess, ScriptExecutionContext context)
         {
             var source = this.Evaluate(elementAccess.SourceExpression, context);
@@ -320,6 +337,10 @@ namespace Snowflake.Execution
                     throw new ScriptExecutionException("Arrays can only be accessed via integers.", context.GetStackFrames());
 
                 value = array.GetValue(index);
+            }
+            else if (source is ScriptDictionary dictionary)
+            {
+                value = dictionary[element];
             }
             else if (source is ScriptList list)
             {
@@ -397,6 +418,31 @@ namespace Snowflake.Execution
 
             for (int i = 0; i < list.ValueExpressions.Count; i++)
                 value.Add(this.Evaluate(list.ValueExpressions[i], context));
+
+            return value;
+        }
+
+        private object EvaluateMemberAccess(MemberAccessNode memberAccess, ScriptExecutionContext context)
+        {
+            var source = this.Evaluate(memberAccess.SourceExpression, context);
+            
+            object value = null;
+
+            if (source is ScriptDictionary dictionary)
+            {
+                try
+                {
+                    value = dictionary[memberAccess.MemberName];
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    throw new ScriptExecutionException($"Key '{memberAccess.MemberName}' not present in dictionary.", context.GetStackFrames(), ex);
+                }
+            }
+            else
+            {
+                throw new NotImplementedException($"Sources of type {source.GetType()} not implemented in {nameof(EvaluateMemberAccess)}.");
+            }
 
             return value;
         }
