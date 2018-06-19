@@ -568,6 +568,11 @@ namespace Snowflake.Execution
 
         private bool GreaterThan(object lhs, object rhs, ScriptExecutionContext context)
         {
+            if (lhs is string || rhs is string)
+            {
+                throw new ScriptExecutionException($"{nameof(GreaterThan)} cannot not be used on strings.");
+            }
+
             if (lhs is int lhsInt)
             {
                 if (rhs is int rhsInt)
@@ -585,6 +590,11 @@ namespace Snowflake.Execution
 
         private bool LessThan(object lhs, object rhs, ScriptExecutionContext context)
         {
+            if (lhs is string || rhs is string)
+            {
+                throw new ScriptExecutionException($"{nameof(LessThan)} cannot not be used on strings.");
+            }
+
             if (lhs is int lhsInt)
             {
                 if (rhs is int rhsInt)

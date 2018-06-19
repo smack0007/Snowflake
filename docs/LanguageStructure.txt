@@ -85,8 +85,6 @@ GenericArgsList = "<" <TypeName> ( "," <TypeName> )* ">" ;
 
 List = "[" <Expression>? ( "," <Expression> )* "]" ;
 
-Array = "[|" <Expression>? ( "," <Expression> )* "|]" ;
-
 Dictionary = "{" <DictionaryPair>? ( "," <DictionaryPair> )* "}" ;
 
 DictionaryPair = ( <Identifier> | <Expression> ) ":" <Expression> ;

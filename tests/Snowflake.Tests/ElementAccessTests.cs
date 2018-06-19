@@ -26,7 +26,7 @@ return foo[bar][bar + 1];");
 		{
 			AssertScriptReturnValue(42, @"
 var foo = [ [ 1, 2, 3 ], [ 4, 5, 42 ] ];
-func bar() { return 1; };
+var bar = func() { return 1; };
 return foo[bar()][bar() + 1];");
 		}
 	}

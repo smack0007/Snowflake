@@ -6,7 +6,7 @@ namespace Snowflake.Tests
     public class TypeTests : LanguageTestFixture
     {
         [Fact]
-        public void Type_Can_Be_Stored_InVariable()
+        public void Type_Can_Be_Stored_In_Variable()
         {
             AssertScriptReturnValue<Person>(
                 (engine) =>
